@@ -54,7 +54,7 @@
       <!-- Sign in -->
       <nav class="flex items-center gap-4">
         <a 
-          href="/app" 
+          href="/auth/login" 
           class="text-xs hover:underline-offset-2 hover:underline transition-all duration-75"
         >
           Sign in
@@ -128,9 +128,12 @@
               </div>
             </div>
             
-            <button class="w-full py-2 px-4 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75">
+            <a 
+              href="/auth/login"
+              class="block w-full py-2 px-4 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75 text-center"
+            >
               Get started
-            </button>
+            </a>
           </div>
           
           <!-- Stats -->
