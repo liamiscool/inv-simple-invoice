@@ -1,9 +1,9 @@
 import { Resend } from 'resend';
-import { RESEND_API_KEY } from '$env/static/private';
 import { generateInvoiceEmailHTML, generateInvoiceEmailText, type EmailTemplateData } from './templates';
+import { env } from '$env/dynamic/private';
 
-// Initialize Resend client
-const resend = new Resend(RESEND_API_KEY);
+// Initialize Resend client (handle missing key gracefully)
+const resend = env.RESEND_API_KEY ? new Resend(env.RESEND_API_KEY) : null;
 
 export interface SendInvoiceEmailOptions {
   to: string;
@@ -29,7 +29,7 @@ export async function sendInvoiceEmail(
 ): Promise<EmailDeliveryResult> {
   try {
     // Validate required fields
-    if (!RESEND_API_KEY) {
+    if (!resend) {
       throw new Error('RESEND_API_KEY is not configured');
     }
 
@@ -131,7 +131,7 @@ export async function sendTestEmail(to: string): Promise<EmailDeliveryResult> {
  * Check if email service is properly configured
  */
 export function isEmailServiceConfigured(): boolean {
-  return Boolean(RESEND_API_KEY);
+  return Boolean(env.RESEND_API_KEY);
 }
 
 /**
