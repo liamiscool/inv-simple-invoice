@@ -8,38 +8,38 @@
   <title>Dashboard - inv</title>
 </svelte:head>
 
-<div class="space-y-6">
+<div class="max-w-5xl space-y-6">
   <!-- Welcome -->
   <div>
-    <h1 class="text-lg mb-2">Dashboard</h1>
+    <h1 class="text-sm mb-2">Dashboard</h1>
     <p class="text-xs text-gray-600">
-      Welcome back! {data.session?.user?.email || 'User'}
+      Welcome back, {data.session?.user?.email?.split('@')[0] || 'User'}
     </p>
   </div>
   
   <!-- Quick stats -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
     <div class="border border-thin rounded-sm p-4">
-      <div class="text-lg font-light">0</div>
+      <div class="text-2xl font-light mb-1">0</div>
       <div class="text-xs text-gray-600">Draft invoices</div>
     </div>
     <div class="border border-thin rounded-sm p-4">
-      <div class="text-lg font-light">0</div>
+      <div class="text-2xl font-light mb-1">0</div>
       <div class="text-xs text-gray-600">Sent this month</div>
     </div>
     <div class="border border-thin rounded-sm p-4">
-      <div class="text-lg font-light">$0</div>
+      <div class="text-2xl font-light mb-1">$0</div>
       <div class="text-xs text-gray-600">Outstanding</div>
     </div>
     <div class="border border-thin rounded-sm p-4">
-      <div class="text-lg font-light">0</div>
+      <div class="text-2xl font-light mb-1">0</div>
       <div class="text-xs text-gray-600">Clients</div>
     </div>
   </div>
   
   <!-- Quick actions -->
   <div class="space-y-4">
-    <h2 class="text-sm">Quick actions</h2>
+    <h2 class="text-xs">Quick actions</h2>
     <div class="flex flex-wrap gap-3">
       <a 
         href="/app/invoices/new"
@@ -62,12 +62,58 @@
     </div>
   </div>
   
+  <!-- Getting started guide -->
+  <div class="space-y-4">
+    <h2 class="text-xs">Get started</h2>
+    <div class="border border-thin rounded-sm p-6">
+      <div class="space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="w-4 h-4 border border-thin rounded-sm flex items-center justify-center">
+            <div class="w-2 h-2 bg-gray-400 rounded-sm"></div>
+          </div>
+          <div class="flex-1">
+            <div class="text-xs font-normal mb-1">Add your first client</div>
+            <div class="text-xs text-gray-600">Add client details to start creating invoices</div>
+          </div>
+          <a 
+            href="/app/clients/new"
+            class="text-xs hover:text-black transition-colors text-gray-600"
+          >
+            Add client →
+          </a>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <div class="w-4 h-4 border border-thin rounded-sm"></div>
+          <div class="flex-1">
+            <div class="text-xs text-gray-600 mb-1">Create your first invoice</div>
+            <div class="text-xs text-gray-600">Choose a template and create an invoice</div>
+          </div>
+          <span class="text-xs text-gray-400">
+            Add client first
+          </span>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <div class="w-4 h-4 border border-thin rounded-sm"></div>
+          <div class="flex-1">
+            <div class="text-xs text-gray-600 mb-1">Send your first invoice</div>
+            <div class="text-xs text-gray-600">Email your invoice with one click</div>
+          </div>
+          <span class="text-xs text-gray-400">
+            Create invoice first  
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
   <!-- Recent activity placeholder -->
   <div class="space-y-4">
-    <h2 class="text-sm">Recent activity</h2>
-    <div class="border border-thin rounded-sm p-8 text-center text-gray-500">
-      <p class="text-xs">No recent activity</p>
-      <p class="text-xs">Create your first invoice to get started</p>
+    <h2 class="text-xs">Recent activity</h2>
+    <div class="border border-thin rounded-sm p-8 text-center">
+      <p class="text-xs text-gray-600 mb-1">No recent activity</p>
+      <p class="text-xs text-gray-600">Your invoice activity will appear here</p>
     </div>
   </div>
 </div>
