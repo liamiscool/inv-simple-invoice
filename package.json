@@ -30,6 +30,7 @@
 		"@supabase/ssr": "^0.7.0",
 		"@supabase/supabase-js": "^2.74.0",
 		"animejs": "^4.2.2",
+		"puppeteer": "^24.23.0",
 		"resend": "^6.1.2",
 		"stripe": "^19.1.0"
 	}

@@ -83,62 +83,65 @@
 
 ---
 
-## Phase 4: Invoice System
-### 4.1 Invoice CRUD
-- [ ] Invoice list with status badges
-- [ ] Create invoice wizard
-  - [ ] Client selection
-  - [ ] Template selection
-  - [ ] Line items editor
-  - [ ] Tax calculation per line
-  - [ ] Notes field
-- [ ] Auto-numbering system (INV-YYYY-####)
-- [ ] Edit existing invoices
-- [ ] Duplicate invoice feature
-- [ ] Status management (draft/sent/paid/etc.)
+## Phase 4: Invoice System ✅ **COMPLETE**
+### 4.1 Invoice CRUD ✅ **COMPLETE**
+- [x] Invoice list with status badges
+- [x] Create invoice wizard
+  - [x] Client selection
+  - [x] Template selection
+  - [x] Line items editor
+  - [x] Tax calculation per line
+  - [x] Notes field
+- [x] Auto-numbering system (INV-YYYY-####)
+- [x] Edit existing invoices
+- [x] Duplicate invoice feature
+- [x] Status management (draft/sent/paid/etc.)
 
-### 4.2 Invoice Calculations
-- [ ] Subtotal computation
-- [ ] Tax totals by rate
-- [ ] Grand total
-- [ ] Database triggers for auto-calculation
-- [ ] Currency display (no conversion)
-
----
-
-## Phase 5: Templates - MVP
-### 5.1 Curated Templates (2-3)
-- [ ] Create minimal template designs
-- [ ] Template JSON spec structure
-- [ ] Template preview generation
-- [ ] Template selection UI
-- [ ] Store in database as 'curated' type
-
-### 5.2 Template Rendering
-- [ ] PDF generation service (/app/invoices/[id]/pdf)
-- [ ] Server-side rendering with Chromium
-- [ ] Font loading and embedding
-- [ ] Multi-line text handling
-- [ ] Table row generation
-- [ ] Page size and margins
+### 4.2 Invoice Calculations ✅ **COMPLETE**
+- [x] Subtotal computation
+- [x] Tax totals by rate
+- [x] Grand total
+- [x] Database triggers for auto-calculation
+- [x] Currency display (no conversion)
 
 ---
 
-## Phase 6: PDF & Email
-### 6.1 PDF Generation
-- [ ] Invoice data → PDF pipeline
-- [ ] Template spec interpretation
-- [ ] Precise positioning (±2px tolerance)
-- [ ] Error handling and fallbacks
-- [ ] Download endpoint
+## Phase 5: Templates - MVP ✅ **COMPLETE**
+### 5.1 Curated Templates (2-3) ✅ **COMPLETE**
+- [x] Create minimal template designs
+- [x] Template JSON spec structure
+- [x] Template preview generation
+- [x] Template selection UI
+- [x] Store in database as 'curated' type
 
-### 6.2 Email Integration (Resend)
-- [ ] Configure Resend account
-- [ ] Minimal email templates (MJML/HTML)
-- [ ] Send invoice endpoint
-- [ ] PDF attachment
-- [ ] Delivery tracking
-- [ ] Error handling and retries
+### 5.2 Template Rendering ✅ **COMPLETE**
+- [x] PDF generation service (/app/invoices/[id]/pdf)
+- [x] Server-side rendering with template engine
+- [x] Font loading and embedding
+- [x] Multi-line text handling
+- [x] Table row generation
+- [x] Page size and margins
+
+---
+
+## Phase 6: PDF & Email ✅ **COMPLETE**
+### 6.1 PDF Generation ✅ **COMPLETE**
+- [x] Invoice data → PDF pipeline
+- [x] Template spec interpretation
+- [x] Precise positioning (±2px tolerance)
+- [x] Error handling and fallbacks
+- [x] Download endpoint
+- [x] Puppeteer integration for production PDFs
+- [x] HTML fallback for development
+
+### 6.2 Email Integration (Resend) ✅ **COMPLETE**
+- [x] Configure Resend account
+- [x] Professional email templates (HTML/Text)
+- [x] Send invoice endpoint
+- [x] PDF attachment support
+- [x] Email delivery tracking
+- [x] Error handling and retries
+- [x] Email modal UI with form validation
 
 ---
 
@@ -277,29 +280,33 @@
 
 ---
 
-## Current Status: Phase 4 - Invoice System Next! 🚀
+## Current Status: Phase 5 - Templates MVP Next! 🚀
 
 **✅ COMPLETED PHASES:**
 - **Phase 1**: Foundation (Project Setup + Infrastructure) 
 - **Phase 2**: Authentication & Base UI (Auth + Homepage + App Shell)
 - **Phase 3**: Core Data Management (Onboarding + Client Management + Settings)
+- **Phase 4**: Invoice System (Full CRUD + Status Management + PDF Preview)
+- **Phase 5**: Templates - MVP (Template System & Advanced PDF)
+- **Phase 6**: PDF & Email (Enhanced PDF + Email Integration)
 
-**🎯 CURRENT PHASE:** Invoice System (The Main Feature!)
+**🎯 CURRENT PHASE:** Billing & Monetization (Stripe Integration)
 **Next Steps**:
-1. Invoice list with status badges
-2. Create invoice wizard (client selection, line items)
-3. Auto-numbering system (INV-YYYY-####)
-4. Tax calculations and totals
-5. Status management (draft/sent/paid)
+1. Stripe products setup (pro_monthly, pro_yearly)
+2. Checkout flow integration
+3. Webhook handling for subscription events
+4. Free plan limits implementation
+5. Upgrade prompts and feature gating
 
-**🔥 App Status:** **FULLY FUNCTIONAL FOR USER & CLIENT MANAGEMENT!**
+**🔥 App Status:** **PRODUCTION-READY INVOICE PLATFORM!**
 - Homepage: http://localhost:5177/ (Yeezy aesthetic with animations)
-- Onboarding: 2-step wizard for new users
-- Client Management: Full CRUD with search
-- Settings: Complete profile and company management
-- Database: All RLS policies working perfectly
+- Complete invoice lifecycle: Create → Edit → Send → Track status → PDF → Email
+- Template system with curated designs and precise PDF generation
+- Email integration with professional templates and PDF attachments
+- Real-time calculations, status management, duplicate/delete functionality
+- Template management page and invoice dashboard
 
-**Ready to Build**: The core invoice system - this is where the magic happens!
+**Ready to Build**: Monetization system with Stripe integration!
 
 **Blockers**: None
 

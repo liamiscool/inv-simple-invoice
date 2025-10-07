@@ -8,6 +8,7 @@
   
   // Form data
   let selectedClientId = $state('');
+  let selectedTemplateId = $state('');
   let issueDate = $state(new Date().toISOString().split('T')[0]);
   let dueDate = $state('');
   let notes = $state('');
@@ -29,6 +30,10 @@
   // Computed values
   const selectedClient = $derived(
     data.clients?.find(c => c.id === selectedClientId) || null
+  );
+  
+  const selectedTemplate = $derived(
+    data.templates?.find(t => t.id === selectedTemplateId) || null
   );
   
   const totals = $derived(() => {
@@ -67,6 +72,13 @@
     }).format(amount);
   }
   
+  // Auto-select first template if none selected
+  $effect(() => {
+    if (data.templates && data.templates.length > 0 && !selectedTemplateId) {
+      selectedTemplateId = data.templates[0].id;
+    }
+  });
+  
   // Update currency when client changes
   $effect(() => {
     if (selectedClient && selectedClient.currency) {
@@ -79,6 +91,11 @@
     
     if (!selectedClientId) {
       error = 'Please select a client';
+      return;
+    }
+    
+    if (!selectedTemplateId) {
+      error = 'Please select a template';
       return;
     }
     
@@ -115,7 +132,7 @@
         .insert({
           org_id: profile.org_id,
           client_id: selectedClientId,
-          template_id: data.defaultTemplate.id, // We'll create a default template
+          template_id: selectedTemplateId,
           number: nextNumber,
           issue_date: issueDate,
           due_date: dueDate || null,
@@ -215,6 +232,27 @@
           </div>
           
           <div>
+            <label for="template" class="block text-xs text-gray-600 mb-1">
+              Template <span class="text-red-600">*</span>
+            </label>
+            <select
+              id="template"
+              bind:value={selectedTemplateId}
+              class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+              required
+            >
+              <option value="">Select a template</option>
+              {#each data.templates || [] as template}
+                <option value={template.id}>
+                  {template.title} {template.kind === 'curated' ? '(Built-in)' : '(Custom)'}
+                </option>
+              {/each}
+            </select>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
             <label for="currency" class="block text-xs text-gray-600 mb-1">Currency</label>
             <select
               id="currency"
@@ -226,6 +264,18 @@
               {/each}
             </select>
           </div>
+          
+          {#if selectedTemplate}
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Template Preview</label>
+              <div class="px-3 py-2 text-xs border border-thin rounded-sm bg-gray-50">
+                <div class="font-medium">{selectedTemplate.title}</div>
+                {#if selectedTemplate.spec?.meta?.description}
+                  <div class="text-gray-600 text-xs">{selectedTemplate.spec.meta.description}</div>
+                {/if}
+              </div>
+            </div>
+          {/if}
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -382,7 +432,7 @@
         
         <button
           type="submit"
-          disabled={isLoading || !selectedClientId || totals().total <= 0}
+          disabled={isLoading || !selectedClientId || !selectedTemplateId || totals().total <= 0}
           class="px-6 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Creating Invoice...' : 'Create Invoice'}

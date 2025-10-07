@@ -7,6 +7,18 @@
   let message = $state('');
   let error = $state('');
   
+  // Email modal state
+  let showEmailModal = $state(false);
+  let emailForm = $state({
+    to: '',
+    subject: '',
+    message: '',
+    includePdf: true
+  });
+  let emailLoading = $state(false);
+  let emailError = $state('');
+  let emailSuccess = $state('');
+  
   const statusColors = {
     draft: 'text-gray-600 bg-gray-100',
     sent: 'text-blue-600 bg-blue-100', 
@@ -151,6 +163,76 @@
       error = 'Failed to delete invoice';
     }
   }
+  
+  function openEmailModal() {
+    // Pre-fill email form
+    emailForm.to = data.invoice.client.email || '';
+    emailForm.subject = `Invoice ${data.invoice.number} from ${data.invoice.client.company || 'Your Company'}`;
+    emailForm.message = '';
+    emailForm.includePdf = true;
+    
+    emailError = '';
+    emailSuccess = '';
+    showEmailModal = true;
+  }
+  
+  function closeEmailModal() {
+    showEmailModal = false;
+    emailForm = {
+      to: '',
+      subject: '',
+      message: '',
+      includePdf: true
+    };
+  }
+  
+  async function sendInvoiceEmail(e: Event) {
+    e.preventDefault();
+    
+    if (!emailForm.to) {
+      emailError = 'Recipient email is required';
+      return;
+    }
+    
+    emailLoading = true;
+    emailError = '';
+    emailSuccess = '';
+    
+    try {
+      const response = await fetch(`/app/invoices/${data.invoice.id}/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          to: emailForm.to,
+          subject: emailForm.subject || undefined,
+          message: emailForm.message || undefined,
+          include_pdf: emailForm.includePdf
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to send email');
+      }
+      
+      emailSuccess = 'Invoice sent successfully!';
+      
+      // Close modal after a delay
+      setTimeout(() => {
+        closeEmailModal();
+        // Refresh page to show updated status
+        window.location.reload();
+      }, 2000);
+      
+    } catch (err: any) {
+      emailError = err.message || 'Failed to send invoice';
+    } finally {
+      emailLoading = false;
+    }
+  }
 </script>
 
 <svelte:head>
@@ -189,6 +271,16 @@
       </div>
       
       <div class="flex items-center gap-3">
+        {#if ['draft', 'sent'].includes(data.invoice.status)}
+          <button
+            onclick={openEmailModal}
+            disabled={isLoading}
+            class="px-4 py-2 border border-blue-600 text-xs text-blue-600 hover:bg-blue-600 hover:text-white transition-colors duration-75 disabled:opacity-50"
+          >
+            Send Email
+          </button>
+        {/if}
+        
         {#if data.invoice.status === 'draft'}
           <button
             onclick={() => updateStatus('sent')}
@@ -409,5 +501,103 @@
         <p class="text-xs text-red-600">{error}</p>
       </div>
     {/if}
+  </div>
+{/if}
+
+<!-- Email Modal -->
+{#if showEmailModal}
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-sm border border-thin max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-medium">Send Invoice via Email</h3>
+          <button
+            onclick={closeEmailModal}
+            class="text-gray-400 hover:text-gray-600"
+          >
+            ✕
+          </button>
+        </div>
+        
+        <form onsubmit={sendInvoiceEmail} class="space-y-4">
+          <div>
+            <label for="email-to" class="block text-xs text-gray-600 mb-1">
+              To <span class="text-red-600">*</span>
+            </label>
+            <input
+              id="email-to"
+              type="email"
+              bind:value={emailForm.to}
+              placeholder="client@example.com"
+              class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+              required
+            />
+          </div>
+          
+          <div>
+            <label for="email-subject" class="block text-xs text-gray-600 mb-1">Subject</label>
+            <input
+              id="email-subject"
+              type="text"
+              bind:value={emailForm.subject}
+              placeholder="Invoice {data.invoice.number}"
+              class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+            />
+          </div>
+          
+          <div>
+            <label for="email-message" class="block text-xs text-gray-600 mb-1">Additional Message</label>
+            <textarea
+              id="email-message"
+              bind:value={emailForm.message}
+              placeholder="Optional message to include in the email..."
+              rows="3"
+              class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors resize-none"
+            ></textarea>
+          </div>
+          
+          <div class="flex items-center gap-2">
+            <input
+              id="include-pdf"
+              type="checkbox"
+              bind:checked={emailForm.includePdf}
+              class="rounded border-thin"
+            />
+            <label for="include-pdf" class="text-xs text-gray-600">
+              Attach PDF invoice
+            </label>
+          </div>
+          
+          {#if emailError}
+            <div class="text-xs text-red-600 bg-red-50 border border-red-200 rounded-sm p-3">
+              {emailError}
+            </div>
+          {/if}
+          
+          {#if emailSuccess}
+            <div class="text-xs text-green-600 bg-green-50 border border-green-200 rounded-sm p-3">
+              {emailSuccess}
+            </div>
+          {/if}
+          
+          <div class="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onclick={closeEmailModal}
+              class="px-4 py-2 border border-thin text-xs hover:border-black transition-colors duration-75"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={emailLoading || !emailForm.to}
+              class="px-4 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {emailLoading ? 'Sending...' : 'Send Email'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 {/if}

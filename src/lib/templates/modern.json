@@ -1,0 +1,153 @@
+{
+  "meta": {
+    "name": "Modern",
+    "description": "Contemporary invoice design with clear hierarchy",
+    "width": 210,
+    "height": 297,
+    "dpi": 300,
+    "margins": {
+      "top": 25,
+      "right": 25,
+      "bottom": 25,
+      "left": 25
+    }
+  },
+  "styles": {
+    "fonts": {
+      "primary": "Arial, sans-serif"
+    },
+    "colors": {
+      "primary": "#000000",
+      "secondary": "#555555",
+      "accent": "#000000"
+    },
+    "sizes": {
+      "default": 10,
+      "small": 8,
+      "large": 14,
+      "title": 24
+    }
+  },
+  "areas": {
+    "invoice_title": {
+      "x": 25,
+      "y": 25,
+      "font_size": 24,
+      "font_weight": "bold"
+    },
+    "invoice_number": {
+      "x": 160,
+      "y": 30,
+      "w": 25,
+      "align": "right",
+      "font_size": 12
+    },
+    "company_info": {
+      "x": 25,
+      "y": 50,
+      "w": 75,
+      "h": 35,
+      "font_size": 9
+    },
+    "issue_date": {
+      "x": 130,
+      "y": 50,
+      "font_size": 9
+    },
+    "due_date": {
+      "x": 130,
+      "y": 55,
+      "font_size": 9
+    },
+    "client_name": {
+      "x": 25,
+      "y": 90,
+      "font_weight": "bold",
+      "font_size": 12
+    },
+    "client_company": {
+      "x": 25,
+      "y": 95,
+      "font_size": 10
+    },
+    "client_email": {
+      "x": 25,
+      "y": 100,
+      "font_size": 9,
+      "color": "#555555"
+    },
+    "items_table": {
+      "x": 25,
+      "y": 120,
+      "w": 160,
+      "row_height": 9,
+      "header_height": 12,
+      "border_color": "#DDDDDD",
+      "border_width": 0.8,
+      "header_bg": "#F8F9FA",
+      "alt_row_bg": "#FDFDFD",
+      "columns": [
+        {
+          "key": "description",
+          "label": "Description",
+          "w": 80,
+          "align": "left"
+        },
+        {
+          "key": "qty",
+          "label": "Qty",
+          "w": 20,
+          "align": "center"
+        },
+        {
+          "key": "unit_price",
+          "label": "Unit Price",
+          "w": 25,
+          "align": "right"
+        },
+        {
+          "key": "tax_rate",
+          "label": "Tax %",
+          "w": 15,
+          "align": "right"
+        },
+        {
+          "key": "line_total",
+          "label": "Total",
+          "w": 20,
+          "align": "right"
+        }
+      ]
+    },
+    "subtotal": {
+      "x": 130,
+      "y": 210,
+      "w": 55,
+      "align": "right",
+      "font_size": 10
+    },
+    "tax_total": {
+      "x": 130,
+      "y": 216,
+      "w": 55,
+      "align": "right",
+      "font_size": 10
+    },
+    "grand_total": {
+      "x": 130,
+      "y": 225,
+      "w": 55,
+      "align": "right",
+      "font_weight": "bold",
+      "font_size": 12
+    },
+    "notes": {
+      "x": 25,
+      "y": 245,
+      "w": 160,
+      "h": 25,
+      "font_size": 8,
+      "color": "#555555"
+    }
+  }
+}
