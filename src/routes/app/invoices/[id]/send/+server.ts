@@ -112,8 +112,8 @@ export const POST: RequestHandler = async ({ request, params, locals: { supabase
     // Prepare email options
     const emailOptions = {
       to,
-      from: userProfile?.email ? `${userProfile.company_name || userProfile.full_name} <noreply@inv.tools>` : undefined,
-      replyTo: userProfile?.email,
+      from: userProfile?.email ? `${userProfile.company_name || userProfile.full_name} <invoices@mail.inv.tools>` : undefined,
+      replyTo: userProfile?.email || 'hello@mail.inv.tools',
       subject: subject || undefined,
       attachmentBuffer: undefined as Buffer | undefined,
       attachmentFilename: undefined as string | undefined
