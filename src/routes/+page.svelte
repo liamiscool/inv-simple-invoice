@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import anime from 'animejs';
+  import * as anime from 'animejs';
   
   let currentTab = $state(0);
   let emailInput = $state('');
