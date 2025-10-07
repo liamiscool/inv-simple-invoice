@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    @apply font-mono text-xs md:text-sm;
+  }
+  
+  body {
+    @apply bg-white text-black antialiased;
+  }
+  
+  h1 {
+    @apply text-base md:text-lg font-normal;
+  }
+  
+  h2 {
+    @apply text-sm md:text-base font-normal;
+  }
+  
+  h3 {
+    @apply text-xs md:text-sm font-normal;
+  }
+  
+  input, textarea, select {
+    @apply text-xs md:text-sm;
+  }
+}
+
+@layer utilities {
+  .border-thin {
+    border-width: 1px;
+  }
+}
