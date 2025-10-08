@@ -43,7 +43,7 @@ export async function sendInvoiceEmail(
 
     // Prepare email payload
     const emailPayload: any = {
-      from: options.from || 'Invoices <onboarding@resend.dev>',
+      from: options.from || 'inv <invoices@send.inv.so>',
       to: [options.to],
       subject: options.subject || `Invoice ${templateData.invoiceNumber} from ${templateData.companyName}`,
       html: htmlContent,
@@ -92,7 +92,7 @@ export async function sendInvoiceEmail(
 export async function sendTestEmail(to: string): Promise<EmailDeliveryResult> {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'inv <onboarding@resend.dev>',
+      from: 'inv <invoices@send.inv.so>',
       to: [to],
       subject: 'Test Email from inv',
       html: `
