@@ -1,9 +1,8 @@
 import { env } from '$env/dynamic/public';
 
 // Stripe Payment Links
-// TODO: Replace these with your actual Stripe payment links after creating them
-export const STRIPE_MONTHLY_LINK = env.PUBLIC_STRIPE_MONTHLY_LINK || 'https://buy.stripe.com/test_REPLACE_ME';
-export const STRIPE_YEARLY_LINK = env.PUBLIC_STRIPE_YEARLY_LINK || 'https://buy.stripe.com/test_REPLACE_ME';
+export const STRIPE_MONTHLY_LINK = env.PUBLIC_STRIPE_MONTHLY_LINK || 'https://buy.stripe.com/test_aFa00lb5BeFQ5jteAQ';
+export const STRIPE_YEARLY_LINK = env.PUBLIC_STRIPE_YEARLY_LINK || 'https://buy.stripe.com/test_dRm6oJ4Hd8hs5jtdwM';
 
 // Plan details
 export const PLANS = {
