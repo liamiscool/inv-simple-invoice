@@ -29,9 +29,11 @@ export async function generateInvoicePDF(
   options: PDFGenerationOptions = {}
 ): Promise<Buffer> {
   // Dynamically import Puppeteer only when this function is called
-  let puppeteer: typeof import('puppeteer');
+  // Using string-based import to prevent bundler from analyzing it
+  let puppeteer: any;
   try {
-    puppeteer = await import('puppeteer');
+    const puppeteerModule = 'puppeteer';
+    puppeteer = await import(/* @vite-ignore */ puppeteerModule);
   } catch (e) {
     throw new Error(
       'PDF generation requires Puppeteer which is not available in this environment. ' +
@@ -132,9 +134,11 @@ export async function generateInvoicePreview(
   options: { width?: number; height?: number; quality?: number } = {}
 ): Promise<Buffer> {
   // Dynamically import Puppeteer
-  let puppeteer: typeof import('puppeteer');
+  // Using string-based import to prevent bundler from analyzing it
+  let puppeteer: any;
   try {
-    puppeteer = await import('puppeteer');
+    const puppeteerModule = 'puppeteer';
+    puppeteer = await import(/* @vite-ignore */ puppeteerModule);
   } catch (e) {
     throw new Error('Preview generation requires Puppeteer which is not available in this environment.');
   }
@@ -183,7 +187,8 @@ export async function generateInvoicePreview(
  */
 export async function testPDFGeneration(): Promise<boolean> {
   try {
-    const puppeteer = await import('puppeteer');
+    const puppeteerModule = 'puppeteer';
+    const puppeteer = await import(/* @vite-ignore */ puppeteerModule);
     const browser = await puppeteer.launch({ headless: true });
     await browser.close();
     return true;
