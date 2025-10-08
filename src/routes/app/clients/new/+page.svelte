@@ -1,18 +1,22 @@
 <script lang="ts">
   import type { PageData } from './$types';
-  
+  import UpgradeModal from '$lib/components/UpgradeModal.svelte';
+  import { STRIPE_MONTHLY_LINK, STRIPE_YEARLY_LINK } from '$lib/config/stripe';
+  import { canAddClient } from '$lib/subscription/service';
+
   let { data }: { data: PageData } = $props();
-  
+
   let isLoading = $state(false);
   let error = $state('');
-  
+  let showUpgradeModal = $state(false);
+
   // Form data
   let name = $state('');
   let company = $state('');
   let email = $state('');
   let currency = $state('EUR');
   let notes = $state('');
-  
+
   const currencies = [
     { code: 'EUR', name: 'Euro (€)' },
     { code: 'USD', name: 'US Dollar ($)' },
@@ -20,25 +24,33 @@
     { code: 'CAD', name: 'Canadian Dollar (C$)' },
     { code: 'AUD', name: 'Australian Dollar (A$)' }
   ];
-  
+
   async function handleSubmit(e: Event) {
     e.preventDefault();
     isLoading = true;
     error = '';
-    
+
     try {
       const { data: user } = await data.supabase.auth.getUser();
       if (!user.user) throw new Error('No user found');
-      
+
+      // Check if user can add more clients
+      const allowed = await canAddClient(data.supabase, user.user.id);
+      if (!allowed) {
+        isLoading = false;
+        showUpgradeModal = true;
+        return;
+      }
+
       // Get user's org_id
       const { data: profile } = await data.supabase
         .from('app_user')
         .select('org_id')
         .eq('id', user.user.id)
         .single();
-        
+
       if (!profile) throw new Error('Profile not found');
-      
+
       // Create client
       const { error: insertError } = await data.supabase
         .from('client')
@@ -50,12 +62,12 @@
           currency,
           notes: notes || null
         });
-        
+
       if (insertError) throw insertError;
-      
+
       // Redirect to clients page
       window.location.href = '/app/clients';
-      
+
     } catch (err: any) {
       error = err.message || 'Something went wrong. Please try again.';
     } finally {
@@ -177,3 +189,12 @@
     {/if}
   </form>
 </div>
+
+<!-- Upgrade Modal -->
+<UpgradeModal
+  bind:show={showUpgradeModal}
+  reason="client_limit"
+  onClose={() => showUpgradeModal = false}
+  monthlyLink={STRIPE_MONTHLY_LINK}
+  yearlyLink={STRIPE_YEARLY_LINK}
+/>
