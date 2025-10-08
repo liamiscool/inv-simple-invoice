@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import anime from 'animejs';
 
   let currentTab = $state(0);
   let emailInput = $state('');
@@ -21,7 +20,10 @@
     }
   ];
 
-  onMount(() => {
+  onMount(async () => {
+    // Dynamically import anime.js to avoid SSR issues
+    const anime = await import('animejs');
+
     // Animate invoice counter
     anime.default({
       targets: { value: 0 },
