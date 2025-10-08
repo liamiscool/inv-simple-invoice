@@ -167,8 +167,8 @@ export function generateInvoiceEmailHTML(data: EmailTemplateData): string {
       </div>
       
       <div class="footer">
-        <p>This invoice was generated using <a href="https://inv.tools">inv</a> • Beautiful invoices for designers</p>
-        <p style="margin-top: 10px; font-size: 11px;">Questions? Reply to this email or contact <a href="mailto:hello@mail.inv.tools">hello@mail.inv.tools</a></p>
+        <p>This invoice was generated using <a href="https://inv.so">inv</a> • Beautiful invoices for designers</p>
+        <p style="margin-top: 10px; font-size: 11px;">Questions? Reply to this email</p>
       </div>
     </body>
     </html>
@@ -204,6 +204,6 @@ ${data.companyName}
 
 ---
 This invoice was generated using inv • Beautiful invoices for designers
-Questions? Reply to this email or contact hello@mail.inv.tools
+Questions? Reply to this email
   `.trim();
 }
