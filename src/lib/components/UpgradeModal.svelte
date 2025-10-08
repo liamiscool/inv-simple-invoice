@@ -11,6 +11,8 @@
 
   let { show = $bindable(), reason = 'general', onClose, monthlyLink, yearlyLink }: Props = $props();
 
+  let loading = $state(false);
+
   const reasons = {
     client_limit: {
       title: 'Client Limit Reached',
@@ -34,9 +36,33 @@
     }
   }
 
-  function handleUpgrade(link: string) {
-    if (browser) {
-      window.location.href = link;
+  async function handleUpgrade(priceType: 'monthly' | 'yearly') {
+    if (!browser || loading) return;
+
+    loading = true;
+
+    try {
+      const response = await fetch('/api/stripe/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceType })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error || 'Failed to create checkout session');
+        loading = false;
+        return;
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert('Something went wrong. Please try again.');
+      loading = false;
     }
   }
 </script>
@@ -59,8 +85,9 @@
       <div class="space-y-3 mb-6">
         <!-- Monthly Plan -->
         <button
-          onclick={() => handleUpgrade(monthlyLink)}
-          class="w-full text-left p-4 border border-thin rounded-sm hover:border-black transition-colors group"
+          onclick={() => handleUpgrade('monthly')}
+          disabled={loading}
+          class="w-full text-left p-4 border border-thin rounded-sm hover:border-black transition-colors group disabled:opacity-50"
         >
           <div class="flex justify-between items-start mb-2">
             <div>
@@ -79,8 +106,9 @@
 
         <!-- Yearly Plan -->
         <button
-          onclick={() => handleUpgrade(yearlyLink)}
-          class="w-full text-left p-4 border-2 border-black rounded-sm hover:bg-black hover:text-white transition-all group relative"
+          onclick={() => handleUpgrade('yearly')}
+          disabled={loading}
+          class="w-full text-left p-4 border-2 border-black rounded-sm hover:bg-black hover:text-white transition-all group relative disabled:opacity-50"
         >
           <div class="absolute -top-2 right-4 bg-black text-white text-xs px-2 py-0.5 rounded-sm group-hover:bg-white group-hover:text-black">
             Save 20%

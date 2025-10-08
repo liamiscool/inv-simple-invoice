@@ -1,12 +1,76 @@
 <script lang="ts">
-	// 2006 Sony-inspired design - tighter, closer to original
+	import { onMount } from 'svelte';
+	import anime from 'animejs/dist/bundles/anime.esm.js';
+
+	// Modernized version with better fonts and animations
+	let mounted = false;
+
+	onMount(() => {
+		mounted = true;
+
+		// Animate ASCII art on load
+		anime({
+			targets: '.ascii-hero',
+			opacity: [0, 1],
+			translateY: [10, 0],
+			duration: 800,
+			easing: 'easeOutQuad'
+		});
+
+		// Animate columns stagger
+		anime({
+			targets: '.col',
+			opacity: [0, 1],
+			translateY: [20, 0],
+			delay: anime.stagger(80),
+			duration: 600,
+			easing: 'easeOutQuad'
+		});
+
+		// Animate what's new items
+		anime({
+			targets: '.wn-item',
+			opacity: [0, 1],
+			translateX: [-10, 0],
+			delay: anime.stagger(100, { start: 200 }),
+			duration: 500,
+			easing: 'easeOutQuad'
+		});
+
+		// Hover animations for nav links
+		const navLinks = document.querySelectorAll('.navlink');
+		navLinks.forEach((link) => {
+			link.addEventListener('mouseenter', () => {
+				anime({
+					targets: link,
+					translateY: -1,
+					duration: 100,
+					easing: 'easeOutQuad'
+				});
+			});
+			link.addEventListener('mouseleave', () => {
+				anime({
+					targets: link,
+					translateY: 0,
+					duration: 100,
+					easing: 'easeOutQuad'
+				});
+			});
+		});
+	});
 </script>
 
 <svelte:head>
 	<title>inv - Beautiful Invoices for Designers</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+	<link
+		href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+		rel="stylesheet"
+	/>
 </svelte:head>
 
-<div class="sony">
+<div class="modern">
 	<!-- Top Bar -->
 	<div class="topbar">
 		<div class="wrap">
@@ -46,7 +110,6 @@
 		<div class="wrap">
 			<div class="hero-img">
 				<pre class="ascii-hero">{`
-
 
 
      ██▓ ███▄    █  ██▒   █▓
@@ -247,10 +310,12 @@
 		box-sizing: border-box;
 	}
 
-	.sony {
-		font-family: Verdana, Arial, Helvetica, sans-serif;
+	.modern {
+		font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 		font-size: 11px;
 		background: #fff;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
 	}
 
 	.wrap {
@@ -262,7 +327,7 @@
 	/* Top Bar */
 	.topbar {
 		background: #fff;
-		border-bottom: 1px solid #ccc;
+		border-bottom: 1px solid #e0e0e0;
 		padding: 6px 0;
 	}
 
@@ -274,9 +339,10 @@
 
 	.logo {
 		font-size: 24px;
-		font-weight: bold;
-		font-family: Arial, sans-serif;
+		font-weight: 600;
+		font-family: 'JetBrains Mono', monospace;
 		color: #000;
+		letter-spacing: -0.02em;
 	}
 
 	.search {
@@ -287,24 +353,41 @@
 
 	.search-txt {
 		font-size: 10px;
-		font-weight: bold;
+		font-weight: 600;
+		font-family: 'JetBrains Mono', monospace;
+		letter-spacing: 0.05em;
 	}
 
 	.search-input {
-		border: 1px solid #999;
-		padding: 1px 4px;
-		font-size: 10px;
+		border: 1px solid #d0d0d0;
+		padding: 3px 6px;
+		font-size: 11px;
 		width: 100px;
+		font-family: 'Inter', sans-serif;
+		border-radius: 2px;
+		transition: border-color 0.15s;
+	}
+
+	.search-input:focus {
+		outline: none;
+		border-color: #000;
 	}
 
 	.search-go {
-		background: #666;
+		background: #000;
 		color: #fff;
 		border: none;
-		padding: 2px 10px;
+		padding: 4px 12px;
 		font-size: 10px;
-		font-weight: bold;
+		font-weight: 600;
 		cursor: pointer;
+		font-family: 'JetBrains Mono', monospace;
+		letter-spacing: 0.05em;
+		transition: opacity 0.1s;
+	}
+
+	.search-go:hover {
+		opacity: 0.85;
 	}
 
 	.location {
@@ -315,22 +398,29 @@
 	}
 
 	.global-btn {
-		background: #ddd;
-		border: 1px solid #999;
-		padding: 2px 8px;
+		background: #f5f5f5;
+		border: 1px solid #e0e0e0;
+		padding: 3px 10px;
 		font-size: 10px;
 		cursor: pointer;
-		border-radius: 10px;
+		border-radius: 12px;
+		font-family: 'Inter', sans-serif;
+		transition: background 0.15s;
+	}
+
+	.global-btn:hover {
+		background: #eaeaea;
 	}
 
 	.region {
-		font-weight: bold;
+		font-weight: 600;
+		font-family: 'JetBrains Mono', monospace;
 	}
 
 	/* Main Nav */
 	.mainnav {
-		background: #f0f0f0;
-		border-bottom: 1px solid #ccc;
+		background: #fafafa;
+		border-bottom: 1px solid #e0e0e0;
 	}
 
 	.mainnav .wrap {
@@ -338,31 +428,36 @@
 	}
 
 	.navlink {
-		padding: 6px 16px;
+		padding: 8px 16px;
 		font-size: 10px;
-		font-weight: bold;
+		font-weight: 600;
 		color: #000;
 		text-decoration: none;
-		border-right: 1px solid #ccc;
-		background: #f0f0f0;
+		border-right: 1px solid #e0e0e0;
+		background: #fafafa;
+		font-family: 'JetBrains Mono', monospace;
+		letter-spacing: 0.03em;
+		transition: background 0.1s, transform 0.1s;
 	}
 
 	.navlink:hover {
-		background: #e0e0e0;
+		background: #f0f0f0;
 	}
 
 	/* Sub Nav */
 	.subnav {
-		background: #e8e8e8;
-		border-bottom: 2px solid #999;
-		padding: 4px 0;
+		background: #f5f5f5;
+		border-bottom: 1px solid #d0d0d0;
+		padding: 5px 0;
 	}
 
 	.sublink {
 		font-size: 10px;
-		font-weight: bold;
+		font-weight: 600;
 		color: #000;
 		text-decoration: none;
+		font-family: 'JetBrains Mono', monospace;
+		letter-spacing: 0.03em;
 	}
 
 	/* Hero */
@@ -378,16 +473,17 @@
 	}
 
 	.hero-img {
-		background: linear-gradient(135deg, #e8f4f8 0%, #d4e8f0 100%);
-		border: 1px solid #ccc;
+		background: linear-gradient(135deg, #f8fafb 0%, #f0f4f8 100%);
+		border: 1px solid #e0e0e0;
 		padding: 10px;
 	}
 
 	.ascii-hero {
-		font-family: 'Courier New', monospace;
+		font-family: 'JetBrains Mono', monospace;
 		font-size: 10px;
 		line-height: 1.2;
 		color: #333;
+		opacity: 0;
 	}
 
 	.hero-txt {
@@ -396,10 +492,11 @@
 
 	.hero-title {
 		font-size: 20px;
-		font-weight: normal;
+		font-weight: 400;
 		color: #999;
 		line-height: 1.2;
 		margin-bottom: 8px;
+		font-family: 'Inter', sans-serif;
 	}
 
 	.world {
@@ -408,8 +505,10 @@
 
 	.inv-brand {
 		color: #000;
-		font-weight: bold;
+		font-weight: 700;
 		font-size: 26px;
+		font-family: 'JetBrains Mono', monospace;
+		letter-spacing: -0.02em;
 	}
 
 	.hero-sub {
@@ -426,23 +525,25 @@
 	.wn-header {
 		background: linear-gradient(to right, #6699cc 0%, #99bbdd 100%);
 		color: #fff;
-		padding: 4px 8px;
+		padding: 5px 10px;
 		font-size: 13px;
-		font-weight: bold;
+		font-weight: 600;
 		border: 1px solid #5588bb;
+		font-family: 'Inter', sans-serif;
 	}
 
 	.wn-body {
-		background: #f0f8ff;
-		border: 1px solid #ccc;
+		background: #f8fbff;
+		border: 1px solid #e0e0e0;
 		border-top: none;
-		padding: 8px;
+		padding: 10px;
 	}
 
 	.wn-item {
 		font-size: 10px;
-		margin-bottom: 6px;
+		margin-bottom: 7px;
 		color: #333;
+		opacity: 0;
 	}
 
 	.wn-item:last-child {
@@ -464,11 +565,13 @@
 		background: linear-gradient(to bottom, #6699cc 0%, #5588bb 100%);
 		color: #fff;
 		text-align: center;
-		padding: 6px;
+		padding: 7px;
 		text-decoration: none;
 		font-size: 12px;
-		font-weight: bold;
+		font-weight: 600;
 		border: 1px solid #4477aa;
+		font-family: 'Inter', sans-serif;
+		transition: background 0.15s;
 	}
 
 	.tab:hover {
@@ -488,26 +591,33 @@
 
 	.col {
 		background: #fff;
-		border: 1px solid #ccc;
+		border: 1px solid #e0e0e0;
+		opacity: 0;
+		transition: border-color 0.15s;
+	}
+
+	.col:hover {
+		border-color: #000;
 	}
 
 	.col-head {
-		background: #f0f0f0;
-		padding: 4px 6px;
+		background: #fafafa;
+		padding: 5px 8px;
 		font-size: 10px;
-		font-weight: bold;
-		border-bottom: 1px solid #ccc;
+		font-weight: 600;
+		border-bottom: 1px solid #e0e0e0;
+		font-family: 'JetBrains Mono', monospace;
 	}
 
 	.col-img {
 		background: #fafafa;
-		padding: 6px;
-		border-bottom: 1px solid #eee;
+		padding: 8px;
+		border-bottom: 1px solid #f0f0f0;
 		text-align: center;
 	}
 
 	.ascii-sm {
-		font-family: 'Courier New', monospace;
+		font-family: 'JetBrains Mono', monospace;
 		font-size: 8px;
 		line-height: 1.2;
 		color: #333;
@@ -515,66 +625,69 @@
 	}
 
 	.col-txt {
-		padding: 6px;
+		padding: 8px;
 	}
 
 	.col-title {
 		font-size: 10px;
-		font-weight: bold;
-		margin-bottom: 4px;
+		font-weight: 600;
+		margin-bottom: 5px;
 		color: #000;
 	}
 
 	.col-desc {
 		font-size: 10px;
 		color: #666;
-		margin-bottom: 6px;
-		line-height: 1.3;
+		margin-bottom: 7px;
+		line-height: 1.4;
 	}
 
 	.col-link {
 		font-size: 9px;
 		color: #0066cc;
 		text-decoration: none;
+		font-family: 'JetBrains Mono', monospace;
+		transition: opacity 0.1s;
 	}
 
 	.col-link:hover {
-		text-decoration: underline;
+		opacity: 0.7;
 	}
 
 	/* Bottom Links */
 	.bottom-links {
-		background: #f8f8f8;
-		border: 1px solid #ccc;
-		padding: 8px;
+		background: #fafafa;
+		border: 1px solid #e0e0e0;
+		padding: 10px;
 		margin: 10px 0;
 	}
 
 	.bottom-links .wrap {
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
-		gap: 8px;
+		gap: 10px;
 	}
 
 	.link-col {
 		font-size: 9px;
-		line-height: 1.6;
+		line-height: 1.7;
 	}
 
 	.link-col a {
 		color: #0066cc;
 		text-decoration: none;
+		transition: opacity 0.1s;
 	}
 
 	.link-col a:hover {
-		text-decoration: underline;
+		opacity: 0.7;
 	}
 
 	/* Footer */
 	.footer {
-		background: #f0f0f0;
-		border-top: 2px solid #999;
-		padding: 12px 0;
+		background: #fafafa;
+		border-top: 1px solid #d0d0d0;
+		padding: 14px 0;
 		margin-top: 20px;
 	}
 
@@ -582,18 +695,21 @@
 		display: flex;
 		gap: 16px;
 		justify-content: center;
-		margin-bottom: 8px;
+		margin-bottom: 10px;
 	}
 
 	.footer-links a {
 		font-size: 9px;
 		color: #0066cc;
 		text-decoration: none;
-		font-weight: bold;
+		font-weight: 600;
+		font-family: 'JetBrains Mono', monospace;
+		letter-spacing: 0.03em;
+		transition: opacity 0.1s;
 	}
 
 	.footer-links a:hover {
-		text-decoration: underline;
+		opacity: 0.7;
 	}
 
 	.copyright {
