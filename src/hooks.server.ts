@@ -4,7 +4,16 @@ import { env } from '$env/dynamic/public';
 import { sequence } from '@sveltejs/kit/hooks';
 
 const supabase: Handle = async ({ event, resolve }) => {
-  event.locals.supabase = createServerClient(env.PUBLIC_SUPABASE_URL!, env.PUBLIC_SUPABASE_ANON_KEY!, {
+  // Check for required environment variables
+  if (!env.PUBLIC_SUPABASE_URL || !env.PUBLIC_SUPABASE_ANON_KEY) {
+    console.error('Missing Supabase environment variables', {
+      hasUrl: !!env.PUBLIC_SUPABASE_URL,
+      hasKey: !!env.PUBLIC_SUPABASE_ANON_KEY
+    });
+    throw new Error('Supabase configuration is missing. Please check environment variables.');
+  }
+
+  event.locals.supabase = createServerClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_ANON_KEY, {
     cookies: {
       getAll: () => event.cookies.getAll(),
       setAll: (cookiesToSet) => {
