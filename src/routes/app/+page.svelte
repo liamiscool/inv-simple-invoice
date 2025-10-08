@@ -6,7 +6,7 @@
 
   let stats = $state({
     drafts: 0,
-    sentThisMonth: 0,
+    earnings: 0,
     outstanding: 0,
     clients: 0
   });
@@ -38,17 +38,16 @@
         .eq('org_id', orgId)
         .eq('status', 'draft');
 
-      // Get sent this month count
-      const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      startOfMonth.setHours(0, 0, 0, 0);
-
-      const { count: sentCount } = await data.supabase
+      // Get total earnings (paid + partially paid amounts)
+      const { data: paidInvoices } = await data.supabase
         .from('invoice')
-        .select('*', { count: 'exact', head: true })
+        .select('amount_paid')
         .eq('org_id', orgId)
-        .in('status', ['sent', 'partially_paid'])
-        .gte('created_at', startOfMonth.toISOString());
+        .in('status', ['paid', 'partially_paid']);
+
+      const earnings = (paidInvoices || []).reduce((sum, inv) => {
+        return sum + (inv.amount_paid || 0);
+      }, 0);
 
       // Get outstanding amount (sent + partially_paid)
       const { data: unpaidInvoices } = await data.supabase
@@ -89,7 +88,7 @@
 
       stats = {
         drafts: draftCount || 0,
-        sentThisMonth: sentCount || 0,
+        earnings,
         outstanding,
         clients: clientCount || 0
       };
@@ -156,8 +155,8 @@
         <div class="text-xs text-gray-600">Draft invoices</div>
       </div>
       <div class="border border-thin rounded-sm p-4">
-        <div class="text-2xl font-light mb-1">{stats.sentThisMonth}</div>
-        <div class="text-xs text-gray-600">Sent this month</div>
+        <div class="text-2xl font-light mb-1">{formatCurrency(stats.earnings)}</div>
+        <div class="text-xs text-gray-600">Total earnings</div>
       </div>
       <div class="border border-thin rounded-sm p-4">
         <div class="text-2xl font-light mb-1">{formatCurrency(stats.outstanding)}</div>
