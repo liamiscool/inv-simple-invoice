@@ -1,19 +1,51 @@
 <script lang="ts">
   import type { LayoutData } from './$types';
   import { page } from '$app/stores';
-  
+  import { onMount } from 'svelte';
+  import { STRIPE_MONTHLY_LINK, STRIPE_YEARLY_LINK } from '$lib/config/stripe';
+  import UpgradeModal from '$lib/components/UpgradeModal.svelte';
+
   let { data, children }: { data: LayoutData; children: any } = $props();
   let showMobileSidebar = $state(false);
-  
+  let showUpgradeModal = $state(false);
+  let subscriptionPlan = $state<'free' | 'pro'>('free');
+
+  onMount(async () => {
+    try {
+      const { data: user } = await data.supabase.auth.getUser();
+      if (!user.user) return;
+
+      const { data: profile } = await data.supabase
+        .from('app_user')
+        .select('org_id')
+        .eq('id', user.user.id)
+        .single();
+
+      if (!profile) return;
+
+      const { data: sub } = await data.supabase
+        .from('plan_subscription')
+        .select('plan, status')
+        .eq('org_id', profile.org_id)
+        .single();
+
+      if (sub && sub.plan === 'pro' && sub.status === 'active') {
+        subscriptionPlan = 'pro';
+      }
+    } catch (err) {
+      console.error('Error fetching subscription:', err);
+    }
+  });
+
   async function handleLogout() {
     await data.supabase.auth.signOut();
     window.location.href = '/';
   }
-  
+
   function closeMobileSidebar() {
     showMobileSidebar = false;
   }
-  
+
   const navItems = [
     { href: '/app', label: 'Dashboard', exact: true },
     { href: '/app/invoices', label: 'Invoices' },
@@ -46,18 +78,33 @@
           <a href="/app" class="text-base tracking-tight block mb-6">inv</a>
           <nav class="space-y-3">
             {#each navItems as item}
-              <a 
+              <a
                 href={item.href}
                 onclick={closeMobileSidebar}
                 class="block text-xs hover:text-black transition-colors {
-                  (item.exact ? $page.url.pathname === item.href : $page.url.pathname.startsWith(item.href)) 
+                  (item.exact ? $page.url.pathname === item.href : $page.url.pathname.startsWith(item.href))
                     ? 'text-black' : 'text-gray-600'
                 }"
               >
                 {item.label}
               </a>
             {/each}
-            <button 
+
+            <!-- Mobile Upgrade button -->
+            {#if subscriptionPlan === 'free'}
+              <button
+                onclick={() => { showUpgradeModal = true; closeMobileSidebar(); }}
+                class="block w-full px-3 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors mt-4"
+              >
+                Upgrade to Pro
+              </button>
+            {:else}
+              <div class="mt-4 px-3 py-2 bg-black text-white text-xs text-center">
+                Pro Plan
+              </div>
+            {/if}
+
+            <button
               onclick={handleLogout}
               class="block text-xs text-gray-600 hover:text-black transition-colors mt-6 pt-3 border-t border-thin"
             >
@@ -87,12 +134,30 @@
         {/each}
       </nav>
       
+      <!-- Upgrade button -->
+      {#if subscriptionPlan === 'free'}
+        <div class="mt-6 pt-6 border-t border-thin">
+          <button
+            onclick={() => showUpgradeModal = true}
+            class="w-full px-3 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75"
+          >
+            Upgrade to Pro
+          </button>
+        </div>
+      {:else}
+        <div class="mt-6 pt-6 border-t border-thin">
+          <div class="px-3 py-2 bg-black text-white text-xs text-center">
+            Pro Plan
+          </div>
+        </div>
+      {/if}
+
       <!-- User section -->
-      <div class="mt-8 pt-6 border-t border-thin">
+      <div class="mt-4 pt-4 border-t border-thin">
         <div class="text-xs text-gray-600 mb-2">
           {data.session?.user?.email?.split('@')[0] || 'User'}
         </div>
-        <button 
+        <button
           onclick={handleLogout}
           class="text-xs text-gray-600 hover:text-black transition-colors"
         >
@@ -109,3 +174,12 @@
     </div>
   </main>
 </div>
+
+<!-- Upgrade Modal -->
+<UpgradeModal
+  bind:show={showUpgradeModal}
+  reason="general"
+  onClose={() => showUpgradeModal = false}
+  monthlyLink={STRIPE_MONTHLY_LINK}
+  yearlyLink={STRIPE_YEARLY_LINK}
+/>
