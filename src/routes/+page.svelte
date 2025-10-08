@@ -1,34 +1,34 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import * as anime from 'animejs';
-  
+  import anime from 'animejs';
+
   let currentTab = $state(0);
   let emailInput = $state('');
   let invoicesSent = $state(0);
-  
+
   const tourFrames = [
-    { 
-      title: 'Design', 
-      description: 'Upload your custom invoice design or use curated templates' 
+    {
+      title: 'Design',
+      description: 'Upload your custom invoice design or use curated templates'
     },
-    { 
-      title: 'Send', 
-      description: 'One-click sending with automatic PDF generation' 
+    {
+      title: 'Send',
+      description: 'One-click sending with automatic PDF generation'
     },
-    { 
-      title: 'Track', 
-      description: 'Monitor payments and manage client relationships' 
+    {
+      title: 'Track',
+      description: 'Monitor payments and manage client relationships'
     }
   ];
-  
+
   onMount(() => {
     // Animate invoice counter
-    anime({
+    anime.default({
       targets: { value: 0 },
       value: 2847,
       duration: 1800,
       easing: 'easeOutQuart',
-      update: function(anim) {
+      update: function(anim: any) {
         invoicesSent = Math.round(anim.animations[0].currentValue);
       }
     });
