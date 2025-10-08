@@ -1,13 +1,8 @@
 import type { TemplateSpec } from '$lib/templates';
 import { renderInvoiceHTML, type InvoiceData, type CompanyData } from './renderer';
 
-// Dynamic import for Puppeteer (optional for Cloudflare deployment)
-let puppeteer: typeof import('puppeteer') | null = null;
-try {
-  puppeteer = await import('puppeteer');
-} catch (e) {
-  console.warn('Puppeteer not available - PDF generation will use fallback method');
-}
+// Puppeteer will be dynamically imported when needed
+// This prevents it from being bundled in Cloudflare Workers
 
 export interface PDFGenerationOptions {
   format?: 'A4' | 'Letter';
@@ -33,8 +28,11 @@ export async function generateInvoicePDF(
   template: TemplateSpec,
   options: PDFGenerationOptions = {}
 ): Promise<Buffer> {
-  // If Puppeteer is not available, throw a helpful error
-  if (!puppeteer) {
+  // Dynamically import Puppeteer only when this function is called
+  let puppeteer: typeof import('puppeteer');
+  try {
+    puppeteer = await import('puppeteer');
+  } catch (e) {
     throw new Error(
       'PDF generation requires Puppeteer which is not available in this environment. ' +
       'Please use an external PDF service or Cloudflare Browser Rendering API.'
@@ -133,7 +131,11 @@ export async function generateInvoicePreview(
   template: TemplateSpec,
   options: { width?: number; height?: number; quality?: number } = {}
 ): Promise<Buffer> {
-  if (!puppeteer) {
+  // Dynamically import Puppeteer
+  let puppeteer: typeof import('puppeteer');
+  try {
+    puppeteer = await import('puppeteer');
+  } catch (e) {
     throw new Error('Preview generation requires Puppeteer which is not available in this environment.');
   }
 
@@ -180,10 +182,8 @@ export async function generateInvoicePreview(
  * Health check for PDF generation service
  */
 export async function testPDFGeneration(): Promise<boolean> {
-  if (!puppeteer) {
-    return false;
-  }
   try {
+    const puppeteer = await import('puppeteer');
     const browser = await puppeteer.launch({ headless: true });
     await browser.close();
     return true;
