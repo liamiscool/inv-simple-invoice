@@ -43,12 +43,12 @@ export async function sendInvoiceEmail(
 
     // Prepare email payload
     const emailPayload: any = {
-      from: options.from || 'invoices@mail.inv.tools',
+      from: options.from || 'Invoices <onboarding@resend.dev>',
       to: [options.to],
       subject: options.subject || `Invoice ${templateData.invoiceNumber} from ${templateData.companyName}`,
       html: htmlContent,
       text: textContent,
-      replyTo: options.replyTo || 'hello@mail.inv.tools'
+      replyTo: options.replyTo
     };
 
     // Add PDF attachment if provided
@@ -92,7 +92,7 @@ export async function sendInvoiceEmail(
 export async function sendTestEmail(to: string): Promise<EmailDeliveryResult> {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'noreply@mail.inv.tools',
+      from: 'inv <onboarding@resend.dev>',
       to: [to],
       subject: 'Test Email from inv',
       html: `
