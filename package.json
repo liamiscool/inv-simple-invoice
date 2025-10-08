@@ -33,8 +33,5 @@
 		"animejs": "^4.2.2",
 		"resend": "^6.1.2",
 		"stripe": "^19.1.0"
-	},
-	"optionalDependencies": {
-		"puppeteer": "^24.23.0"
 	}
 }
