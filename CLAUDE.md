@@ -9,27 +9,24 @@ A minimal, Yeezy-inspired invoice tool with stark minimalism and terminal vibes.
 ## Key Commands
 
 ### Development
+
+**Package Manager**: This project uses `pnpm` (not npm).
+
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Run development server
-npm run dev
+pnpm dev
 
 # Build for production
-npm run build
+pnpm build
 
 # Preview production build
-npm run preview
-
-# Run linter
-npm run lint
+pnpm preview
 
 # Type checking
-npm run check
-
-# Format code
-npm run format
+pnpm check
 ```
 
 ### Database
