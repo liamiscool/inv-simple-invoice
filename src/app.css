@@ -5,30 +5,33 @@
 @layer base {
   * {
     @apply border-border;
+    font-family: 'JetBrains Mono', monospace !important;
   }
-  
+
   html {
-    @apply font-mono text-xs md:text-sm;
+    @apply text-sm md:text-base;
+    font-family: 'JetBrains Mono', monospace !important;
   }
-  
+
   body {
     @apply bg-white text-black antialiased;
+    font-family: 'JetBrains Mono', monospace !important;
   }
   
   h1 {
+    @apply text-lg md:text-xl font-normal;
+  }
+
+  h2 {
     @apply text-base md:text-lg font-normal;
   }
-  
-  h2 {
+
+  h3 {
     @apply text-sm md:text-base font-normal;
   }
-  
-  h3 {
-    @apply text-xs md:text-sm font-normal;
-  }
-  
+
   input, textarea, select {
-    @apply text-xs md:text-sm;
+    @apply text-sm md:text-base;
   }
 }
 
