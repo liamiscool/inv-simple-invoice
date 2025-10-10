@@ -4,7 +4,7 @@ import type { TemplateSpec } from '$lib/templates';
 
 export const load: PageServerLoad = async ({ params, locals: { supabase, user } }) => {
   if (!user) {
-    redirect(303, '/login');
+    redirect(303, '/auth/login');
   }
 
   const { data: template, error } = await supabase

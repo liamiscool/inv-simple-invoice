@@ -3,7 +3,7 @@ import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals: { supabase, user } }) => {
   if (!user) {
-    redirect(303, '/login');
+    redirect(303, '/auth/login');
   }
 
   // Get user's org
