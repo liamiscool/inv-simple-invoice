@@ -15,7 +15,10 @@
   // - Consider external service (CloudConvert, etc.) for production
   // ============================================================================
 
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+    'pdfjs-dist/build/pdf.worker.min.mjs',
+    import.meta.url
+  ).toString();
 
   let { data, form }: { data: PageData, form: ActionData } = $props();
 
