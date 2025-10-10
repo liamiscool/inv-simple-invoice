@@ -3,10 +3,7 @@ import type { Actions, PageServerLoad } from './$types';
 import type { TemplateSpec } from '$lib/templates';
 
 export const load: PageServerLoad = async ({ params, locals: { supabase, user } }) => {
-  if (!user) {
-    redirect(303, '/auth/login');
-  }
-
+  // User is already authenticated by /app layout
   const { data: template, error } = await supabase
     .from('template')
     .select('*')
@@ -21,7 +18,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, user } 
   const { data: userProfile } = await supabase
     .from('app_user')
     .select('org_id')
-    .eq('id', user.id)
+    .eq('id', user!.id)
     .single();
 
   if (template.kind === 'custom' && template.org_id !== userProfile?.org_id) {

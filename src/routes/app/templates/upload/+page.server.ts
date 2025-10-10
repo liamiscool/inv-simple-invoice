@@ -2,15 +2,11 @@ import { redirect, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals: { supabase, user } }) => {
-  if (!user) {
-    redirect(303, '/auth/login');
-  }
-
-  // Get user's org
+  // User is already authenticated by /app layout, just get their org
   const { data: userProfile } = await supabase
     .from('app_user')
     .select('org_id')
-    .eq('id', user.id)
+    .eq('id', user!.id)
     .single();
 
   if (!userProfile?.org_id) {
