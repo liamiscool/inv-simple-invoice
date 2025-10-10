@@ -246,9 +246,9 @@
       <p class="text-xs text-gray-600 mb-4">
         The invoice you're looking for doesn't exist or you don't have permission to view it.
       </p>
-      <a 
+      <a
         href="/app/invoices"
-        class="inline-flex items-center px-4 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75"
+        class="inline-flex items-center px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium"
       >
         Back to Invoices
       </a>
@@ -275,7 +275,7 @@
           <button
             onclick={openEmailModal}
             disabled={isLoading}
-            class="px-4 py-2 border border-blue-600 text-xs text-blue-600 hover:bg-blue-600 hover:text-white transition-colors duration-75 disabled:opacity-50"
+            class="px-4 py-2 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75 disabled:opacity-50"
           >
             Send Email
           </button>
@@ -285,7 +285,7 @@
           <button
             onclick={() => updateStatus('sent')}
             disabled={isLoading}
-            class="px-4 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75 disabled:opacity-50"
+            class="px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium disabled:opacity-50"
           >
             Mark as Sent
           </button>
@@ -295,7 +295,7 @@
           <button
             onclick={() => updateStatus('paid')}
             disabled={isLoading}
-            class="px-4 py-2 border border-green-600 text-xs text-green-600 hover:bg-green-600 hover:text-white transition-colors duration-75 disabled:opacity-50"
+            class="px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium disabled:opacity-50"
           >
             Mark as Paid
           </button>
@@ -304,14 +304,14 @@
         <button
           onclick={duplicateInvoice}
           disabled={isLoading}
-          class="px-4 py-2 border border-thin text-xs hover:border-black transition-colors duration-75 disabled:opacity-50"
+          class="px-4 py-2 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75 disabled:opacity-50"
         >
           Duplicate
         </button>
-        
-        <a 
+
+        <a
           href="/app/invoices/{data.invoice.id}/edit"
-          class="px-4 py-2 border border-thin text-xs hover:border-black transition-colors duration-75"
+          class="px-4 py-2 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75"
         >
           Edit
         </a>
@@ -464,9 +464,9 @@
     
     <!-- Actions -->
     <div class="flex items-center justify-between pt-4 border-t border-thin">
-      <a 
+      <a
         href="/app/invoices"
-        class="px-4 py-2 border border-thin text-xs hover:border-black transition-colors duration-75"
+        class="px-4 py-2 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75"
       >
         ← Back to Invoices
       </a>
@@ -479,10 +479,10 @@
           Delete Invoice
         </button>
         
-        <a 
+        <a
           href="/app/invoices/{data.invoice.id}/pdf"
           target="_blank"
-          class="px-4 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75"
+          class="px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium"
         >
           Download PDF
         </a>
@@ -584,14 +584,14 @@
             <button
               type="button"
               onclick={closeEmailModal}
-              class="px-4 py-2 border border-thin text-xs hover:border-black transition-colors duration-75"
+              class="px-4 py-2 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={emailLoading || !emailForm.to}
-              class="px-4 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {emailLoading ? 'Sending...' : 'Send Email'}
             </button>

@@ -174,19 +174,19 @@
       <div class="flex flex-wrap gap-3">
         <a
           href="/app/invoices/new"
-          class="inline-flex items-center px-4 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75"
+          class="inline-flex items-center px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium"
         >
           Create invoice
         </a>
         <a
           href="/app/clients/new"
-          class="inline-flex items-center px-4 py-2 border border-thin text-xs hover:border-black transition-colors duration-75"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75"
         >
           Add client
         </a>
         <a
           href="/app/templates"
-          class="inline-flex items-center px-4 py-2 border border-thin text-xs hover:border-black transition-colors duration-75"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75"
         >
           Browse templates
         </a>
@@ -207,7 +207,7 @@
           <p class="text-xs text-gray-600 mb-3">No invoices yet</p>
           <a
             href="/app/invoices/new"
-            class="inline-flex items-center px-4 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75"
+            class="inline-flex items-center px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium"
           >
             Create your first invoice
           </a>

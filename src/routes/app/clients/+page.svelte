@@ -49,9 +49,9 @@
         {data.clients?.length || 0} clients total
       </p>
     </div>
-    <a 
+    <a
       href="/app/clients/new"
-      class="px-4 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75"
+      class="px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium"
     >
       Add Client
     </a>
@@ -75,9 +75,9 @@
         <p class="text-xs text-gray-600 max-w-sm mx-auto">
           Add your first client to start creating and sending invoices
         </p>
-        <a 
+        <a
           href="/app/clients/new"
-          class="inline-flex items-center px-4 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75"
+          class="inline-flex items-center px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium"
         >
           Add Your First Client
         </a>

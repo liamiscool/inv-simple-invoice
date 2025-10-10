@@ -82,7 +82,7 @@
       <button
         type="submit"
         disabled={isLoading}
-        class="w-full py-2 px-4 border border-black text-sm hover:bg-black hover:text-white transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full py-2 px-4 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
       >
         {isLoading ? 'Creating account...' : 'Create account'}
       </button>

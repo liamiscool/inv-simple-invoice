@@ -187,7 +187,7 @@
           </p>
           <button
             type="button"
-            class="px-4 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75"
+            class="px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium"
           >
             Upgrade to Pro
           </button>
@@ -200,7 +200,7 @@
       <button
         type="submit"
         disabled={isLoading}
-        class="px-6 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75 disabled:opacity-50"
+        class="px-6 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium disabled:opacity-50"
       >
         {isLoading ? 'Saving...' : 'Save Changes'}
       </button>

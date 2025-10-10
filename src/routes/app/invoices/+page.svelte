@@ -91,9 +91,9 @@
         {data.invoices?.length || 0} invoices total
       </p>
     </div>
-    <a 
+    <a
       href="/app/invoices/new"
-      class="px-4 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75"
+      class="px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium"
     >
       Create Invoice
     </a>
@@ -135,9 +135,9 @@
           Create your first invoice to start getting paid
         </p>
         {#if data.clients && data.clients.length > 0}
-          <a 
+          <a
             href="/app/invoices/new"
-            class="inline-flex items-center px-4 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75"
+            class="inline-flex items-center px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium"
           >
             Create Your First Invoice
           </a>
@@ -146,9 +146,9 @@
             <p class="text-xs text-gray-500">
               You need to add a client first
             </p>
-            <a 
+            <a
               href="/app/clients/new"
-              class="inline-flex items-center px-4 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75"
+              class="inline-flex items-center px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium"
             >
               Add Your First Client
             </a>

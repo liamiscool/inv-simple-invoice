@@ -166,17 +166,17 @@
     
     <!-- Actions -->
     <div class="flex items-center justify-between">
-      <a 
+      <a
         href="/app/clients"
-        class="px-4 py-2 border border-thin text-xs hover:border-black transition-colors duration-75"
+        class="px-4 py-2 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75"
       >
         Cancel
       </a>
-      
+
       <button
         type="submit"
         disabled={isLoading || !name}
-        class="px-6 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="px-6 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isLoading ? 'Adding Client...' : 'Add Client'}
       </button>

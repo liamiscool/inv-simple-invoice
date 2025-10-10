@@ -94,7 +94,7 @@
             {#if subscriptionPlan === 'free'}
               <button
                 onclick={() => { showUpgradeModal = true; closeMobileSidebar(); }}
-                class="block w-full px-3 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors mt-4"
+                class="block w-full px-3 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors font-medium mt-4"
               >
                 Upgrade to Pro
               </button>
@@ -139,7 +139,7 @@
         <div class="mt-6 pt-6 border-t border-thin">
           <button
             onclick={() => showUpgradeModal = true}
-            class="w-full px-3 py-2 border border-black text-xs hover:bg-black hover:text-white transition-colors duration-75"
+            class="w-full px-3 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium"
           >
             Upgrade to Pro
           </button>
