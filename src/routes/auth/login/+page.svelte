@@ -62,13 +62,24 @@
   <title>Sign in - inv</title>
 </svelte:head>
 
-<div class="min-h-screen flex flex-col items-center justify-center px-4">
-  <div class="w-full max-w-sm space-y-6">
-    <!-- Header -->
-    <div class="text-center space-y-2">
-      <h1 class="text-lg">inv</h1>
-      <p class="text-xs text-gray-600">Beautiful invoices for designers</p>
-    </div>
+<div class="min-h-screen flex flex-col px-4 pt-4">
+  <!-- Back to home - top left -->
+  <div class="mb-8">
+    <a
+      href="/"
+      class="text-xs text-gray-600 hover:text-black transition-colors inline-flex items-center gap-1"
+    >
+      ← inv
+    </a>
+  </div>
+
+  <div class="flex-1 flex items-center justify-center">
+    <div class="w-full max-w-sm space-y-6">
+      <!-- Header -->
+      <div class="text-center space-y-2">
+        <h1 class="text-lg">Sign in</h1>
+        <p class="text-xs text-gray-600">Beautiful invoices for designers</p>
+      </div>
     
     <!-- Form -->
     {#if !useMagicLink}
@@ -108,21 +119,17 @@
           {isLoading ? 'Signing in...' : 'Sign in'}
         </button>
 
-        <div class="text-center">
+        <div class="flex items-center justify-between text-xs">
           <button
             type="button"
             onclick={() => useMagicLink = true}
-            class="text-xs text-gray-600 hover:text-black transition-colors underline"
+            class="text-gray-600 hover:text-black transition-colors"
           >
-            Sign in with magic link instead
+            Forgot password?
           </button>
-        </div>
-
-        <div class="text-center pt-2 border-t border-thin">
-          <p class="text-xs text-gray-600">
-            Don't have an account?
-            <a href="/auth/signup" class="text-black hover:underline">Sign up</a>
-          </p>
+          <a href="/auth/signup" class="text-gray-600 hover:text-black transition-colors">
+            Sign up
+          </a>
         </div>
       </form>
     {:else}
@@ -153,14 +160,14 @@
           <button
             type="button"
             onclick={() => useMagicLink = false}
-            class="text-xs text-gray-600 hover:text-black transition-colors underline"
+            class="text-xs text-gray-600 hover:text-black transition-colors"
           >
             ← Back to password login
           </button>
         </div>
       </form>
     {/if}
-    
+
     <!-- Message -->
     {#if message}
       <div class="text-center">
@@ -169,15 +176,6 @@
         </p>
       </div>
     {/if}
-    
-    <!-- Footer -->
-    <div class="text-center pt-4">
-      <a 
-        href="/" 
-        class="text-xs text-gray-600 hover:text-black transition-colors"
-      >
-        ← Back to home
-      </a>
     </div>
   </div>
 </div>

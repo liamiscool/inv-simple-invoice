@@ -42,13 +42,24 @@
   <title>Sign up - inv</title>
 </svelte:head>
 
-<div class="min-h-screen flex flex-col items-center justify-center px-4">
-  <div class="w-full max-w-sm space-y-6">
-    <!-- Header -->
-    <div class="text-center space-y-2">
-      <h1 class="text-lg">inv</h1>
-      <p class="text-xs text-gray-600">Beautiful invoices for designers</p>
-    </div>
+<div class="min-h-screen flex flex-col px-4 pt-4">
+  <!-- Back to home - top left -->
+  <div class="mb-8">
+    <a
+      href="/"
+      class="text-xs text-gray-600 hover:text-black transition-colors inline-flex items-center gap-1"
+    >
+      ← inv
+    </a>
+  </div>
+
+  <div class="flex-1 flex items-center justify-center">
+    <div class="w-full max-w-sm space-y-6">
+      <!-- Header -->
+      <div class="text-center space-y-2">
+        <h1 class="text-lg">Create account</h1>
+        <p class="text-xs text-gray-600">Beautiful invoices for designers</p>
+      </div>
 
     <!-- Form -->
     <form onsubmit={handleSignup} class="space-y-4">
@@ -87,11 +98,10 @@
         {isLoading ? 'Creating account...' : 'Create account'}
       </button>
 
-      <div class="text-center pt-2 border-t border-thin">
-        <p class="text-xs text-gray-600">
-          Already have an account?
-          <a href="/auth/login" class="text-black hover:underline">Sign in</a>
-        </p>
+      <div class="text-center text-xs">
+        <span class="text-gray-600">Already have an account?</span>
+        {' '}
+        <a href="/auth/login" class="text-gray-600 hover:text-black transition-colors">Sign in</a>
       </div>
     </form>
 
@@ -103,15 +113,6 @@
         </p>
       </div>
     {/if}
-
-    <!-- Footer -->
-    <div class="text-center pt-4">
-      <a
-        href="/"
-        class="text-xs text-gray-600 hover:text-black transition-colors"
-      >
-        ← Back to home
-      </a>
     </div>
   </div>
 </div>
