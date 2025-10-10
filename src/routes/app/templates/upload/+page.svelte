@@ -1,6 +1,21 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import type { PageData, ActionData } from './$types';
+  import * as pdfjsLib from 'pdfjs-dist';
+
+  // ============================================================================
+  // IMPORTANT NOTE: CLIENT-SIDE PDF CONVERSION
+  // ============================================================================
+  // PDFs are converted to PNG in the BROWSER (not server) to avoid native deps
+  // This ensures deployment works on Cloudflare Pages (serverless environment)
+  //
+  // Future improvements:
+  // - Move conversion to Web Worker for better performance
+  // - Add progress indicator for large PDFs
+  // - Consider external service (CloudConvert, etc.) for production
+  // ============================================================================
+
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
   let { data, form }: { data: PageData, form: ActionData } = $props();
 
@@ -10,14 +25,43 @@
   let templateName = $state('');
   let error = $state('');
   let isDragging = $state(false);
+  let converting = $state(false);
 
-  function processFile(file: File) {
+  async function convertPdfToPng(file: File): Promise<File> {
+    converting = true;
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const page = await pdf.getPage(1); // First page only
+
+      // Render at 300 DPI (scale ~4.17 from 72 DPI)
+      const viewport = page.getViewport({ scale: 300 / 72 });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+
+      const context = canvas.getContext('2d')!;
+      await page.render({ canvasContext: context, viewport }).promise;
+
+      // Convert canvas to Blob then File
+      const blob = await new Promise<Blob>((resolve) =>
+        canvas.toBlob((b) => resolve(b!), 'image/png')
+      );
+
+      return new File([blob], file.name.replace('.pdf', '.png'), { type: 'image/png' });
+    } finally {
+      converting = false;
+    }
+  }
+
+  async function processFile(file: File) {
     if (!file) return;
 
     // Validate file type
-    const allowedTypes = ['image/png', 'image/jpeg', 'image/svg+xml', 'application/pdf'];
+    const allowedTypes = ['image/png', 'image/jpeg', 'application/pdf'];
     if (!allowedTypes.includes(file.type)) {
-      error = 'Invalid file type. Please upload PNG, JPEG, SVG, or PDF.';
+      error = 'Invalid file type. Please upload PNG, JPEG, or PDF.';
       selectedFile = null;
       return;
     }
@@ -28,6 +72,18 @@
       error = 'File too large. Maximum size is 10MB.';
       selectedFile = null;
       return;
+    }
+
+    // Convert PDF to PNG if needed
+    if (file.type === 'application/pdf') {
+      try {
+        file = await convertPdfToPng(file);
+      } catch (err) {
+        console.error('PDF conversion error:', err);
+        error = 'Failed to convert PDF. Please try converting to PNG manually.';
+        selectedFile = null;
+        return;
+      }
     }
 
     error = '';
@@ -115,7 +171,7 @@
     </div>
     <h1 class="text-sm mb-2">Upload Custom Template</h1>
     <p class="text-xs text-gray-600">
-      Upload your own invoice design (PDF, PNG, JPEG, SVG) and map dynamic areas
+      Upload your invoice design (PDF, PNG, or JPEG). PDFs are automatically converted to PNG in your browser.
     </p>
   </div>
 
@@ -135,16 +191,21 @@
     method="POST"
     action="?/upload"
     enctype="multipart/form-data"
-    use:enhance={() => {
+    use:enhance={({ formData }) => {
       uploading = true;
       console.log('=== FORM SUBMIT START ===');
-      const formElement = document.querySelector('form') as HTMLFormElement;
-      const formData = new FormData(formElement);
-      console.log('Template name:', formData.get('name'));
-      console.log('File:', formData.get('file'));
-      console.log('File input:', document.getElementById('file'));
-      console.log('File input files:', (document.getElementById('file') as HTMLInputElement)?.files);
+      console.log('Template name from form:', formData.get('name'));
+      console.log('File from form:', formData.get('file'));
+
+      // Manually add the file if it's missing
+      if (!formData.get('file') && selectedFile) {
+        console.log('Adding selectedFile manually:', selectedFile.name);
+        formData.set('file', selectedFile);
+      }
+
+      console.log('Final file in FormData:', formData.get('file'));
       console.log('=========================');
+
       return async ({ result, update }) => {
         uploading = false;
         console.log('Form result:', result);
@@ -187,7 +248,7 @@
             id="file"
             name="file"
             type="file"
-            accept=".pdf,.png,.jpg,.jpeg,.svg"
+            accept=".pdf,.png,.jpg,.jpeg"
             required
             onchange={handleFileSelect}
             class="hidden"
@@ -270,10 +331,10 @@
 
       <button
         type="submit"
-        disabled={uploading || !selectedFile || !templateName}
+        disabled={converting || uploading || !selectedFile || !templateName}
         class="px-6 py-2 bg-black text-white text-xs rounded-sm hover:bg-gray-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
       >
-        {uploading ? 'Uploading...' : 'Continue to Mapping'}
+        {converting ? 'Converting PDF...' : uploading ? 'Uploading...' : 'Continue to Mapping'}
       </button>
     </div>
   </form>

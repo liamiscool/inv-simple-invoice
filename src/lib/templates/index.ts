@@ -52,7 +52,8 @@ export interface TemplateSpec {
       bottom: number;
       left: number;
     };
-    background_image_url?: string; // Supabase Storage URL for custom template backgrounds
+    background_image_url?: string; // PNG/JPEG preview for mapping UI
+    background_pdf_url?: string;   // Original PDF for final invoice rendering (better quality)
   };
   styles: {
     fonts: {

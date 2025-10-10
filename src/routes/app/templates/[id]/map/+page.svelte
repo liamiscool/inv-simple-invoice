@@ -13,6 +13,13 @@
   // Template spec being edited
   let spec = $state<TemplateSpec>(structuredClone(data.template.spec));
 
+  // Debug logging
+  console.log('=== MAP PAGE DEBUG ===');
+  console.log('Full template:', data.template);
+  console.log('Template spec:', spec);
+  console.log('Background image URL:', spec.meta?.background_image_url);
+  console.log('====================');
+
   // UI state
   let selectedArea: string | null = $state(null);
   let isDragging = $state(false);
@@ -41,16 +48,22 @@
   // Load background image
   $effect(() => {
     if (canvas && spec.meta.background_image_url) {
+      console.log('Loading image from:', spec.meta.background_image_url);
       ctx = canvas.getContext('2d')!;
       bgImage = new Image();
       bgImage.crossOrigin = 'anonymous';
       bgImage.onload = () => {
+        console.log('Image loaded successfully:', bgImage.width, 'x', bgImage.height);
         // Set canvas size to match image
         canvas.width = bgImage.width;
         canvas.height = bgImage.height;
         scale = Math.min(800 / bgImage.width, 600 / bgImage.height);
         imageLoaded = true;
         redraw();
+      };
+      bgImage.onerror = (e) => {
+        console.error('Image failed to load:', e);
+        console.error('Image URL:', spec.meta.background_image_url);
       };
       bgImage.src = spec.meta.background_image_url;
     }

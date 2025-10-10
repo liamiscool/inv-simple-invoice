@@ -176,8 +176,8 @@ export function renderInvoiceHTML(
       margin: 0;
       padding: 0;
       position: relative;
-      ${meta.background_image_url ? `
-        background-image: url('${meta.background_image_url}');
+      ${meta.background_pdf_url || meta.background_image_url ? `
+        background-image: url('${meta.background_pdf_url || meta.background_image_url}');
         background-size: ${meta.width}mm ${meta.height}mm;
         background-repeat: no-repeat;
         background-position: 0 0;

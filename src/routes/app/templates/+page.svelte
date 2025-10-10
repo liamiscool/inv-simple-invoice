@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { enhance } from '$app/forms';
   import type { PageData } from './$types';
-  
+
   let { data }: { data: PageData } = $props();
-  
+  let deletingId: string | null = $state(null);
+
   function formatDate(dateString: string) {
     return new Date(dateString).toLocaleDateString();
   }
@@ -43,85 +45,184 @@
       </div>
     </div>
   {:else}
-    <!-- Templates grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {#each data.templates || [] as template}
-        <div class="border border-thin rounded-sm p-6 space-y-4">
-          <!-- Template header -->
-          <div class="flex items-start justify-between">
-            <div>
-              <h3 class="text-xs font-medium mb-1">{template.title}</h3>
-              <span class="inline-flex px-2 py-0.5 rounded-sm text-xs {template.kind === 'curated' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'}">
-                {template.kind === 'curated' ? 'Built-in' : 'Custom'}
-              </span>
-            </div>
-          </div>
-          
-          <!-- Template description -->
-          {#if template.spec?.meta?.description}
-            <p class="text-xs text-gray-600">
-              {template.spec.meta.description}
-            </p>
-          {/if}
-          
-          <!-- Template specs -->
-          <div class="space-y-2 text-xs text-gray-600">
-            {#if template.spec?.meta}
-              <div class="flex justify-between">
-                <span>Page Size:</span>
-                <span>{template.spec.meta.width}×{template.spec.meta.height}mm</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Resolution:</span>
-                <span>{template.spec.meta.dpi} DPI</span>
-              </div>
-            {/if}
-            {#if template.spec?.styles?.fonts?.primary}
-              <div class="flex justify-between">
-                <span>Font:</span>
-                <span class="truncate ml-2">{template.spec.styles.fonts.primary}</span>
-              </div>
-            {/if}
-          </div>
-          
-          <!-- Template preview -->
-          <div class="border border-thin rounded-sm p-4 bg-gray-50 min-h-[120px] flex items-center justify-center">
-            <div class="text-center">
-              <div class="text-xs text-gray-500 mb-2">Template Preview</div>
-              <div class="text-xs text-gray-400">
-                Preview generation coming soon
-              </div>
-            </div>
-          </div>
-          
-          <!-- Actions -->
-          <div class="flex items-center justify-between pt-2 border-t border-thin">
-            <div class="text-xs text-gray-500">
-              Created {formatDate(template.created_at)}
-            </div>
-            
-            <div class="flex items-center gap-2">
-              {#if template.kind === 'custom'}
-                <button
-                  disabled
-                  class="px-3 py-1 text-xs text-gray-400 cursor-not-allowed"
-                >
-                  Edit
-                </button>
-                <button
-                  disabled
-                  class="px-3 py-1 text-xs text-gray-400 cursor-not-allowed"
-                >
-                  Delete
-                </button>
-              {:else}
-                <span class="text-xs text-gray-500">Built-in template</span>
-              {/if}
-            </div>
-          </div>
+    <!-- Separate custom and curated templates -->
+    {@const customTemplates = data.templates?.filter(t => t.kind === 'custom') || []}
+    {@const curatedTemplates = data.templates?.filter(t => t.kind === 'curated') || []}
+
+    <!-- Custom Templates Section -->
+    {#if customTemplates.length > 0}
+      <div class="space-y-4">
+        <div class="flex items-center justify-between border-b border-thin pb-3">
+          <h2 class="text-sm font-medium">My Custom Templates</h2>
+          <span class="text-xs text-gray-500">{customTemplates.length} template{customTemplates.length !== 1 ? 's' : ''}</span>
         </div>
-      {/each}
-    </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {#each customTemplates as template}
+            <div class="border border-thin rounded-sm p-6 space-y-4 bg-green-50/30">
+              <!-- Template header -->
+              <div class="flex items-start justify-between">
+                <div>
+                  <h3 class="text-xs font-medium mb-1">{template.title}</h3>
+                  <span class="inline-flex px-2 py-0.5 rounded-sm text-xs bg-green-100 text-green-700 border border-green-200">
+                    Custom
+                  </span>
+                </div>
+              </div>
+
+              <!-- Template description -->
+              {#if template.spec?.meta?.description}
+                <p class="text-xs text-gray-600">
+                  {template.spec.meta.description}
+                </p>
+              {/if}
+
+              <!-- Template specs -->
+              <div class="space-y-2 text-xs text-gray-600">
+                {#if template.spec?.meta}
+                  <div class="flex justify-between">
+                    <span>Page Size:</span>
+                    <span>{template.spec.meta.width}×{template.spec.meta.height}mm</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Resolution:</span>
+                    <span>{template.spec.meta.dpi} DPI</span>
+                  </div>
+                {/if}
+                {#if template.spec?.styles?.fonts?.primary}
+                  <div class="flex justify-between">
+                    <span>Font:</span>
+                    <span class="truncate ml-2">{template.spec.styles.fonts.primary}</span>
+                  </div>
+                {/if}
+              </div>
+
+              <!-- Template preview -->
+              <div class="border border-thin rounded-sm p-4 bg-white min-h-[120px] flex items-center justify-center">
+                {#if template.spec?.meta?.background_image_url}
+                  <img
+                    src={template.spec.meta.background_image_url}
+                    alt={template.title}
+                    class="max-w-full max-h-[120px] object-contain"
+                  />
+                {:else}
+                  <div class="text-center">
+                    <div class="text-xs text-gray-500 mb-2">Template Preview</div>
+                    <div class="text-xs text-gray-400">
+                      No preview available
+                    </div>
+                  </div>
+                {/if}
+              </div>
+
+              <!-- Actions -->
+              <div class="flex items-center justify-between pt-2 border-t border-thin">
+                <div class="text-xs text-gray-500">
+                  Created {formatDate(template.created_at)}
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <a
+                    href="/app/templates/{template.id}/map"
+                    class="px-3 py-1 text-xs text-gray-700 hover:text-black hover:underline"
+                  >
+                    Edit Mapping
+                  </a>
+                  <form method="POST" action="?/delete" use:enhance={() => {
+                    deletingId = template.id;
+                    return async ({ update }) => {
+                      await update();
+                      deletingId = null;
+                    };
+                  }}>
+                    <input type="hidden" name="id" value={template.id} />
+                    <button
+                      type="submit"
+                      disabled={deletingId === template.id}
+                      class="px-3 py-1 text-xs text-red-600 hover:text-red-700 hover:underline disabled:opacity-50"
+                    >
+                      {deletingId === template.id ? 'Deleting...' : 'Delete'}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          {/each}
+        </div>
+      </div>
+    {/if}
+
+    <!-- Built-in Templates Section -->
+    {#if curatedTemplates.length > 0}
+      <div class="space-y-4">
+        <div class="flex items-center justify-between border-b border-thin pb-3">
+          <h2 class="text-sm font-medium">Built-in Templates</h2>
+          <span class="text-xs text-gray-500">{curatedTemplates.length} template{curatedTemplates.length !== 1 ? 's' : ''}</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {#each curatedTemplates as template}
+            <div class="border border-thin rounded-sm p-6 space-y-4">
+              <!-- Template header -->
+              <div class="flex items-start justify-between">
+                <div>
+                  <h3 class="text-xs font-medium mb-1">{template.title}</h3>
+                  <span class="inline-flex px-2 py-0.5 rounded-sm text-xs bg-blue-100 text-blue-700 border border-blue-200">
+                    Built-in
+                  </span>
+                </div>
+              </div>
+
+              <!-- Template description -->
+              {#if template.spec?.meta?.description}
+                <p class="text-xs text-gray-600">
+                  {template.spec.meta.description}
+                </p>
+              {/if}
+
+              <!-- Template specs -->
+              <div class="space-y-2 text-xs text-gray-600">
+                {#if template.spec?.meta}
+                  <div class="flex justify-between">
+                    <span>Page Size:</span>
+                    <span>{template.spec.meta.width}×{template.spec.meta.height}mm</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Resolution:</span>
+                    <span>{template.spec.meta.dpi} DPI</span>
+                  </div>
+                {/if}
+                {#if template.spec?.styles?.fonts?.primary}
+                  <div class="flex justify-between">
+                    <span>Font:</span>
+                    <span class="truncate ml-2">{template.spec.styles.fonts.primary}</span>
+                  </div>
+                {/if}
+              </div>
+
+              <!-- Template preview -->
+              <div class="border border-thin rounded-sm p-4 bg-gray-50 min-h-[120px] flex items-center justify-center">
+                <div class="text-center">
+                  <div class="text-xs text-gray-500 mb-2">Template Preview</div>
+                  <div class="text-xs text-gray-400">
+                    Preview generation coming soon
+                  </div>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="flex items-center justify-between pt-2 border-t border-thin">
+                <div class="text-xs text-gray-500">
+                  Created {formatDate(template.created_at)}
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-gray-500">Cannot edit built-in templates</span>
+                </div>
+              </div>
+            </div>
+          {/each}
+        </div>
+      </div>
+    {/if}
     
     <!-- Template usage info -->
     <div class="border border-thin rounded-sm p-6 bg-gray-50">

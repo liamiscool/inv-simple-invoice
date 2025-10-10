@@ -6,6 +6,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A minimal, Yeezy-inspired invoice tool with stark minimalism and terminal vibes. Core innovation: designers can upload their own invoice designs (PDF/PNG) and convert them to reusable templates.
 
+---
+
+## 🚨 IMPORTANT: PDF CONVERSION ARCHITECTURE
+
+**Current Approach**: CLIENT-SIDE PDF CONVERSION
+
+PDFs uploaded by users are converted to PNG **in the browser** (not server-side) to avoid native dependencies like Cairo, Pango, and canvas that don't work on Cloudflare Pages.
+
+**Location**: `src/routes/app/templates/upload/+page.svelte` (lines 6-16, 30-56)
+
+**How it works**:
+1. User uploads PDF via drag & drop
+2. Browser uses pdf.js to render PDF first page at 300 DPI
+3. Canvas API converts to PNG Blob
+4. PNG is uploaded to Supabase Storage
+5. Server only handles PNG uploads
+
+**Future Improvements** (when scaling):
+- Move conversion to Web Worker (better performance, non-blocking UI)
+- Add progress indicator for large PDFs
+- Consider external service (CloudConvert API) for production
+- Or use Cloudflare Workers with pdf.js for server-side conversion
+
+**Why not server-side?**
+- Native dependencies (cairo, pango) don't work on Cloudflare Pages
+- Serverless environment requires pre-compiled binaries
+- Client-side keeps deployment simple and costs low
+
+---
+
 ## Key Commands
 
 ### Development

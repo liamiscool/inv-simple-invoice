@@ -60,10 +60,10 @@ export const actions = {
       return fail(400, { error: 'Missing file or template name' });
     }
 
-    // Validate file type
-    const allowedTypes = ['image/png', 'image/jpeg', 'image/svg+xml', 'application/pdf'];
+    // Validate file type (images only - PDFs are converted client-side before upload)
+    const allowedTypes = ['image/png', 'image/jpeg'];
     if (!allowedTypes.includes(file.type)) {
-      return fail(400, { error: 'Invalid file type. Allowed: PNG, JPEG, SVG, PDF' });
+      return fail(400, { error: 'Invalid file type. Only PNG and JPEG are supported.' });
     }
 
     // Validate file size (10MB)
@@ -84,13 +84,12 @@ export const actions = {
     }
 
     try {
-      // Generate unique filename
       const timestamp = Date.now();
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}/${timestamp}_${templateName.replace(/[^a-z0-9]/gi, '_')}.${fileExt}`;
 
-      // Upload to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      // Upload image file
+      const { error: uploadError } = await supabase.storage
         .from('templates')
         .upload(fileName, file, {
           cacheControl: '3600',
@@ -122,7 +121,7 @@ export const actions = {
               height: 297,
               dpi: 300,
               margins: { top: 20, right: 20, bottom: 20, left: 20 },
-              background_image_url: publicUrl
+              background_image_url: publicUrl // PNG/JPEG - PDFs converted client-side
             },
             styles: {
               fonts: { primary: 'Arial, sans-serif' },
@@ -158,8 +157,12 @@ export const actions = {
       }
 
       // Redirect to mapping interface
-      redirect(303, `/app/templates/${templateData.id}/map`);
+      throw redirect(303, `/app/templates/${templateData.id}/map`);
     } catch (error) {
+      // Re-throw redirect errors (they're not actual errors)
+      if (error instanceof Response || (error && typeof error === 'object' && 'status' in error && 'location' in error)) {
+        throw error;
+      }
       console.error('Unexpected error:', error);
       return fail(500, { error: 'An unexpected error occurred' });
     }

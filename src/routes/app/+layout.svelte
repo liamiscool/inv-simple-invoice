@@ -118,48 +118,48 @@
   
   <!-- Desktop sidebar -->
   <div class="hidden md:fixed md:left-0 md:top-0 md:h-full md:w-48 md:border-r md:border-thin md:bg-white md:block">
-    <div class="py-6 px-4">
-      <a href="/app" class="text-base tracking-tight block mb-6">inv</a>
-      <nav class="space-y-3">
+    <div class="py-8 px-6">
+      <a href="/app" class="text-base tracking-tight block mb-8 font-medium">inv</a>
+      <nav class="space-y-1">
         {#each navItems as item}
-          <a 
+          <a
             href={item.href}
-            class="block text-xs hover:text-black transition-colors {
-              (item.exact ? $page.url.pathname === item.href : $page.url.pathname.startsWith(item.href)) 
-                ? 'text-black' : 'text-gray-600'
+            class="block text-xs hover:text-black transition-colors py-1.5 {
+              (item.exact ? $page.url.pathname === item.href : $page.url.pathname.startsWith(item.href))
+                ? 'text-black font-medium' : 'text-gray-500'
             }"
           >
             {item.label}
           </a>
         {/each}
       </nav>
-      
+
       <!-- Upgrade button -->
       {#if subscriptionPlan === 'free'}
-        <div class="mt-6 pt-6 border-t border-thin">
+        <div class="mt-8 pt-8 border-t border-thin">
           <button
             onclick={() => showUpgradeModal = true}
-            class="w-full px-3 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium"
+            class="w-full px-3 py-1.5 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75"
           >
             Upgrade to Pro
           </button>
         </div>
       {:else}
-        <div class="mt-6 pt-6 border-t border-thin">
-          <div class="px-3 py-2 bg-black text-white text-xs text-center">
+        <div class="mt-8 pt-8 border-t border-thin">
+          <div class="text-xs font-medium">
             Pro Plan
           </div>
         </div>
       {/if}
 
       <!-- User section -->
-      <div class="mt-4 pt-4 border-t border-thin">
-        <div class="text-xs text-gray-600 mb-2">
+      <div class="mt-8 pt-8 border-t border-thin">
+        <div class="text-xs text-gray-500 mb-2">
           {data.session?.user?.email?.split('@')[0] || 'User'}
         </div>
         <button
           onclick={handleLogout}
-          class="text-xs text-gray-600 hover:text-black transition-colors"
+          class="text-xs text-gray-500 hover:text-black transition-colors"
         >
           Sign out
         </button>

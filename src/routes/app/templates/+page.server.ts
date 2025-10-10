@@ -1,5 +1,6 @@
-import type { PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 import { ensureCuratedTemplates, getTemplatesForOrg } from '$lib/templates';
+import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession } }) => {
   const { user } = await safeGetSession();
@@ -97,3 +98,70 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
     templates
   };
 };
+
+export const actions = {
+  delete: async ({ request, locals: { supabase, safeGetSession } }) => {
+    const { user } = await safeGetSession();
+
+    if (!user) {
+      return fail(401, { error: 'Unauthorized' });
+    }
+
+    const formData = await request.formData();
+    const templateId = formData.get('id') as string;
+
+    if (!templateId) {
+      return fail(400, { error: 'Template ID required' });
+    }
+
+    // Get user's org_id
+    const { data: userProfile } = await supabase
+      .from('app_user')
+      .select('org_id')
+      .eq('id', user.id)
+      .single();
+
+    if (!userProfile?.org_id) {
+      return fail(400, { error: 'No organization found' });
+    }
+
+    // Get template to verify ownership and get background image URL
+    const { data: template } = await supabase
+      .from('template')
+      .select('*')
+      .eq('id', templateId)
+      .single();
+
+    if (!template) {
+      return fail(404, { error: 'Template not found' });
+    }
+
+    // Only allow deleting custom templates that belong to this org
+    if (template.kind !== 'custom' || template.org_id !== userProfile.org_id) {
+      return fail(403, { error: 'Cannot delete this template' });
+    }
+
+    // Delete the template from database
+    const { error: deleteError } = await supabase
+      .from('template')
+      .delete()
+      .eq('id', templateId);
+
+    if (deleteError) {
+      console.error('Delete template error:', deleteError);
+      return fail(500, { error: 'Failed to delete template' });
+    }
+
+    // Delete the file from storage if it exists
+    if (template.spec?.meta?.background_image_url) {
+      const urlParts = template.spec.meta.background_image_url.split('/');
+      const fileName = `${user.id}/${urlParts[urlParts.length - 1]}`;
+
+      await supabase.storage
+        .from('templates')
+        .remove([fileName]);
+    }
+
+    return { success: true };
+  }
+} satisfies Actions;
