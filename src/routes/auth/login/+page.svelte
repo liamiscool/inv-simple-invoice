@@ -8,6 +8,7 @@
   let isLoading = $state(false);
   let message = $state('');
   let useMagicLink = $state(false);
+  let showResetPassword = $state(false);
 
   async function handlePasswordLogin(e: Event) {
     e.preventDefault();
@@ -56,6 +57,28 @@
       isLoading = false;
     }
   }
+
+  async function handleResetPassword(e: Event) {
+    e.preventDefault();
+    isLoading = true;
+    message = '';
+
+    try {
+      const { error } = await data.supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${data.url.origin}/auth/reset-password`
+      });
+
+      if (error) {
+        message = error.message;
+      } else {
+        message = 'Check your email for the password reset link!';
+      }
+    } catch (err) {
+      message = 'An error occurred. Please try again.';
+    } finally {
+      isLoading = false;
+    }
+  }
 </script>
 
 <svelte:head>
@@ -82,7 +105,41 @@
       </div>
     
     <!-- Form -->
-    {#if !useMagicLink}
+    {#if showResetPassword}
+      <!-- Reset Password -->
+      <form onsubmit={handleResetPassword} class="space-y-4">
+        <div>
+          <label for="email-reset" class="sr-only">Email</label>
+          <input
+            id="email-reset"
+            type="email"
+            bind:value={email}
+            placeholder="Enter your email"
+            class="w-full px-3 py-2 text-sm border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+            required
+            disabled={isLoading}
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          class="w-full py-2 px-4 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+        >
+          {isLoading ? 'Sending...' : 'Send reset link'}
+        </button>
+
+        <div class="text-center">
+          <button
+            type="button"
+            onclick={() => showResetPassword = false}
+            class="text-xs text-gray-600 hover:text-black transition-colors"
+          >
+            ← Back to sign in
+          </button>
+        </div>
+      </form>
+    {:else if !useMagicLink}
       <!-- Password Login (Default) -->
       <form onsubmit={handlePasswordLogin} class="space-y-4">
         <div>
@@ -122,7 +179,7 @@
         <div class="flex items-center justify-between text-xs">
           <button
             type="button"
-            onclick={() => useMagicLink = true}
+            onclick={() => showResetPassword = true}
             class="text-gray-600 hover:text-black transition-colors"
           >
             Forgot password?
@@ -130,6 +187,16 @@
           <a href="/auth/signup" class="text-gray-600 hover:text-black transition-colors">
             Sign up
           </a>
+        </div>
+
+        <div class="text-center pt-2">
+          <button
+            type="button"
+            onclick={() => useMagicLink = true}
+            class="text-xs text-gray-600 hover:text-black transition-colors"
+          >
+            Use magic link instead
+          </button>
         </div>
       </form>
     {:else}
