@@ -1,4 +1,7 @@
 <script lang="ts">
+  export let data;
+
+  $: isSignedIn = !!data.session;
 </script>
 
 <div class="h-screen flex flex-col relative overflow-hidden">
@@ -6,17 +9,16 @@
   <header class="border-b border-thin px-4 py-3">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-6">
-        <a href="/" class="text-base tracking-tight hover:opacity-70 transition-opacity">inv</a>
-        <span class="text-xs text-gray-600">Beautiful invoices for designers</span>
+        <a href="/" class="text-base tracking-tight font-semibold hover:opacity-70 transition-opacity">inv</a>
+        <a href="/pricing" class="text-xs hover:opacity-70 transition-opacity">Pricing</a>
       </div>
 
       <nav class="flex items-center gap-6">
-        <a href="/pricing" class="text-xs font-semibold">Pricing</a>
         <a
-          href="/auth/login"
-          class="text-xs hover:underline-offset-2 hover:underline transition-all duration-75"
+          href={isSignedIn ? '/app' : '/auth/login'}
+          class="text-xs border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors duration-75"
         >
-          Sign in
+          {isSignedIn ? 'Dashboard' : 'Sign in'}
         </a>
       </nav>
     </div>
