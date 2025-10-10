@@ -27,17 +27,36 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
 
 export const actions = {
   upload: async ({ request, locals: { supabase, safeGetSession } }) => {
+    console.log('=== SERVER: Upload action started ===');
     const { user } = await safeGetSession();
 
     if (!user) {
+      console.log('SERVER: No user found');
       return fail(401, { error: 'Unauthorized' });
     }
 
+    console.log('SERVER: User authenticated:', user.id);
+
     const formData = await request.formData();
+    console.log('SERVER: FormData entries:');
+    for (const [key, value] of formData.entries()) {
+      if (value instanceof File) {
+        console.log(`  ${key}: File(name=${value.name}, size=${value.size}, type=${value.type})`);
+      } else {
+        console.log(`  ${key}: ${value}`);
+      }
+    }
+
     const file = formData.get('file') as File;
     const templateName = formData.get('name') as string;
 
+    console.log('SERVER: Extracted file:', file);
+    console.log('SERVER: Extracted templateName:', templateName);
+
     if (!file || !templateName) {
+      console.log('SERVER: Missing file or template name');
+      console.log('  file:', file);
+      console.log('  templateName:', templateName);
       return fail(400, { error: 'Missing file or template name' });
     }
 

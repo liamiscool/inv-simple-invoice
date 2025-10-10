@@ -1,8 +1,8 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
-  import type { PageData } from './$types';
+  import type { PageData, ActionData } from './$types';
 
-  let { data }: { data: PageData } = $props();
+  let { data, form }: { data: PageData, form: ActionData } = $props();
 
   let uploading = $state(false);
   let selectedFile: File | null = $state(null);
@@ -78,11 +78,16 @@
     const file = event.dataTransfer?.files[0];
     if (file) {
       processFile(file);
-      // Update the hidden file input
-      const input = document.getElementById('file') as HTMLInputElement;
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(file);
-      input.files = dataTransfer.files;
+      // Try to update the hidden file input - this might not work with all browsers
+      try {
+        const input = document.getElementById('file') as HTMLInputElement;
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        input.files = dataTransfer.files;
+        console.log('File added to input:', input.files.length, input.files[0]?.name);
+      } catch (e) {
+        console.error('Failed to add file to input:', e);
+      }
     }
   }
 
@@ -132,8 +137,17 @@
     enctype="multipart/form-data"
     use:enhance={() => {
       uploading = true;
+      console.log('=== FORM SUBMIT START ===');
+      const formElement = document.querySelector('form') as HTMLFormElement;
+      const formData = new FormData(formElement);
+      console.log('Template name:', formData.get('name'));
+      console.log('File:', formData.get('file'));
+      console.log('File input:', document.getElementById('file'));
+      console.log('File input files:', (document.getElementById('file') as HTMLInputElement)?.files);
+      console.log('=========================');
       return async ({ result, update }) => {
         uploading = false;
+        console.log('Form result:', result);
         await update();
       };
     }}
@@ -225,6 +239,12 @@
 
       {#if error}
         <div class="text-xs text-red-600">{error}</div>
+      {/if}
+
+      {#if form?.error}
+        <div class="text-xs text-red-600 bg-red-50 border border-red-200 rounded-sm p-3">
+          <strong>Upload failed:</strong> {form.error}
+        </div>
       {/if}
     </div>
 
