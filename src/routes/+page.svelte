@@ -18,7 +18,7 @@
       <h1 class="text-base tracking-tight font-semibold">inv</h1>
 
       <nav class="flex items-center gap-6">
-        <a href="/pricing" class="text-xs hover:opacity-70 transition-opacity">Pricing</a>
+        <a href="/pricing" class="text-xs border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors duration-75">Pricing</a>
         <a
           href={isSignedIn ? '/app' : '/auth/login'}
           class="text-xs border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors duration-75"
