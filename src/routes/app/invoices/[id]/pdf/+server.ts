@@ -81,7 +81,7 @@ export const GET: RequestHandler = async ({ params, locals: { supabase, safeGetS
       return new Response(pdfBuffer, {
         headers: {
           'Content-Type': 'application/pdf',
-          'Content-Disposition': `inline; filename="invoice-${invoice.number}.pdf"`
+          'Content-Disposition': `attachment; filename="invoice-${invoice.number}.pdf"`
         }
       });
     } catch (error) {
