@@ -1,1 +1,1 @@
-export { load } from './$types';
+// Empty file - using parent layout data
