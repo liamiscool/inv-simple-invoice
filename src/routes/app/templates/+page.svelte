@@ -23,13 +23,12 @@
     </div>
     
     <div class="flex items-center gap-3">
-      <button
-        disabled
-        class="px-4 py-2 border border-thin text-xs text-gray-400 cursor-not-allowed"
+      <a
+        href="/app/templates/upload"
+        class="px-4 py-2 bg-black text-white text-xs rounded-sm hover:bg-gray-800 transition-colors"
       >
         Upload Custom Template
-      </button>
-      <span class="text-xs text-gray-500">(Coming in Phase 9)</span>
+      </a>
     </div>
   </div>
 

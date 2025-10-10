@@ -167,7 +167,7 @@ export function renderInvoiceHTML(
       size: ${meta.width}mm ${meta.height}mm;
       margin: ${meta.margins.top}mm ${meta.margins.right}mm ${meta.margins.bottom}mm ${meta.margins.left}mm;
     }
-    
+
     body {
       font-family: ${styles.fonts.primary};
       font-size: ${styles.sizes.default}pt;
@@ -176,12 +176,18 @@ export function renderInvoiceHTML(
       margin: 0;
       padding: 0;
       position: relative;
+      ${meta.background_image_url ? `
+        background-image: url('${meta.background_image_url}');
+        background-size: ${meta.width}mm ${meta.height}mm;
+        background-repeat: no-repeat;
+        background-position: 0 0;
+      ` : ''}
     }
-    
+
     .area {
       overflow: hidden;
     }
-    
+
     .area-multiline {
       white-space: pre-wrap;
     }

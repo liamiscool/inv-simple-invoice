@@ -52,6 +52,7 @@ export interface TemplateSpec {
       bottom: number;
       left: number;
     };
+    background_image_url?: string; // Supabase Storage URL for custom template backgrounds
   };
   styles: {
     fonts: {
@@ -103,13 +104,13 @@ export interface Template {
 // Built-in curated templates
 export const CURATED_TEMPLATES: Array<Omit<Template, 'id' | 'created_at'>> = [
   {
-    org_id: null,
+    org_id: undefined,
     title: 'Minimal',
     kind: 'curated',
     spec: minimalTemplate as TemplateSpec
   },
   {
-    org_id: null,
+    org_id: undefined,
     title: 'Modern',
     kind: 'curated',
     spec: modernTemplate as TemplateSpec
