@@ -1,63 +1,6 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import anime from 'animejs/dist/bundles/anime.esm.js';
-
-	// Modernized version with better fonts and animations
+	// Modernized version with better fonts
 	let mounted = false;
-
-	onMount(() => {
-		mounted = true;
-
-		// Animate ASCII art on load
-		anime({
-			targets: '.ascii-hero',
-			opacity: [0, 1],
-			translateY: [10, 0],
-			duration: 800,
-			easing: 'easeOutQuad'
-		});
-
-		// Animate columns stagger
-		anime({
-			targets: '.col',
-			opacity: [0, 1],
-			translateY: [20, 0],
-			delay: anime.stagger(80),
-			duration: 600,
-			easing: 'easeOutQuad'
-		});
-
-		// Animate what's new items
-		anime({
-			targets: '.wn-item',
-			opacity: [0, 1],
-			translateX: [-10, 0],
-			delay: anime.stagger(100, { start: 200 }),
-			duration: 500,
-			easing: 'easeOutQuad'
-		});
-
-		// Hover animations for nav links
-		const navLinks = document.querySelectorAll('.navlink');
-		navLinks.forEach((link) => {
-			link.addEventListener('mouseenter', () => {
-				anime({
-					targets: link,
-					translateY: -1,
-					duration: 100,
-					easing: 'easeOutQuad'
-				});
-			});
-			link.addEventListener('mouseleave', () => {
-				anime({
-					targets: link,
-					translateY: 0,
-					duration: 100,
-					easing: 'easeOutQuad'
-				});
-			});
-		});
-	});
 </script>
 
 <svelte:head>
