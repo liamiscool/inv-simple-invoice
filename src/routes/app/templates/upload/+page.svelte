@@ -9,11 +9,9 @@
   let previewUrl: string | null = $state(null);
   let templateName = $state('');
   let error = $state('');
+  let isDragging = $state(false);
 
-  function handleFileSelect(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-
+  function processFile(file: File) {
     if (!file) return;
 
     // Validate file type
@@ -52,10 +50,49 @@
     }
   }
 
+  function handleFileSelect(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file) processFile(file);
+  }
+
+  function handleDragEnter(event: DragEvent) {
+    event.preventDefault();
+    isDragging = true;
+  }
+
+  function handleDragOver(event: DragEvent) {
+    event.preventDefault();
+    isDragging = true;
+  }
+
+  function handleDragLeave(event: DragEvent) {
+    event.preventDefault();
+    isDragging = false;
+  }
+
+  function handleDrop(event: DragEvent) {
+    event.preventDefault();
+    isDragging = false;
+
+    const file = event.dataTransfer?.files[0];
+    if (file) {
+      processFile(file);
+      // Update the hidden file input
+      const input = document.getElementById('file') as HTMLInputElement;
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      input.files = dataTransfer.files;
+    }
+  }
+
   function clearFile() {
     selectedFile = null;
     previewUrl = null;
     error = '';
+    // Clear the file input
+    const input = document.getElementById('file') as HTMLInputElement;
+    if (input) input.value = '';
   }
 </script>
 
@@ -125,7 +162,13 @@
       </label>
 
       {#if !selectedFile}
-        <div class="border-2 border-dashed border-gray-300 rounded-sm p-8 text-center">
+        <div
+          ondragenter={handleDragEnter}
+          ondragover={handleDragOver}
+          ondragleave={handleDragLeave}
+          ondrop={handleDrop}
+          class="border-2 border-dashed rounded-sm p-8 text-center transition-colors {isDragging ? 'border-black bg-gray-50' : 'border-gray-300'}"
+        >
           <input
             id="file"
             name="file"
@@ -139,11 +182,11 @@
             for="file"
             class="cursor-pointer inline-flex flex-col items-center gap-3"
           >
-            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-12 h-12 {isDragging ? 'text-black' : 'text-gray-400'} transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
             <div class="space-y-1">
-              <div class="text-xs font-medium">Click to upload</div>
+              <div class="text-xs font-medium">{isDragging ? 'Drop file here' : 'Click to upload or drag & drop'}</div>
               <div class="text-xs text-gray-500">PDF, PNG, JPEG, or SVG (max 10MB)</div>
             </div>
           </label>
