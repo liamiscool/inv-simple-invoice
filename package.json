@@ -30,7 +30,6 @@
 		"@stripe/stripe-js": "^8.0.0",
 		"@supabase/ssr": "^0.7.0",
 		"@supabase/supabase-js": "^2.74.0",
-		"animejs": "^4.2.2",
 		"resend": "^6.1.2",
 		"stripe": "^19.1.0"
 	}

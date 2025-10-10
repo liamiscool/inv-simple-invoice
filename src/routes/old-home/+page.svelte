@@ -1,9 +1,7 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   let currentTab = $state(0);
   let emailInput = $state('');
-  let invoicesSent = $state(0);
+  let invoicesSent = 2847;
 
   const tourFrames = [
     {
@@ -20,22 +18,6 @@
     }
   ];
 
-  onMount(async () => {
-    // Dynamically import anime.js to avoid SSR issues
-    const anime = await import('animejs/lib/anime.es.js');
-
-    // Animate invoice counter
-    anime.default({
-      targets: { value: 0 },
-      value: 2847,
-      duration: 1800,
-      easing: 'easeOutQuart',
-      update: function(anim: any) {
-        invoicesSent = Math.round(anim.animations[0].currentValue);
-      }
-    });
-  });
-  
   function handleEmailSubmit(e: Event) {
     e.preventDefault();
     // TODO: Handle email capture
