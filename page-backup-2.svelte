@@ -226,14 +226,6 @@
 </div>
 
 <style>
-  :global(body) {
-    font-family: 'JetBrains Mono', monospace !important;
-  }
-
-  * {
-    font-family: 'JetBrains Mono', monospace !important;
-  }
-
   @keyframes underline-sweep {
     from { width: 0; }
     to { width: 100%; }
