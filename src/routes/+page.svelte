@@ -1,5 +1,10 @@
 <script lang="ts">
+  import type { PageData } from './$types';
+
+  export let data: PageData;
+
   let invoicesSent = 2847;
+  $: isSignedIn = !!data.session;
 
   function handleEmailSubmit(e: Event) {
     e.preventDefault();
@@ -12,18 +17,15 @@
   <!-- Header -->
   <header class="border-b border-thin px-4 py-3">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-6">
-        <h1 class="text-base tracking-tight">inv</h1>
-        <span class="text-xs text-gray-600">Beautiful invoices for designers</span>
-      </div>
+      <h1 class="text-base tracking-tight font-semibold">inv</h1>
 
       <nav class="flex items-center gap-6">
         <a href="/pricing" class="text-xs hover:opacity-70 transition-opacity">Pricing</a>
         <a
-          href="/auth/login"
-          class="text-xs hover:underline-offset-2 hover:underline transition-all duration-75"
+          href={isSignedIn ? '/app' : '/auth/login'}
+          class="text-xs border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors duration-75"
         >
-          Sign in
+          {isSignedIn ? 'Dashboard' : 'Sign in'}
         </a>
       </nav>
     </div>
@@ -63,10 +65,10 @@
           <!-- CTA -->
           <div class="flex items-center gap-4 pt-4">
             <a
-              href="/auth/login"
+              href={isSignedIn ? '/app' : '/auth/login'}
               class="inline-block py-3 px-10 bg-black text-white text-sm font-medium hover:bg-gray-800 transition-colors duration-75"
             >
-              Get started free
+              {isSignedIn ? 'Go to Dashboard' : 'Get started free'}
             </a>
             <span class="text-sm text-gray-500 font-normal">
               {invoicesSent.toLocaleString()} invoices sent
