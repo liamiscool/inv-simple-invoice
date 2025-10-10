@@ -15,10 +15,12 @@
   <!-- Header -->
   <header class="border-b border-thin px-4 py-3">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <h1 class="text-base tracking-tight font-semibold">inv</h1>
+      <div class="flex items-center gap-6">
+        <h1 class="text-base tracking-tight font-semibold">inv</h1>
+        <a href="/pricing" class="text-xs hover:opacity-70 transition-opacity">Pricing</a>
+      </div>
 
       <nav class="flex items-center gap-6">
-        <a href="/pricing" class="text-xs border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors duration-75">Pricing</a>
         <a
           href={isSignedIn ? '/app' : '/auth/login'}
           class="text-xs border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors duration-75"
