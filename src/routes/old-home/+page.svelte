@@ -22,7 +22,7 @@
 
   onMount(async () => {
     // Dynamically import anime.js to avoid SSR issues
-    const anime = await import('animejs');
+    const anime = await import('animejs/lib/anime.es.js');
 
     // Animate invoice counter
     anime.default({
