@@ -61,39 +61,39 @@
   <title>Settings - inv</title>
 </svelte:head>
 
-<div class="max-w-2xl space-y-6">
+<div class="max-w-6xl space-y-8">
   <!-- Header -->
   <div>
-    <h1 class="text-sm mb-2">Settings</h1>
-    <p class="text-xs text-gray-600">
+    <h1 class="text-base font-medium mb-1">Settings</h1>
+    <p class="text-xs text-gray-500">
       Manage your profile and company information
     </p>
   </div>
-  
-  <form onsubmit={handleSubmit} class="space-y-6">
+
+  <form onsubmit={handleSubmit} class="space-y-12">
     <!-- Personal Information -->
-    <div class="border border-thin rounded-sm p-6 space-y-4">
-      <h2 class="text-xs mb-4">Personal Information</h2>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="space-y-5">
+      <h2 class="text-sm font-medium pb-2 border-b border-gray-200">Personal Information</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
-          <label for="fullName" class="block text-xs text-gray-600 mb-1">Full Name</label>
+          <label for="fullName" class="block text-xs text-gray-500 mb-1.5">Full Name</label>
           <input
             id="fullName"
             type="text"
             bind:value={fullName}
             placeholder="Your full name"
-            class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+            class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
             required
           />
         </div>
-        
+
         <div>
-          <label for="defaultCurrency" class="block text-xs text-gray-600 mb-1">Default Currency</label>
+          <label for="defaultCurrency" class="block text-xs text-gray-500 mb-1.5">Default Currency</label>
           <select
             id="defaultCurrency"
             bind:value={defaultCurrency}
-            class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+            class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
           >
             {#each currencies as currency}
               <option value={currency.code}>{currency.name}</option>
@@ -102,117 +102,117 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Company Information -->
-    <div class="border border-thin rounded-sm p-6 space-y-4">
-      <h2 class="text-xs mb-4">Company Information</h2>
-      
+    <div class="space-y-5">
+      <h2 class="text-sm font-medium pb-2 border-b border-gray-200">Company Information</h2>
+
       <div>
-        <label for="companyName" class="block text-xs text-gray-600 mb-1">Company Name</label>
+        <label for="companyName" class="block text-xs text-gray-500 mb-1.5">Company Name</label>
         <input
           id="companyName"
           type="text"
           bind:value={companyName}
           placeholder="Your company name"
-          class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+          class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
         />
       </div>
-      
+
       <div>
-        <label for="companyAddress" class="block text-xs text-gray-600 mb-1">Company Address</label>
+        <label for="companyAddress" class="block text-xs text-gray-500 mb-1.5">Company Address</label>
         <textarea
           id="companyAddress"
           bind:value={companyAddress}
           placeholder="Your company address"
           rows="3"
-          class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors resize-none"
+          class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors resize-none"
         ></textarea>
       </div>
-      
+
       <div>
-        <label for="taxId" class="block text-xs text-gray-600 mb-1">Tax ID / VAT Number</label>
+        <label for="taxId" class="block text-xs text-gray-500 mb-1.5">Tax ID / VAT Number</label>
         <input
           id="taxId"
           type="text"
           bind:value={taxId}
           placeholder="Your tax identification number"
-          class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+          class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
         />
       </div>
     </div>
-    
+
     <!-- Bank Details -->
-    <div class="border border-thin rounded-sm p-6 space-y-4">
-      <h2 class="text-xs mb-4">Bank Transfer Details</h2>
-      
+    <div class="space-y-5">
+      <h2 class="text-sm font-medium pb-2 border-b border-gray-200">Bank Transfer Details</h2>
+
       <div>
-        <label for="bankDetails" class="block text-xs text-gray-600 mb-1">Bank Information</label>
+        <label for="bankDetails" class="block text-xs text-gray-500 mb-1.5">Bank Information</label>
         <textarea
           id="bankDetails"
           bind:value={bankDetails}
           placeholder="Bank details to display on invoices (IBAN, account number, etc.)"
           rows="4"
-          class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors resize-none"
+          class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors resize-none"
         ></textarea>
-        <p class="text-xs text-gray-500 mt-1">
+        <p class="text-xs text-gray-400 mt-1.5">
           This information will be displayed on your invoices for bank transfer payments
         </p>
       </div>
     </div>
-    
+
     <!-- Account Information -->
-    <div class="border border-thin rounded-sm p-6 space-y-4">
-      <h2 class="text-xs mb-4">Account</h2>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="space-y-5">
+      <h2 class="text-sm font-medium pb-2 border-b border-gray-200">Account</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
-          <label class="block text-xs text-gray-600 mb-1">Email</label>
-          <div class="px-3 py-2 text-xs border border-thin rounded-sm bg-gray-50 text-gray-600">
+          <label class="block text-xs text-gray-500 mb-1.5">Email</label>
+          <div class="px-3 py-1.5 text-xs border border-gray-300 bg-gray-50 text-gray-500">
             {data.session?.user?.email || 'Not available'}
           </div>
         </div>
-        
+
         <div>
-          <label class="block text-xs text-gray-600 mb-1">Plan</label>
-          <div class="px-3 py-2 text-xs border border-thin rounded-sm bg-gray-50 text-gray-600">
+          <label class="block text-xs text-gray-500 mb-1.5">Plan</label>
+          <div class="px-3 py-1.5 text-xs border border-gray-300 bg-gray-50 text-gray-500">
             {data.subscription?.plan === 'free' ? 'Free' : 'Pro'} Plan
           </div>
         </div>
       </div>
-      
+
       {#if data.subscription?.plan === 'free'}
-        <div class="pt-3 border-t border-thin">
-          <p class="text-xs text-gray-600 mb-2">
+        <div class="pt-5 border-t border-gray-200">
+          <p class="text-xs text-gray-500 mb-3">
             Upgrade to Pro for unlimited sending and custom templates
           </p>
           <button
             type="button"
-            class="px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium"
+            class="px-4 py-1.5 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75"
           >
             Upgrade to Pro
           </button>
         </div>
       {/if}
     </div>
-    
+
     <!-- Save Button -->
-    <div class="flex justify-end">
+    <div class="flex justify-end pt-4">
       <button
         type="submit"
         disabled={isLoading}
-        class="px-6 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium disabled:opacity-50"
+        class="px-6 py-1.5 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50"
       >
         {isLoading ? 'Saving...' : 'Save Changes'}
       </button>
     </div>
-    
+
     <!-- Messages -->
     {#if message}
       <div class="text-center">
         <p class="text-xs text-green-600">{message}</p>
       </div>
     {/if}
-    
+
     {#if error}
       <div class="text-center">
         <p class="text-xs text-red-600">{error}</p>

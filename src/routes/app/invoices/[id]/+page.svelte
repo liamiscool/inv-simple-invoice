@@ -241,102 +241,102 @@
 
 {#if !data.invoice}
   <div class="max-w-2xl">
-    <div class="border border-thin rounded-sm p-8 text-center">
-      <h1 class="text-xs mb-2">Invoice not found</h1>
-      <p class="text-xs text-gray-600 mb-4">
+    <div class="py-16 text-center">
+      <h1 class="text-sm font-medium mb-2">Invoice not found</h1>
+      <p class="text-xs text-gray-500 mb-4">
         The invoice you're looking for doesn't exist or you don't have permission to view it.
       </p>
       <a
         href="/app/invoices"
-        class="inline-flex items-center px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium"
+        class="inline-flex items-center px-4 py-1.5 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75"
       >
         Back to Invoices
       </a>
     </div>
   </div>
 {:else}
-  <div class="max-w-4xl space-y-6">
+  <div class="max-w-6xl space-y-8">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
-        <div class="flex items-center gap-3 mb-2">
-          <h1 class="text-sm">Invoice {data.invoice.number}</h1>
-          <span class="inline-flex px-2 py-1 rounded-sm text-xs {statusColors[data.invoice.status as keyof typeof statusColors]}">
+        <div class="flex items-center gap-3 mb-1">
+          <h1 class="text-base font-medium">Invoice {data.invoice.number}</h1>
+          <span class="inline-flex px-2 py-0.5 text-xs {statusColors[data.invoice.status as keyof typeof statusColors]}">
             {statusLabels[data.invoice.status as keyof typeof statusLabels]}
           </span>
         </div>
-        <p class="text-xs text-gray-600">
+        <p class="text-xs text-gray-500">
           Created {formatDate(data.invoice.created_at)}
         </p>
       </div>
-      
-      <div class="flex items-center gap-3">
+
+      <div class="flex items-center gap-2">
         {#if ['draft', 'sent'].includes(data.invoice.status)}
           <button
             onclick={openEmailModal}
             disabled={isLoading}
-            class="px-4 py-2 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75 disabled:opacity-50"
+            class="px-3 py-1.5 text-xs text-gray-700 hover:text-black transition-colors disabled:opacity-50"
           >
             Send Email
           </button>
         {/if}
-        
+
         {#if data.invoice.status === 'draft'}
           <button
             onclick={() => updateStatus('sent')}
             disabled={isLoading}
-            class="px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium disabled:opacity-50"
+            class="px-4 py-1.5 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50"
           >
             Mark as Sent
           </button>
         {/if}
-        
+
         {#if ['sent', 'partially_paid'].includes(data.invoice.status)}
           <button
             onclick={() => updateStatus('paid')}
             disabled={isLoading}
-            class="px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium disabled:opacity-50"
+            class="px-4 py-1.5 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50"
           >
             Mark as Paid
           </button>
         {/if}
-        
+
         <button
           onclick={duplicateInvoice}
           disabled={isLoading}
-          class="px-4 py-2 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75 disabled:opacity-50"
+          class="px-3 py-1.5 text-xs text-gray-700 hover:text-black transition-colors disabled:opacity-50"
         >
           Duplicate
         </button>
 
         <a
           href="/app/invoices/{data.invoice.id}/edit"
-          class="px-4 py-2 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75"
+          class="px-3 py-1.5 text-xs text-gray-700 hover:text-black transition-colors"
         >
           Edit
         </a>
       </div>
     </div>
-    
+
     <!-- Invoice Details -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Client Information -->
-      <div class="border border-thin rounded-sm p-6">
-        <h2 class="text-xs mb-4">Bill To</h2>
+      <div class="space-y-3">
+        <h2 class="text-sm font-medium">Bill To</h2>
         <div class="space-y-1 text-xs">
           <div class="font-medium">{data.invoice.client.name}</div>
           {#if data.invoice.client.company}
             <div class="text-gray-600">{data.invoice.client.company}</div>
           {/if}
           {#if data.invoice.client.email}
-            <div class="text-gray-600">{data.invoice.client.email}</div>
+            <div class="text-gray-500">{data.invoice.client.email}</div>
           {/if}
         </div>
       </div>
-      
+
       <!-- Invoice Information -->
-      <div class="border border-thin rounded-sm p-6">
-        <h2 class="text-xs mb-4">Invoice Details</h2>
+      <div class="space-y-3">
+        <h2 class="text-sm font-medium">Invoice Details</h2>
         <div class="space-y-2 text-xs">
           <div class="flex justify-between">
             <span class="text-gray-600">Number:</span>

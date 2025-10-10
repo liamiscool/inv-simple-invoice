@@ -56,16 +56,19 @@
   });
 </script>
 
-<div class="max-w-4xl mx-auto p-6">
-  <h1 class="text-2xl mb-6">Debug: Subscription Info</h1>
+<div class="max-w-6xl space-y-6">
+  <div>
+    <h1 class="text-base font-medium mb-1">Debug: Subscription Info</h1>
+    <p class="text-xs text-gray-500">Development debugging information</p>
+  </div>
 
   {#if loading}
-    <p>Loading...</p>
+    <p class="text-xs text-gray-500">Loading...</p>
   {:else if subscriptionInfo}
-    <pre class="bg-gray-100 p-4 rounded text-xs overflow-auto">{JSON.stringify(subscriptionInfo, null, 2)}</pre>
+    <pre class="bg-gray-50 p-4 text-xs overflow-auto border border-gray-200">{JSON.stringify(subscriptionInfo, null, 2)}</pre>
   {/if}
 
-  <div class="mt-6">
-    <a href="/app/clients" class="text-sm underline">← Back to clients</a>
+  <div>
+    <a href="/app/clients" class="text-xs text-gray-500 hover:text-black transition-colors">← Back to clients</a>
   </div>
 </div>

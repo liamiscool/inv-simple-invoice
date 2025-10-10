@@ -80,23 +80,23 @@
   <title>Add Client - inv</title>
 </svelte:head>
 
-<div class="max-w-2xl space-y-6">
+<div class="max-w-6xl space-y-8">
   <!-- Header -->
   <div>
-    <h1 class="text-sm mb-2">Add Client</h1>
-    <p class="text-xs text-gray-600">
+    <h1 class="text-base font-medium mb-1">Add Client</h1>
+    <p class="text-xs text-gray-500">
       Add a new client to start creating invoices
     </p>
   </div>
-  
-  <form onsubmit={handleSubmit} class="space-y-6">
+
+  <form onsubmit={handleSubmit} class="space-y-8">
     <!-- Basic Information -->
-    <div class="border border-thin rounded-sm p-6 space-y-4">
-      <h2 class="text-xs mb-4">Basic Information</h2>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="space-y-5">
+      <h2 class="text-sm font-medium pb-2 border-b border-gray-200">Basic Information</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
-          <label for="name" class="block text-xs text-gray-600 mb-1">
+          <label for="name" class="block text-xs text-gray-500 mb-1.5">
             Client Name <span class="text-red-600">*</span>
           </label>
           <input
@@ -104,41 +104,41 @@
             type="text"
             bind:value={name}
             placeholder="John Doe"
-            class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+            class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
             required
           />
         </div>
-        
+
         <div>
-          <label for="company" class="block text-xs text-gray-600 mb-1">Company</label>
+          <label for="company" class="block text-xs text-gray-500 mb-1.5">Company</label>
           <input
             id="company"
             type="text"
             bind:value={company}
             placeholder="Acme Inc."
-            class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+            class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
           />
         </div>
       </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
-          <label for="email" class="block text-xs text-gray-600 mb-1">Email</label>
+          <label for="email" class="block text-xs text-gray-500 mb-1.5">Email</label>
           <input
             id="email"
             type="email"
             bind:value={email}
             placeholder="john@example.com"
-            class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+            class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
           />
         </div>
-        
+
         <div>
-          <label for="currency" class="block text-xs text-gray-600 mb-1">Preferred Currency</label>
+          <label for="currency" class="block text-xs text-gray-500 mb-1.5">Preferred Currency</label>
           <select
             id="currency"
             bind:value={currency}
-            class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+            class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
           >
             {#each currencies as curr}
               <option value={curr.code}>{curr.name}</option>
@@ -147,28 +147,28 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Additional Information -->
-    <div class="border border-thin rounded-sm p-6 space-y-4">
-      <h2 class="text-xs mb-4">Additional Information</h2>
-      
+    <div class="space-y-5">
+      <h2 class="text-sm font-medium pb-2 border-b border-gray-200">Additional Information</h2>
+
       <div>
-        <label for="notes" class="block text-xs text-gray-600 mb-1">Notes</label>
+        <label for="notes" class="block text-xs text-gray-500 mb-1.5">Notes</label>
         <textarea
           id="notes"
           bind:value={notes}
           placeholder="Additional notes about this client..."
           rows="3"
-          class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors resize-none"
+          class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors resize-none"
         ></textarea>
       </div>
     </div>
-    
+
     <!-- Actions -->
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between pt-4">
       <a
         href="/app/clients"
-        class="px-4 py-2 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75"
+        class="px-4 py-1.5 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75"
       >
         Cancel
       </a>
@@ -176,12 +176,12 @@
       <button
         type="submit"
         disabled={isLoading || !name}
-        class="px-6 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+        class="px-6 py-1.5 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isLoading ? 'Adding Client...' : 'Add Client'}
       </button>
     </div>
-    
+
     {#if error}
       <div class="text-center">
         <p class="text-xs text-red-600">{error}</p>

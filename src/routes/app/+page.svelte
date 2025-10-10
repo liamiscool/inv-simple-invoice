@@ -134,59 +134,59 @@
   <title>Dashboard - inv</title>
 </svelte:head>
 
-<div class="max-w-5xl space-y-6">
+<div class="max-w-6xl space-y-8">
   <!-- Welcome -->
   <div>
-    <h1 class="text-sm mb-2">Dashboard</h1>
-    <p class="text-xs text-gray-600">
+    <h1 class="text-base font-medium mb-1">Dashboard</h1>
+    <p class="text-xs text-gray-500">
       Welcome back, {data.session?.user?.email?.split('@')[0] || 'User'}
     </p>
   </div>
 
   {#if loading}
     <div class="text-center py-12">
-      <p class="text-xs text-gray-600">Loading...</p>
+      <p class="text-xs text-gray-500">Loading...</p>
     </div>
   {:else}
     <!-- Quick stats -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="border border-thin rounded-sm p-4">
+      <div class="border-l-2 border-black pl-4 py-2">
         <div class="text-2xl font-light mb-1">{stats.drafts}</div>
-        <div class="text-xs text-gray-600">Draft invoices</div>
+        <div class="text-xs text-gray-500">Draft invoices</div>
       </div>
-      <div class="border border-thin rounded-sm p-4">
+      <div class="border-l-2 border-black pl-4 py-2">
         <div class="text-2xl font-light mb-1">{formatCurrency(stats.earnings)}</div>
-        <div class="text-xs text-gray-600">Total earnings</div>
+        <div class="text-xs text-gray-500">Total earnings</div>
       </div>
-      <div class="border border-thin rounded-sm p-4">
+      <div class="border-l-2 border-black pl-4 py-2">
         <div class="text-2xl font-light mb-1">{formatCurrency(stats.outstanding)}</div>
-        <div class="text-xs text-gray-600">Outstanding</div>
+        <div class="text-xs text-gray-500">Outstanding</div>
       </div>
-      <div class="border border-thin rounded-sm p-4">
+      <div class="border-l-2 border-black pl-4 py-2">
         <div class="text-2xl font-light mb-1">{stats.clients}</div>
-        <div class="text-xs text-gray-600">Clients</div>
+        <div class="text-xs text-gray-500">Clients</div>
       </div>
     </div>
 
     <!-- Quick actions -->
     <div class="space-y-4">
-      <h2 class="text-xs">Quick actions</h2>
-      <div class="flex flex-wrap gap-3">
+      <h2 class="text-sm font-medium">Quick actions</h2>
+      <div class="flex flex-wrap gap-2">
         <a
           href="/app/invoices/new"
-          class="inline-flex items-center px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium"
+          class="inline-flex items-center px-4 py-1.5 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75"
         >
           Create invoice
         </a>
         <a
           href="/app/clients/new"
-          class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75"
+          class="inline-flex items-center px-4 py-1.5 text-xs text-gray-700 hover:text-black transition-colors"
         >
           Add client
         </a>
         <a
           href="/app/templates"
-          class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75"
+          class="inline-flex items-center px-4 py-1.5 text-xs text-gray-700 hover:text-black transition-colors"
         >
           Browse templates
         </a>
@@ -196,28 +196,28 @@
     <!-- Recent invoices -->
     <div class="space-y-4">
       <div class="flex items-center justify-between">
-        <h2 class="text-xs">Recent invoices</h2>
-        <a href="/app/invoices" class="text-xs text-gray-600 hover:text-black transition-colors">
+        <h2 class="text-sm font-medium">Recent invoices</h2>
+        <a href="/app/invoices" class="text-xs text-gray-500 hover:text-black transition-colors">
           View all →
         </a>
       </div>
 
       {#if recentInvoices.length === 0}
-        <div class="border border-thin rounded-sm p-8 text-center">
-          <p class="text-xs text-gray-600 mb-3">No invoices yet</p>
+        <div class="py-12 text-center">
+          <p class="text-xs text-gray-500 mb-4">No invoices yet</p>
           <a
             href="/app/invoices/new"
-            class="inline-flex items-center px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium"
+            class="inline-flex items-center px-4 py-1.5 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75"
           >
             Create your first invoice
           </a>
         </div>
       {:else}
-        <div class="border border-thin rounded-sm divide-y divide-thin">
+        <div class="border-t border-b border-gray-200 divide-y divide-gray-100">
           {#each recentInvoices as invoice}
             <a
               href="/app/invoices/{invoice.id}"
-              class="block p-4 hover:bg-gray-50 transition-colors"
+              class="block py-3 hover:bg-gray-50/50 transition-colors"
             >
               <div class="flex items-center justify-between">
                 <div class="flex-1 min-w-0">
@@ -227,7 +227,7 @@
                       {invoice.status.replace('_', ' ')}
                     </div>
                   </div>
-                  <div class="text-xs text-gray-600 mt-1">
+                  <div class="text-xs text-gray-500 mt-0.5">
                     {invoice.client?.company || invoice.client?.name || 'Unknown client'}
                   </div>
                 </div>
@@ -236,7 +236,7 @@
                     {formatCurrency(invoice.total, invoice.currency)}
                   </div>
                   {#if invoice.due_date}
-                    <div class="text-xs text-gray-600 mt-1">
+                    <div class="text-xs text-gray-500 mt-0.5">
                       Due {formatDate(invoice.due_date)}
                     </div>
                   {/if}

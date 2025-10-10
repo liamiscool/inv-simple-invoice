@@ -117,52 +117,64 @@
   {/if}
   
   <!-- Desktop sidebar -->
-  <div class="hidden md:fixed md:left-0 md:top-0 md:h-full md:w-48 md:border-r md:border-thin md:bg-white md:block">
-    <div class="py-8 px-6">
-      <a href="/app" class="text-base tracking-tight block mb-8 font-medium">inv</a>
-      <nav class="space-y-1">
-        {#each navItems as item}
-          <a
-            href={item.href}
-            class="block text-xs hover:text-black transition-colors py-1.5 {
-              (item.exact ? $page.url.pathname === item.href : $page.url.pathname.startsWith(item.href))
-                ? 'text-black font-medium' : 'text-gray-500'
-            }"
-          >
-            {item.label}
-          </a>
-        {/each}
-      </nav>
+  <div class="hidden md:fixed md:left-0 md:top-0 md:h-full md:w-48 md:border-r md:border-thin md:bg-white md:flex md:flex-col">
+    <div class="py-8 px-6 flex-1 flex flex-col">
+      <!-- Logo and Nav -->
+      <div class="flex-shrink-0">
+        <a href="/app" class="text-base tracking-tight block mb-8 font-medium">inv</a>
+        <nav class="space-y-1">
+          {#each navItems as item}
+            <a
+              href={item.href}
+              class="block text-xs hover:text-black transition-colors py-1.5 {
+                (item.exact ? $page.url.pathname === item.href : $page.url.pathname.startsWith(item.href))
+                  ? 'text-black font-medium' : 'text-gray-500'
+              }"
+            >
+              {item.label}
+            </a>
+          {/each}
+        </nav>
+      </div>
 
-      <!-- Upgrade button -->
-      {#if subscriptionPlan === 'free'}
-        <div class="mt-8 pt-8 border-t border-thin">
+      <!-- Spacer to push bottom content down -->
+      <div class="flex-1"></div>
+
+      <!-- Upgrade section -->
+      <div class="flex-shrink-0">
+        {#if subscriptionPlan === 'free'}
+          <div class="bg-gradient-to-br from-gray-900 to-black p-4 mb-4 text-white">
+            <div class="text-xs font-medium mb-2">Upgrade to Pro</div>
+            <div class="text-xs text-gray-300 mb-3 leading-relaxed">
+              Unlimited invoices, custom templates, and priority support
+            </div>
+            <button
+              onclick={() => showUpgradeModal = true}
+              class="w-full px-3 py-1.5 bg-white text-black text-xs hover:bg-gray-100 transition-colors duration-75 font-medium"
+            >
+              Upgrade Now
+            </button>
+          </div>
+        {:else}
+          <div class="pb-4 mb-4 border-b border-thin">
+            <div class="text-xs font-medium text-green-600">
+              ✓ Pro Plan Active
+            </div>
+          </div>
+        {/if}
+
+        <!-- User section -->
+        <div class="pb-4">
+          <div class="text-xs text-gray-500 mb-2 truncate">
+            {data.session?.user?.email?.split('@')[0] || 'User'}
+          </div>
           <button
-            onclick={() => showUpgradeModal = true}
-            class="w-full px-3 py-1.5 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75"
+            onclick={handleLogout}
+            class="text-xs text-gray-500 hover:text-black transition-colors"
           >
-            Upgrade to Pro
+            Sign out
           </button>
         </div>
-      {:else}
-        <div class="mt-8 pt-8 border-t border-thin">
-          <div class="text-xs font-medium">
-            Pro Plan
-          </div>
-        </div>
-      {/if}
-
-      <!-- User section -->
-      <div class="mt-8 pt-8 border-t border-thin">
-        <div class="text-xs text-gray-500 mb-2">
-          {data.session?.user?.email?.split('@')[0] || 'User'}
-        </div>
-        <button
-          onclick={handleLogout}
-          class="text-xs text-gray-500 hover:text-black transition-colors"
-        >
-          Sign out
-        </button>
       </div>
     </div>
   </div>

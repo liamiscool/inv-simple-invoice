@@ -105,54 +105,54 @@
 </svelte:head>
 
 <div class="min-h-screen bg-white flex items-center justify-center px-4">
-  <div class="w-full max-w-md space-y-6">
+  <div class="w-full max-w-md space-y-8">
     <!-- Progress -->
-    <div class="text-center space-y-2">
-      <h1 class="text-sm">Welcome to inv</h1>
-      <p class="text-xs text-gray-600">
+    <div class="text-center space-y-3">
+      <h1 class="text-base font-medium">Welcome to inv</h1>
+      <p class="text-xs text-gray-500">
         Let's set up your account ({step}/2)
       </p>
       <div class="flex gap-2 justify-center">
-        <div class="w-16 h-1 {step >= 1 ? 'bg-black' : 'bg-gray-200'} transition-colors"></div>
-        <div class="w-16 h-1 {step >= 2 ? 'bg-black' : 'bg-gray-200'} transition-colors"></div>
+        <div class="w-16 h-0.5 {step >= 1 ? 'bg-black' : 'bg-gray-200'} transition-colors"></div>
+        <div class="w-16 h-0.5 {step >= 2 ? 'bg-black' : 'bg-gray-200'} transition-colors"></div>
       </div>
     </div>
-    
+
     <form onsubmit={handleSubmit} class="space-y-6">
       {#if step === 1}
         <!-- Step 1: Personal Info -->
-        <div class="space-y-4">
-          <h2 class="text-xs mb-4">Personal Information</h2>
-          
+        <div class="space-y-5">
+          <h2 class="text-sm font-medium">Personal Information</h2>
+
           <div>
-            <label for="fullName" class="block text-xs text-gray-600 mb-1">Full Name</label>
+            <label for="fullName" class="block text-xs text-gray-500 mb-1.5">Full Name</label>
             <input
               id="fullName"
               type="text"
               bind:value={fullName}
               placeholder="Your full name"
-              class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+              class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
               required
             />
           </div>
-          
+
           <div>
-            <label for="companyName" class="block text-xs text-gray-600 mb-1">Company Name</label>
+            <label for="companyName" class="block text-xs text-gray-500 mb-1.5">Company Name</label>
             <input
               id="companyName"
               type="text"
               bind:value={companyName}
               placeholder="Your company name"
-              class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+              class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
             />
           </div>
-          
+
           <div>
-            <label for="defaultCurrency" class="block text-xs text-gray-600 mb-1">Default Currency</label>
+            <label for="defaultCurrency" class="block text-xs text-gray-500 mb-1.5">Default Currency</label>
             <select
               id="defaultCurrency"
               bind:value={defaultCurrency}
-              class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+              class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
             >
               {#each currencies as currency}
                 <option value={currency.code}>{currency.name}</option>
@@ -160,86 +160,86 @@
             </select>
           </div>
         </div>
-        
+
         <button
           type="button"
           onclick={nextStep}
           disabled={!fullName}
-          class="w-full py-2 px-4 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full py-1.5 px-4 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Continue
         </button>
       {:else if step === 2}
         <!-- Step 2: Company Details -->
-        <div class="space-y-4">
-          <h2 class="text-xs mb-4">Company Details (Optional)</h2>
-          
+        <div class="space-y-5">
+          <h2 class="text-sm font-medium">Company Details <span class="text-gray-400">(Optional)</span></h2>
+
           <div>
-            <label for="companyAddress" class="block text-xs text-gray-600 mb-1">Company Address</label>
+            <label for="companyAddress" class="block text-xs text-gray-500 mb-1.5">Company Address</label>
             <textarea
               id="companyAddress"
               bind:value={companyAddress}
               placeholder="Your company address"
               rows="3"
-              class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors resize-none"
+              class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors resize-none"
             ></textarea>
           </div>
-          
+
           <div>
-            <label for="taxId" class="block text-xs text-gray-600 mb-1">Tax ID / VAT Number</label>
+            <label for="taxId" class="block text-xs text-gray-500 mb-1.5">Tax ID / VAT Number</label>
             <input
               id="taxId"
               type="text"
               bind:value={taxId}
               placeholder="Your tax identification number"
-              class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+              class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
             />
           </div>
-          
+
           <div>
-            <label for="bankDetails" class="block text-xs text-gray-600 mb-1">Bank Transfer Details</label>
+            <label for="bankDetails" class="block text-xs text-gray-500 mb-1.5">Bank Transfer Details</label>
             <textarea
               id="bankDetails"
               bind:value={bankDetails}
               placeholder="Bank details to display on invoices (IBAN, account number, etc.)"
               rows="3"
-              class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors resize-none"
+              class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors resize-none"
             ></textarea>
           </div>
         </div>
-        
+
         <div class="flex gap-3">
           <button
             type="button"
             onclick={prevStep}
-            class="flex-1 py-2 px-4 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75"
+            class="flex-1 py-1.5 px-4 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75"
           >
             Back
           </button>
           <button
             type="submit"
             disabled={isLoading}
-            class="flex-1 py-2 px-4 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium disabled:opacity-50"
+            class="flex-1 py-1.5 px-4 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50"
           >
             {isLoading ? 'Setting up...' : 'Complete Setup'}
           </button>
         </div>
       {/if}
-      
+
       {#if error}
         <div class="text-center">
           <p class="text-xs text-red-600">{error}</p>
         </div>
       {/if}
     </form>
-    
+
     <!-- Skip option -->
     {#if step === 2}
       <div class="text-center">
         <button
           onclick={handleSubmit}
           disabled={isLoading}
-          class="text-xs text-gray-600 hover:text-black transition-colors"
+          class="text-xs text-gray-500 hover:text-black transition-colors"
         >
           Skip and continue with minimal setup
         </button>
