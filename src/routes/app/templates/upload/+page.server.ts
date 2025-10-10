@@ -1,12 +1,19 @@
 import { redirect, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals: { supabase, user } }) => {
-  // User is already authenticated by /app layout, just get their org
+export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession } }) => {
+  // User is already authenticated by /app layout
+  const { user } = await safeGetSession();
+
+  if (!user) {
+    redirect(303, '/auth/login');
+  }
+
+  // Get their org
   const { data: userProfile } = await supabase
     .from('app_user')
     .select('org_id')
-    .eq('id', user!.id)
+    .eq('id', user.id)
     .single();
 
   if (!userProfile?.org_id) {
@@ -19,7 +26,9 @@ export const load: PageServerLoad = async ({ locals: { supabase, user } }) => {
 };
 
 export const actions = {
-  upload: async ({ request, locals: { supabase, user } }) => {
+  upload: async ({ request, locals: { supabase, safeGetSession } }) => {
+    const { user } = await safeGetSession();
+
     if (!user) {
       return fail(401, { error: 'Unauthorized' });
     }

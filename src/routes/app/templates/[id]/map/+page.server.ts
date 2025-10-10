@@ -2,8 +2,14 @@ import { redirect, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import type { TemplateSpec } from '$lib/templates';
 
-export const load: PageServerLoad = async ({ params, locals: { supabase, user } }) => {
+export const load: PageServerLoad = async ({ params, locals: { supabase, safeGetSession } }) => {
   // User is already authenticated by /app layout
+  const { user } = await safeGetSession();
+
+  if (!user) {
+    redirect(303, '/auth/login');
+  }
+
   const { data: template, error } = await supabase
     .from('template')
     .select('*')
@@ -18,7 +24,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, user } 
   const { data: userProfile } = await supabase
     .from('app_user')
     .select('org_id')
-    .eq('id', user!.id)
+    .eq('id', user.id)
     .single();
 
   if (template.kind === 'custom' && template.org_id !== userProfile?.org_id) {
@@ -31,7 +37,9 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, user } 
 };
 
 export const actions = {
-  save: async ({ request, params, locals: { supabase, user } }) => {
+  save: async ({ request, params, locals: { supabase, safeGetSession } }) => {
+    const { user } = await safeGetSession();
+
     if (!user) {
       return fail(401, { error: 'Unauthorized' });
     }
