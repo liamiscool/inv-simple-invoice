@@ -26,6 +26,7 @@
   let dragStart = $state({ x: 0, y: 0 });
   let scale = $state(1); // Canvas zoom/scale factor
   let imageLoaded = $state(false);
+  let imageError = $state<string | null>(null);
 
   // Area definitions
   const areaDefinitions = {
@@ -64,6 +65,7 @@
       bgImage.onerror = (e) => {
         console.error('Image failed to load:', e);
         console.error('Image URL:', spec.meta.background_image_url);
+        imageError = `Failed to load image from: ${spec.meta.background_image_url}. Check if the storage bucket is public and the URL is accessible.`;
       };
       bgImage.src = spec.meta.background_image_url;
     }
@@ -276,7 +278,15 @@
     <!-- Canvas -->
     <div class="lg:col-span-2 border border-thin rounded-sm p-4 bg-white">
       <div class="overflow-auto" style="max-height: 800px;">
-        {#if imageLoaded}
+        {#if imageError}
+          <div class="flex flex-col items-center justify-center h-96 text-red-600 text-xs p-4 text-center">
+            <div class="mb-2 font-medium">Image Loading Error</div>
+            <div class="text-gray-600 max-w-md">{imageError}</div>
+            <div class="mt-4 text-gray-500 text-xs">
+              Debug info: Check browser console for details
+            </div>
+          </div>
+        {:else if imageLoaded}
           <canvas
             bind:this={canvas}
             onmousedown={handleCanvasMouseDown}
@@ -287,7 +297,10 @@
           ></canvas>
         {:else}
           <div class="flex items-center justify-center h-96 text-gray-400 text-xs">
-            Loading template image...
+            <div class="flex flex-col items-center gap-2">
+              <div>Loading template image...</div>
+              <div class="text-xs text-gray-500">URL: {spec.meta?.background_image_url || 'No URL set'}</div>
+            </div>
           </div>
         {/if}
       </div>
