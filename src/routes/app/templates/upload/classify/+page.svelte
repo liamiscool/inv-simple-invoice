@@ -25,9 +25,26 @@
   let error = $state<string | null>(null);
   let scale = $state(1);
   let pdfRendered = $state(false);
+  let originalImageData: ImageData | null = null; // Store original PDF rendering
+  let customFieldIndex: number | null = $state(null); // Index of item being given custom field
+  let customFieldName = $state(''); // Custom field name input
+  let customFieldSuggestion: string | null = $state(null); // Suggested standard field
+  let validationError = $state(false); // Show validation errors
+
+  // Multi-select state
+  let isDragging = $state(false);
+  let dragStartX = $state(0);
+  let dragStartY = $state(0);
+  let dragEndX = $state(0);
+  let dragEndY = $state(0);
+  let selectedItems = $state<Set<number>>(new Set());
+  let showMultiSelectPopup = $state(false);
+  let popupX = $state(0);
+  let popupY = $state(0);
 
   // Area definitions for field mapping
   const fieldOptions = [
+    { value: '__ignore__', label: '🗑️ Ignore / Delete' },
     { value: 'invoice_title', label: 'Invoice Title' },
     { value: 'invoice_number', label: 'Invoice Number' },
     { value: 'issue_date', label: 'Issue Date' },
@@ -92,12 +109,14 @@
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer2 }).promise;
       const page = await pdf.getPage(1);
 
-      // Calculate scale to fit canvas
+      // Calculate scale to fit canvas (render at 300 DPI for quality)
       const viewport = page.getViewport({ scale: 300 / 72 }); // 300 DPI
 
       canvas.width = viewport.width;
       canvas.height = viewport.height;
-      scale = Math.min(1000 / viewport.width, 700 / viewport.height);
+
+      // Scale to fit container (will be handled by CSS max-width: 100%)
+      scale = 1;
 
       ctx = canvas.getContext('2d')!;
 
@@ -106,6 +125,9 @@
         canvasContext: ctx,
         viewport
       }).promise;
+
+      // Save the original PDF rendering (before we draw overlays)
+      originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
       pdfRendered = true;
       redraw();
@@ -119,11 +141,27 @@
   }
 
   function redraw() {
-    if (!ctx || !pdfRendered || !extractedText) return;
+    if (!ctx || !pdfRendered || !extractedText || !originalImageData) return;
 
-    // Redraw canvas (clear overlays)
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    ctx.putImageData(imageData, 0, 0);
+    // Restore original PDF rendering (clears all overlays)
+    ctx.putImageData(originalImageData, 0, 0);
+
+    // Draw selection rectangle if dragging
+    if (isDragging) {
+      const rect = canvas.getBoundingClientRect();
+      const actualScale = rect.width / canvas.width;
+
+      const x1 = Math.min(dragStartX, dragEndX);
+      const y1 = Math.min(dragStartY, dragEndY);
+      const x2 = Math.max(dragStartX, dragEndX);
+      const y2 = Math.max(dragStartY, dragEndY);
+
+      ctx.strokeStyle = '#3b82f6';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+      ctx.fillStyle = 'rgba(59, 130, 246, 0.1)';
+      ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+    }
 
     // Draw text boxes
     extractedText.items.forEach((item, index) => {
@@ -131,7 +169,12 @@
       if (!classification) return;
 
       const isSelected = selectedItemIndex === index;
+      const isInMultiSelect = selectedItems.has(index);
       const isStatic = classification.classification === 'static';
+      const isDynamic = classification.classification === 'dynamic';
+      const isMapped = isDynamic && classification.fieldMapping && classification.fieldMapping !== '';
+      const isIgnored = classification.fieldMapping === '__ignore__';
+      const isUnmapped = isDynamic && !isMapped && !isIgnored;
 
       // Convert coordinates to canvas space (already at 300 DPI from extraction)
       const x = item.x;
@@ -139,53 +182,155 @@
       const w = item.width;
       const h = item.height;
 
+      // Color scheme: gray=static, blue=dynamic, red=validation error for unmapped
+      let strokeColor: string;
+      let fillColor: string;
+
+      if (isIgnored) {
+        // Ignored items - very light gray
+        strokeColor = isSelected ? '#9ca3af' : '#d1d5db';
+        fillColor = 'rgba(156, 163, 175, 0.05)';
+      } else if (isStatic) {
+        // Static - gray
+        strokeColor = isSelected ? '#6b7280' : '#9ca3af';
+        fillColor = 'rgba(107, 114, 128, 0.1)';
+      } else if (validationError && isUnmapped) {
+        // Validation error - unmapped dynamic field - red
+        strokeColor = isSelected ? '#ef4444' : '#fca5a5';
+        fillColor = 'rgba(239, 68, 68, 0.15)';
+      } else {
+        // Dynamic - blue
+        strokeColor = isSelected ? '#3b82f6' : '#93c5fd';
+        fillColor = 'rgba(59, 130, 246, 0.1)';
+      }
+
       // Draw box
-      ctx.strokeStyle = isStatic
-        ? (isSelected ? '#10b981' : '#6ee7b7') // Green for static
-        : (isSelected ? '#ef4444' : '#fca5a5'); // Red for dynamic
-      ctx.lineWidth = isSelected ? 3 : 1.5;
+      ctx.strokeStyle = strokeColor;
+      ctx.lineWidth = (isSelected || isInMultiSelect) ? 3 : 1.5;
       ctx.strokeRect(x, y, w, h);
 
       // Draw fill overlay
-      ctx.fillStyle = isStatic
-        ? 'rgba(16, 185, 129, 0.1)'
-        : 'rgba(239, 68, 68, 0.1)';
+      ctx.fillStyle = fillColor;
       ctx.fillRect(x, y, w, h);
 
+      // Highlight multi-selected items
+      if (isInMultiSelect) {
+        ctx.strokeStyle = '#3b82f6';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x, y, w, h);
+        ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
+        ctx.fillRect(x, y, w, h);
+      }
+
       // Draw index label for selected item
-      if (isSelected) {
-        ctx.fillStyle = isStatic ? '#10b981' : '#ef4444';
+      if (isSelected || isInMultiSelect) {
+        ctx.fillStyle = isInMultiSelect ? '#3b82f6' : strokeColor;
         ctx.font = 'bold 12px monospace';
         ctx.fillText(`#${index}`, x, y - 5);
       }
     });
   }
 
-  function handleCanvasClick(event: MouseEvent) {
+  function handleCanvasMouseDown(event: MouseEvent) {
     if (!extractedText) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / scale;
-    const y = (event.clientY - rect.top) / scale;
+    const actualScale = rect.width / canvas.width;
+    const x = (event.clientX - rect.left) / actualScale;
+    const y = (event.clientY - rect.top) / actualScale;
 
-    // Find clicked text item
-    let clickedIndex: number | null = null;
+    isDragging = true;
+    dragStartX = x;
+    dragStartY = y;
+    dragEndX = x;
+    dragEndY = y;
+    selectedItems = new Set();
+    showMultiSelectPopup = false;
 
+    // Store popup position at mouse down (first click) - use clientX/Y for fixed positioning
+    popupX = event.clientX;
+    popupY = event.clientY;
+  }
+
+  function handleCanvasMouseMove(event: MouseEvent) {
+    if (!isDragging || !extractedText) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const actualScale = rect.width / canvas.width;
+    dragEndX = (event.clientX - rect.left) / actualScale;
+    dragEndY = (event.clientY - rect.top) / actualScale;
+
+    // Find items within selection rectangle
+    const x1 = Math.min(dragStartX, dragEndX);
+    const y1 = Math.min(dragStartY, dragEndY);
+    const x2 = Math.max(dragStartX, dragEndX);
+    const y2 = Math.max(dragStartY, dragEndY);
+
+    selectedItems = new Set();
     extractedText.items.forEach((item, index) => {
       const itemX = item.x;
       const itemY = item.y;
       const itemW = item.width;
       const itemH = item.height;
 
-      if (x >= itemX && x <= itemX + itemW && y >= itemY && y <= itemY + itemH) {
-        clickedIndex = index;
+      // Check if item intersects with selection rectangle
+      if (itemX + itemW >= x1 && itemX <= x2 && itemY + itemH >= y1 && itemY <= y2) {
+        selectedItems.add(index);
       }
     });
 
-    if (clickedIndex !== null) {
-      selectedItemIndex = clickedIndex;
-      redraw();
+    redraw();
+  }
+
+  function handleCanvasMouseUp(event: MouseEvent) {
+    if (!isDragging) return;
+
+    isDragging = false;
+
+    // If multiple items selected, show popup
+    if (selectedItems.size > 1) {
+      // Position popup to the right of the selection box
+      const rect = canvas.getBoundingClientRect();
+      const actualScale = rect.width / canvas.width;
+
+      // Calculate selection box bounds in screen coordinates
+      const x1Screen = rect.left + (Math.min(dragStartX, dragEndX) * actualScale);
+      const x2Screen = rect.left + (Math.max(dragStartX, dragEndX) * actualScale);
+      const y1Screen = rect.top + (Math.min(dragStartY, dragEndY) * actualScale);
+      const y2Screen = rect.top + (Math.max(dragStartY, dragEndY) * actualScale);
+
+      // Position to the right of selection box
+      const popupWidth = 192; // w-48 = 12rem = 192px
+      const popupHeight = 256; // max-h-64 = 16rem = 256px (max)
+
+      let x = x2Screen + 10; // 10px gap from selection
+      let y = y1Screen;
+
+      // Check right boundary - if popup goes off screen, show on left side instead
+      if (x + popupWidth > window.innerWidth) {
+        x = x1Screen - popupWidth - 10;
+      }
+
+      // Check bottom boundary
+      if (y + popupHeight > window.innerHeight) {
+        y = window.innerHeight - popupHeight - 10;
+      }
+
+      // Check top boundary
+      if (y < 10) {
+        y = 10;
+      }
+
+      popupX = x;
+      popupY = y;
+      showMultiSelectPopup = true;
+    } else if (selectedItems.size === 1) {
+      // Single item - select it normally
+      selectedItemIndex = Array.from(selectedItems)[0];
+      selectedItems = new Set();
     }
+
+    redraw();
   }
 
   function toggleClassification(index: number) {
@@ -197,6 +342,8 @@
       ? suggestFieldMapping(extractedText!.items[index].text, extractedText!.items[index], extractedText!.items)
       : null;
 
+    // Create new Map to trigger Svelte reactivity
+    classifiedItems = new Map(classifiedItems);
     classifiedItems.set(index, {
       classification: newClassification,
       fieldMapping: newFieldMapping
@@ -209,10 +356,119 @@
     const current = classifiedItems.get(index);
     if (!current) return;
 
+    if (fieldMapping === '__custom__') {
+      // User selected "Custom..." - show custom field input
+      customFieldIndex = index;
+      customFieldName = '';
+      customFieldSuggestion = null;
+      return;
+    }
+
     classifiedItems.set(index, {
       ...current,
       fieldMapping
     });
+  }
+
+  function detectSimilarField(customName: string): string | null {
+    const normalized = customName.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+    // Check if it matches any standard field
+    for (const field of fieldOptions) {
+      const fieldNormalized = field.value.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const labelNormalized = field.label.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+      if (normalized === fieldNormalized || normalized === labelNormalized) {
+        return field.value;
+      }
+
+      // Check for partial matches (e.g., "invoice" matches "invoice_number")
+      if (normalized.includes(fieldNormalized) || fieldNormalized.includes(normalized)) {
+        return field.value;
+      }
+    }
+
+    return null;
+  }
+
+  function handleCustomFieldInput() {
+    if (!customFieldName.trim()) return;
+
+    // Check if it matches an existing field
+    const suggestion = detectSimilarField(customFieldName);
+    customFieldSuggestion = suggestion;
+  }
+
+  function saveCustomField(useSuggestion: boolean) {
+    if (customFieldIndex === null) return;
+
+    const current = classifiedItems.get(customFieldIndex);
+    if (!current) return;
+
+    let fieldValue: string;
+
+    if (useSuggestion && customFieldSuggestion) {
+      // Use suggested standard field
+      fieldValue = customFieldSuggestion;
+    } else {
+      // Create custom field (prefix with custom_)
+      fieldValue = 'custom_' + customFieldName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    }
+
+    classifiedItems.set(customFieldIndex, {
+      ...current,
+      fieldMapping: fieldValue
+    });
+
+    // Reset custom field state
+    customFieldIndex = null;
+    customFieldName = '';
+    customFieldSuggestion = null;
+  }
+
+  function cancelCustomField() {
+    customFieldIndex = null;
+    customFieldName = '';
+    customFieldSuggestion = null;
+  }
+
+  function applyToMultipleItems(fieldMapping: string) {
+    if (selectedItems.size === 0) return;
+
+    // Create new Map to trigger reactivity
+    classifiedItems = new Map(classifiedItems);
+
+    selectedItems.forEach((index) => {
+      const current = classifiedItems.get(index);
+      if (current) {
+        classifiedItems.set(index, {
+          classification: 'dynamic',
+          fieldMapping
+        });
+      }
+    });
+
+    // Clear selection and close popup
+    selectedItems = new Set();
+    showMultiSelectPopup = false;
+    redraw();
+  }
+
+  function setMultipleAsStatic() {
+    if (selectedItems.size === 0) return;
+
+    classifiedItems = new Map(classifiedItems);
+
+    selectedItems.forEach((index) => {
+      classifiedItems.set(index, {
+        classification: 'static',
+        fieldMapping: null
+      });
+    });
+
+    selectedItems = new Set();
+    showMultiSelectPopup = false;
+    redraw();
   }
 
   function bulkSetClassification(classification: 'static' | 'dynamic') {
@@ -239,9 +495,26 @@
       return;
     }
 
+    // Validate all dynamic fields are mapped
+    const unmappedItems: number[] = [];
+    classifiedItems.forEach((classification, index) => {
+      if (classification.classification === 'dynamic' &&
+          (!classification.fieldMapping || classification.fieldMapping === '')) {
+        unmappedItems.push(index);
+      }
+    });
+
+    if (unmappedItems.length > 0) {
+      validationError = true;
+      error = `Please map all dynamic fields. ${unmappedItems.length} field${unmappedItems.length > 1 ? 's' : ''} need${unmappedItems.length === 1 ? 's' : ''} a mapping (highlighted in red).`;
+      redraw(); // Redraw to show red highlights
+      return;
+    }
+
     try {
       generating = true;
       error = null;
+      validationError = false;
 
       // Step 1: Generate blank template by removing dynamic text
       const blankCanvas = document.createElement('canvas');
@@ -252,11 +525,15 @@
       // Copy original PDF rendering
       blankCtx.drawImage(canvas, 0, 0);
 
-      // White out dynamic text areas
+      // White out dynamic text areas and ignored items
       blankCtx.fillStyle = '#ffffff';
       extractedText.items.forEach((item, index) => {
         const classification = classifiedItems.get(index);
-        if (classification?.classification === 'dynamic') {
+        const isDynamic = classification?.classification === 'dynamic';
+        const isIgnored = classification?.fieldMapping === '__ignore__';
+
+        // Remove dynamic data and ignored items from template
+        if (isDynamic || isIgnored) {
           // Add small padding to ensure complete coverage
           const padding = 2;
           blankCtx.fillRect(
@@ -355,11 +632,18 @@
       }
     };
 
-    // Add dynamic text items as areas
+    // Add dynamic text items as areas (skip ignored items)
     extractedText.items.forEach((item, index) => {
       const classification = classifiedItems.get(index);
       if (classification?.classification === 'dynamic' && classification.fieldMapping) {
-        const fieldKey = classification.fieldMapping as keyof typeof spec.areas;
+        const fieldMapping = classification.fieldMapping;
+
+        // Skip ignored items
+        if (fieldMapping === '__ignore__') {
+          return;
+        }
+
+        const fieldKey = fieldMapping as keyof typeof spec.areas;
 
         // Skip if it's grand_total or items_table (already defined)
         if (fieldKey === 'grand_total' || fieldKey === 'items_table') {
@@ -378,7 +662,7 @@
           return;
         }
 
-        // Add as area
+        // Add as area (supports both standard and custom fields)
         (spec.areas as any)[fieldKey] = {
           x: pxToMm(item.x),
           y: pxToMm(item.y),
@@ -393,21 +677,38 @@
     return spec;
   }
 
+  // Track which fields have been used
+  let usedFields = $derived.by(() => {
+    const used = new Set<string>();
+    classifiedItems.forEach((classification) => {
+      if (classification.fieldMapping && classification.fieldMapping !== '__ignore__' && !classification.fieldMapping.startsWith('custom_')) {
+        used.add(classification.fieldMapping);
+      }
+    });
+    return used;
+  });
+
   // Computed stats
   let stats = $derived.by(() => {
-    if (!extractedText) return { total: 0, static: 0, dynamic: 0, mapped: 0 };
+    if (!extractedText) return { total: 0, static: 0, dynamic: 0, mapped: 0, unmapped: 0, ignored: 0 };
 
     let staticCount = 0;
     let dynamicCount = 0;
     let mappedCount = 0;
+    let unmappedCount = 0;
+    let ignoredCount = 0;
 
     classifiedItems.forEach((classification) => {
-      if (classification.classification === 'static') {
+      if (classification.fieldMapping === '__ignore__') {
+        ignoredCount++;
+      } else if (classification.classification === 'static') {
         staticCount++;
       } else {
         dynamicCount++;
-        if (classification.fieldMapping) {
+        if (classification.fieldMapping && classification.fieldMapping !== '') {
           mappedCount++;
+        } else {
+          unmappedCount++;
         }
       }
     });
@@ -416,7 +717,9 @@
       total: extractedText.items.length,
       static: staticCount,
       dynamic: dynamicCount,
-      mapped: mappedCount
+      mapped: mappedCount,
+      unmapped: unmappedCount,
+      ignored: ignoredCount
     };
   });
 </script>
@@ -454,33 +757,29 @@
     <div class="text-xs space-y-2">
       <div class="font-medium">How to classify your template:</div>
       <ul class="list-disc list-inside text-gray-700 space-y-1">
-        <li><span class="text-green-600 font-medium">Green boxes</span> = Static labels (will be kept in template)</li>
-        <li><span class="text-red-600 font-medium">Red boxes</span> = Dynamic data (will be removed and mapped)</li>
-        <li>Click any text box to toggle between static/dynamic</li>
+        <li><span class="text-gray-600 font-medium">Gray boxes</span> = Static labels (kept in template)</li>
+        <li><span class="text-blue-600 font-medium">Blue boxes</span> = Dynamic data (will be replaced with invoice data)</li>
+        <li>Use the toggle switch to change between static/dynamic</li>
         <li>For dynamic text, assign a field mapping in the sidebar</li>
-        <li>Click "Generate Template" when done to create your blank template</li>
+        <li>Use "Ignore / Delete" for unwanted text</li>
       </ul>
     </div>
   </div>
 
   <!-- Stats -->
   {#if extractedText}
-    <div class="grid grid-cols-4 gap-4">
-      <div class="border border-thin rounded-sm p-3 bg-white">
-        <div class="text-xs text-gray-600">Total Text Items</div>
-        <div class="text-lg font-medium">{stats.total}</div>
+    <div class="grid grid-cols-3 gap-4">
+      <div class="border border-thin rounded-sm p-3 {stats.unmapped === 0 ? 'bg-green-50' : 'bg-red-50'}">
+        <div class="text-xs {stats.unmapped === 0 ? 'text-green-700' : 'text-red-700'}">Dynamic Fields</div>
+        <div class="text-lg font-medium {stats.unmapped === 0 ? 'text-green-900' : 'text-red-900'}">{stats.mapped + stats.ignored} of {stats.dynamic + stats.ignored}</div>
       </div>
-      <div class="border border-thin rounded-sm p-3 bg-green-50">
-        <div class="text-xs text-green-700">Static Labels</div>
-        <div class="text-lg font-medium text-green-900">{stats.static}</div>
+      <div class="border border-thin rounded-sm p-3 bg-gray-50">
+        <div class="text-xs text-gray-700">Static Labels</div>
+        <div class="text-lg font-medium text-gray-900">{stats.static}</div>
       </div>
-      <div class="border border-thin rounded-sm p-3 bg-red-50">
-        <div class="text-xs text-red-700">Dynamic Data</div>
-        <div class="text-lg font-medium text-red-900">{stats.dynamic}</div>
-      </div>
-      <div class="border border-thin rounded-sm p-3 bg-blue-50">
-        <div class="text-xs text-blue-700">Mapped Fields</div>
-        <div class="text-lg font-medium text-blue-900">{stats.mapped}/{stats.dynamic}</div>
+      <div class="border border-thin rounded-sm p-3 bg-gray-50">
+        <div class="text-xs text-gray-600">Ignored</div>
+        <div class="text-lg font-medium text-gray-700">{stats.ignored}</div>
       </div>
     </div>
   {/if}
@@ -493,88 +792,125 @@
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Canvas -->
-    <div class="lg:col-span-2 border border-thin rounded-sm p-4 bg-white">
-      <div class="overflow-auto" style="max-height: 800px;">
-        <!-- Always render canvas so it can be bound -->
-        <canvas
-          bind:this={canvas}
-          onclick={handleCanvasClick}
-          style="cursor: pointer; width: {canvas?.width ? canvas.width * scale : 0}px; height: {canvas?.height ? canvas.height * scale : 0}px; display: {pdfRendered ? 'block' : 'none'};"
-          class="border border-gray-200"
-        ></canvas>
+    <div class="lg:col-span-2 border border-thin rounded-sm p-4 bg-white flex items-start justify-center">
+      <!-- Always render canvas so it can be bound -->
+      <canvas
+        bind:this={canvas}
+        onmousedown={handleCanvasMouseDown}
+        onmousemove={handleCanvasMouseMove}
+        onmouseup={handleCanvasMouseUp}
+        style="cursor: crosshair; width: 100%; height: auto; display: {pdfRendered ? 'block' : 'none'};"
+        class="border border-gray-200"
+      ></canvas>
 
-        <!-- Loading/Error States -->
-        {#if loading}
-          <div class="flex items-center justify-center h-96 text-gray-400 text-xs">
-            Analyzing PDF and extracting text...
-          </div>
-        {:else if !extractedText && !error}
-          <div class="flex items-center justify-center h-96 text-gray-400 text-xs">
-            Waiting for PDF...
-          </div>
-        {/if}
-      </div>
+      <!-- Loading/Error States -->
+      {#if loading}
+        <div class="flex items-center justify-center h-96 text-gray-400 text-xs">
+          Analyzing PDF and extracting text...
+        </div>
+      {:else if !extractedText && !error}
+        <div class="flex items-center justify-center h-96 text-gray-400 text-xs">
+          Waiting for PDF...
+        </div>
+      {/if}
     </div>
 
     <!-- Sidebar -->
     <div class="space-y-4">
-      <!-- Quick Actions -->
-      <div class="border border-thin rounded-sm p-4 space-y-3">
-        <div class="text-xs font-medium">Quick Actions</div>
-        <div class="flex flex-col gap-2">
-          <button
-            onclick={() => bulkSetClassification('static')}
-            class="px-3 py-2 text-xs bg-green-100 text-green-700 hover:bg-green-200 rounded-sm"
-          >
-            Mark All as Static
-          </button>
-          <button
-            onclick={() => bulkSetClassification('dynamic')}
-            class="px-3 py-2 text-xs bg-red-100 text-red-700 hover:bg-red-200 rounded-sm"
-          >
-            Mark All as Dynamic
-          </button>
-        </div>
-      </div>
-
       <!-- Text Items List -->
       {#if extractedText}
-        <div class="border border-thin rounded-sm p-4 space-y-3 overflow-y-auto" style="max-height: 600px;">
+        <div class="border border-thin rounded-sm p-4 space-y-3">
           <div class="text-xs font-medium">Text Items ({extractedText.items.length})</div>
           <div class="space-y-2">
             {#each extractedText.items as item, index}
               {@const classification = classifiedItems.get(index)}
               {@const isSelected = selectedItemIndex === index}
               {@const isStatic = classification?.classification === 'static'}
+              {@const isDynamic = classification?.classification === 'dynamic'}
+              {@const isMapped = isDynamic && classification.fieldMapping && classification.fieldMapping !== ''}
+              {@const isIgnored = classification?.fieldMapping === '__ignore__'}
 
               <div
-                class="border rounded-sm p-2 text-xs cursor-pointer transition-colors {isSelected ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}"
+                class="border rounded-sm p-2 text-xs cursor-pointer transition-colors {isSelected ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'} {isDynamic && !isIgnored ? 'bg-blue-50' : ''}"
                 onclick={() => { selectedItemIndex = index; redraw(); }}
               >
                 <div class="flex items-start justify-between gap-2 mb-2">
-                  <div class="flex-1 font-mono text-xs break-all {isStatic ? 'text-green-700' : 'text-red-700'}">
+                  <div class="flex-1 font-mono text-xs break-all {isIgnored ? 'text-gray-400 line-through' : isStatic ? 'text-gray-700' : 'text-blue-700'}">
                     {item.text}
                   </div>
+                  <!-- Toggle Switch -->
                   <button
                     onclick={(e) => { e.stopPropagation(); toggleClassification(index); }}
-                    class="px-2 py-1 text-xs rounded-sm {isStatic ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-red-100 text-red-700 hover:bg-red-200'}"
+                    class="flex items-center gap-1.5 text-xs"
+                    title="Toggle between static and dynamic"
                   >
-                    {isStatic ? 'Static' : 'Dynamic'}
+                    <span class="text-gray-600 text-[10px] uppercase tracking-wide {isStatic ? 'font-medium' : ''}">Static</span>
+                    <div class="relative inline-block w-8 h-4 rounded-full transition-colors {isStatic ? 'bg-gray-400' : 'bg-blue-500'}">
+                      <div class="absolute top-0.5 transition-transform rounded-full w-3 h-3 bg-white {isStatic ? 'left-0.5' : 'left-4'}"></div>
+                    </div>
+                    <span class="text-gray-600 text-[10px] uppercase tracking-wide {!isStatic ? 'font-medium' : ''}">Dynamic</span>
                   </button>
                 </div>
 
                 {#if !isStatic && classification}
-                  <select
-                    value={classification.fieldMapping || ''}
-                    onchange={(e) => updateFieldMapping(index, e.currentTarget.value)}
-                    onclick={(e) => e.stopPropagation()}
-                    class="w-full px-2 py-1 text-xs border border-gray-200 rounded-sm"
-                  >
-                    <option value="">-- Select field --</option>
-                    {#each fieldOptions as field}
-                      <option value={field.value}>{field.label}</option>
-                    {/each}
-                  </select>
+                  {#if customFieldIndex === index}
+                    <!-- Custom field input -->
+                    <div class="space-y-2" onclick={(e) => e.stopPropagation()}>
+                      <input
+                        type="text"
+                        bind:value={customFieldName}
+                        oninput={handleCustomFieldInput}
+                        placeholder="Enter field name..."
+                        class="w-full px-2 py-1 text-xs border border-gray-300 rounded-sm"
+                        autofocus
+                      />
+
+                      {#if customFieldSuggestion}
+                        <div class="text-xs p-2 bg-blue-50 border border-blue-200 rounded-sm">
+                          <div class="text-blue-700 mb-1">Did you mean:</div>
+                          <button
+                            onclick={() => saveCustomField(true)}
+                            class="text-blue-600 hover:underline font-medium"
+                          >
+                            {fieldOptions.find(f => f.value === customFieldSuggestion)?.label}
+                          </button>
+                        </div>
+                      {/if}
+
+                      <div class="flex gap-1">
+                        <button
+                          onclick={() => saveCustomField(false)}
+                          disabled={!customFieldName.trim()}
+                          class="flex-1 px-2 py-1 text-xs bg-black text-white rounded-sm hover:bg-gray-800 disabled:bg-gray-300"
+                        >
+                          Save Custom
+                        </button>
+                        <button
+                          onclick={cancelCustomField}
+                          class="px-2 py-1 text-xs border border-gray-300 rounded-sm hover:bg-gray-50"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  {:else}
+                    <select
+                      value={classification.fieldMapping || ''}
+                      onchange={(e) => updateFieldMapping(index, e.currentTarget.value)}
+                      onclick={(e) => e.stopPropagation()}
+                      class="w-full px-2 py-1 text-xs border border-gray-200 rounded-sm"
+                    >
+                      <option value="">-- Select field --</option>
+                      {#each fieldOptions as field}
+                        {@const isUsed = usedFields.has(field.value) && classification.fieldMapping !== field.value}
+                        {@const canReuse = field.value === 'payment_info' || field.value === '__ignore__'}
+                        <option value={field.value} disabled={isUsed && !canReuse}>
+                          {field.label}{isUsed && !canReuse ? ' ✓' : ''}{canReuse && isUsed ? ' (reusable)' : ''}
+                        </option>
+                      {/each}
+                      <option value="__custom__">✨ Custom field...</option>
+                    </select>
+                  {/if}
                 {/if}
               </div>
             {/each}
@@ -583,6 +919,53 @@
       {/if}
     </div>
   </div>
+
+  <!-- Multi-select popup -->
+  {#if showMultiSelectPopup}
+    <div
+      class="fixed bg-white border border-gray-300 rounded-sm shadow-lg z-50 w-48"
+      style="left: {popupX}px; top: {popupY}px; position: fixed;"
+    >
+      <div class="text-xs font-medium px-3 py-2 border-b border-gray-200 bg-gray-50">
+        Apply to {selectedItems.size} items
+      </div>
+
+      <div class="max-h-64 overflow-y-auto">
+        <div class="p-1">
+          <button
+            onclick={() => setMultipleAsStatic()}
+            class="w-full text-left px-2 py-1.5 text-xs hover:bg-gray-100 rounded-sm"
+          >
+            Set as Static
+          </button>
+
+          <div class="border-t border-gray-200 my-1"></div>
+
+          <div class="text-[10px] text-gray-600 px-2 py-1 uppercase tracking-wide">
+            Set as Dynamic:
+          </div>
+
+          {#each fieldOptions as field}
+            <button
+              onclick={() => applyToMultipleItems(field.value)}
+              class="w-full text-left px-2 py-1.5 text-xs hover:bg-gray-100 rounded-sm"
+            >
+              {field.label}
+            </button>
+          {/each}
+        </div>
+      </div>
+
+      <div class="border-t border-gray-200 p-1">
+        <button
+          onclick={() => { showMultiSelectPopup = false; selectedItems = new Set(); redraw(); }}
+          class="w-full text-left px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded-sm"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  {/if}
 </div>
 
 <!-- Hidden form for save -->

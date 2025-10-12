@@ -70,7 +70,7 @@ export async function extractTextFromPdf(
       return {
         text: item.str.trim(),
         x,
-        y: pageHeight - y, // Flip Y coordinate (PDF has origin at bottom-left, we want top-left)
+        y: pageHeight - y - fontSize, // Flip Y coordinate and offset by font height (PDF Y is at baseline, we want top)
         width,
         height,
         fontSize,
