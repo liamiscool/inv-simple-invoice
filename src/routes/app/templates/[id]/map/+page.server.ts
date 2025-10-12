@@ -31,6 +31,17 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, safeGet
     redirect(303, '/app/templates');
   }
 
+  // Check if template has been processed (has a spec with background_image_url that's not a PDF)
+  const spec = template.spec as TemplateSpec | null;
+  const bgUrl = spec?.meta?.background_image_url;
+
+  // If background is a PDF or missing, redirect back to classify to generate template
+  if (!bgUrl || bgUrl.endsWith('.pdf')) {
+    // Check if we have the original PDF URL in metadata or reconstruct it
+    const pdfUrl = bgUrl || `https://kaijqyzmpqzdctbjlvxf.supabase.co/storage/v1/object/public/templates/${template.org_id || userProfile?.org_id}/${template.id}.pdf`;
+    redirect(303, `/app/templates/upload/classify?id=${template.id}&pdf=${encodeURIComponent(pdfUrl)}`);
+  }
+
   return {
     template
   };

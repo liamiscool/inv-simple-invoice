@@ -114,9 +114,26 @@
       previewUrl = null; // PDF preview requires PDF.js, skip for now
     }
 
-    // Auto-fill template name from filename
+    // Auto-fill template name from filename (remove extension)
     if (!templateName) {
-      templateName = file.name.replace(/\.[^/.]+$/, '');
+      const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '');
+      console.log('🔍 Auto-naming debug:', {
+        filename: file.name,
+        nameWithoutExt,
+        currentTemplateName: templateName,
+        templateCount: data.templateCount
+      });
+
+      // If filename is too generic or empty, use Template #X format
+      if (!nameWithoutExt || nameWithoutExt.toLowerCase() === 'untitled' || nameWithoutExt.toLowerCase() === 'invoice') {
+        templateName = `Template #${data.templateCount + 1}`;
+        console.log('✅ Set numbered name:', templateName);
+      } else {
+        templateName = nameWithoutExt;
+        console.log('✅ Set filename as name:', templateName);
+      }
+    } else {
+      console.log('⚠️ Template name already set, skipping auto-name:', templateName);
     }
   }
 

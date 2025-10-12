@@ -26,6 +26,12 @@
 
     <div class="flex items-center gap-3">
       <a
+        href="/app/settings"
+        class="px-4 py-1.5 border border-gray-300 text-xs hover:bg-gray-50 transition-colors duration-75"
+      >
+        Manage Custom Fields
+      </a>
+      <a
         href="/app/templates/upload"
         class="px-4 py-1.5 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75"
       >

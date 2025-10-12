@@ -1,52 +1,43 @@
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession } }) => {
-  const { user } = await safeGetSession();
+  const { session, user } = await safeGetSession();
 
-  if (!user) {
-    return {
-      profile: null,
-      subscription: null,
-      customFields: []
-    };
+  if (!session || !user) {
+    redirect(303, '/login');
   }
 
-  // Get user profile
-  const { data: profile } = await supabase
+  // Get user's org_id
+  const { data: userProfile } = await supabase
     .from('app_user')
-    .select('*')
+    .select('org_id')
     .eq('id', user.id)
     .single();
 
-  // Get subscription info
-  const { data: subscription } = await supabase
-    .from('plan_subscription')
-    .select('plan, status')
-    .eq('org_id', profile?.org_id)
-    .single();
+  if (!userProfile?.org_id) {
+    return { customFields: [] };
+  }
 
   // Get custom fields for this org
-  let customFields = [];
-  if (profile?.org_id) {
-    const { data } = await supabase
-      .from('custom_field')
-      .select('*')
-      .eq('org_id', profile.org_id)
-      .order('created_at', { ascending: false });
+  const { data: customFields, error } = await supabase
+    .from('custom_field')
+    .select('*')
+    .eq('org_id', userProfile.org_id)
+    .order('created_at', { ascending: false });
 
-    customFields = data || [];
+  if (error) {
+    console.error('Error loading custom fields:', error);
+    return { customFields: [] };
   }
 
   return {
-    profile,
-    subscription,
-    customFields
+    customFields: customFields || []
   };
 };
 
 export const actions = {
-  createCustomField: async ({ request, locals: { supabase, safeGetSession } }) => {
+  create: async ({ request, locals: { supabase, safeGetSession } }) => {
     const { user } = await safeGetSession();
 
     if (!user) {
@@ -92,7 +83,7 @@ export const actions = {
     return { success: true, message: 'Custom field created successfully' };
   },
 
-  deleteCustomField: async ({ request, locals: { supabase, safeGetSession } }) => {
+  delete: async ({ request, locals: { supabase, safeGetSession } }) => {
     const { user } = await safeGetSession();
 
     if (!user) {

@@ -20,8 +20,15 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
     redirect(303, '/app/settings');
   }
 
+  // Get template count for auto-naming
+  const { count } = await supabase
+    .from('template')
+    .select('*', { count: 'exact', head: true })
+    .eq('org_id', userProfile.org_id);
+
   return {
-    orgId: userProfile.org_id
+    orgId: userProfile.org_id,
+    templateCount: count || 0
   };
 };
 
