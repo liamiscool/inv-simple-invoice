@@ -31,7 +31,8 @@ export const load: PageServerLoad = async ({ url, locals: { supabase, safeGetSes
 
   return {
     template,
-    pdfUrl
+    pdfUrl,
+    userId: user.id
   };
 };
 

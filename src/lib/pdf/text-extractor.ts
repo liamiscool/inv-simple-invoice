@@ -43,12 +43,13 @@ export async function extractTextFromPdf(
   // Get first page only (MVP - single page invoices)
   const page = await pdf.getPage(1);
 
-  // Get page dimensions
-  const viewport = page.getViewport({ scale: 1.0 });
+  // Get page dimensions at target DPI
+  const scale = dpi / 72; // PDF is natively 72 DPI
+  const viewport = page.getViewport({ scale });
   const pageWidth = viewport.width;
   const pageHeight = viewport.height;
 
-  // Extract text content
+  // Extract text content (this returns coordinates at scale 1.0)
   const textContent = await page.getTextContent();
 
   // Convert text items to our format
@@ -56,13 +57,14 @@ export async function extractTextFromPdf(
     .filter((item): item is any => 'str' in item && 'transform' in item)
     .map((item) => {
       // PDF.js returns transform matrix: [scaleX, skewY, skewX, scaleY, translateX, translateY]
+      // These are at 72 DPI (scale 1.0), so we need to scale them to our target DPI
       const transform = item.transform;
-      const fontSize = Math.abs(transform[3]); // scaleY gives font height
-      const x = transform[4]; // translateX
-      const y = transform[5]; // translateY
+      const fontSize = Math.abs(transform[3]) * scale; // scaleY gives font height, scaled to target DPI
+      const x = transform[4] * scale; // translateX, scaled to target DPI
+      const y = transform[5] * scale; // translateY, scaled to target DPI
 
       // Estimate width based on text length and font size (rough approximation)
-      const width = item.width || (item.str.length * fontSize * 0.5);
+      const width = item.width ? (item.width * scale) : (item.str.length * fontSize * 0.5);
       const height = fontSize;
 
       return {

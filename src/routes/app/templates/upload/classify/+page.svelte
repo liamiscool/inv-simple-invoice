@@ -276,7 +276,7 @@
       // Step 2: Upload blank template to Supabase
       const timestamp = Date.now();
       const fileName = `blank_${timestamp}_${data.template.title.replace(/[^a-z0-9]/gi, '_')}.png`;
-      const filePath = `${data.template.org_id}/${fileName}`;
+      const filePath = `${data.userId}/${fileName}`;
 
       // We need to upload via form, so convert blob to File
       const blankFile = new File([blankBlob], fileName, { type: 'image/png' });
