@@ -81,7 +81,14 @@
       const response2 = await fetch(data.pdfUrl);
       const arrayBuffer2 = await response2.arrayBuffer();
 
-      // Render PDF to canvas
+      // Render PDF to canvas (wait for canvas to be ready)
+      if (!canvas) {
+        console.error('Canvas element not ready');
+        error = 'Canvas not initialized. Please refresh the page.';
+        loading = false;
+        return;
+      }
+
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer2 }).promise;
       const page = await pdf.getPage(1);
 
@@ -487,20 +494,26 @@
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Canvas -->
     <div class="lg:col-span-2 border border-thin rounded-sm p-4 bg-white">
-      {#if loading}
-        <div class="flex items-center justify-center h-96 text-gray-400 text-xs">
-          Analyzing PDF and extracting text...
-        </div>
-      {:else if extractedText}
-        <div class="overflow-auto" style="max-height: 800px;">
-          <canvas
-            bind:this={canvas}
-            onclick={handleCanvasClick}
-            style="cursor: pointer; width: {canvas?.width ? canvas.width * scale : 0}px; height: {canvas?.height ? canvas.height * scale : 0}px;"
-            class="border border-gray-200"
-          ></canvas>
-        </div>
-      {/if}
+      <div class="overflow-auto" style="max-height: 800px;">
+        <!-- Always render canvas so it can be bound -->
+        <canvas
+          bind:this={canvas}
+          onclick={handleCanvasClick}
+          style="cursor: pointer; width: {canvas?.width ? canvas.width * scale : 0}px; height: {canvas?.height ? canvas.height * scale : 0}px; display: {pdfRendered ? 'block' : 'none'};"
+          class="border border-gray-200"
+        ></canvas>
+
+        <!-- Loading/Error States -->
+        {#if loading}
+          <div class="flex items-center justify-center h-96 text-gray-400 text-xs">
+            Analyzing PDF and extracting text...
+          </div>
+        {:else if !extractedText && !error}
+          <div class="flex items-center justify-center h-96 text-gray-400 text-xs">
+            Waiting for PDF...
+          </div>
+        {/if}
+      </div>
     </div>
 
     <!-- Sidebar -->
