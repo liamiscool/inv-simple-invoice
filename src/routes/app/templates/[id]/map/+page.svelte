@@ -48,27 +48,41 @@
 
   // Load background image
   $effect(() => {
-    if (canvas && spec.meta.background_image_url) {
-      console.log('Loading image from:', spec.meta.background_image_url);
-      ctx = canvas.getContext('2d')!;
-      bgImage = new Image();
-      bgImage.crossOrigin = 'anonymous';
-      bgImage.onload = () => {
-        console.log('Image loaded successfully:', bgImage.width, 'x', bgImage.height);
-        // Set canvas size to match image
-        canvas.width = bgImage.width;
-        canvas.height = bgImage.height;
-        scale = Math.min(800 / bgImage.width, 600 / bgImage.height);
-        imageLoaded = true;
-        redraw();
-      };
-      bgImage.onerror = (e) => {
-        console.error('Image failed to load:', e);
-        console.error('Image URL:', spec.meta.background_image_url);
-        imageError = `Failed to load image from: ${spec.meta.background_image_url}. Check if the storage bucket is public and the URL is accessible.`;
-      };
-      bgImage.src = spec.meta.background_image_url;
+    console.log('Effect running - canvas:', !!canvas, 'url:', spec.meta?.background_image_url);
+
+    if (!spec.meta?.background_image_url) {
+      console.error('No background_image_url in template spec');
+      imageError = 'Template has no background image URL';
+      return;
     }
+
+    if (!canvas) {
+      console.log('Canvas not ready yet, waiting...');
+      return;
+    }
+
+    console.log('Loading image from:', spec.meta.background_image_url);
+    ctx = canvas.getContext('2d')!;
+    bgImage = new Image();
+    bgImage.crossOrigin = 'anonymous';
+
+    bgImage.onload = () => {
+      console.log('Image loaded successfully:', bgImage.width, 'x', bgImage.height);
+      // Set canvas size to match image
+      canvas.width = bgImage.width;
+      canvas.height = bgImage.height;
+      scale = Math.min(800 / bgImage.width, 600 / bgImage.height);
+      imageLoaded = true;
+      redraw();
+    };
+
+    bgImage.onerror = (e) => {
+      console.error('Image failed to load:', e);
+      console.error('Image URL:', spec.meta.background_image_url);
+      imageError = `Failed to load image from: ${spec.meta.background_image_url}. Check if the storage bucket is public and the URL is accessible.`;
+    };
+
+    bgImage.src = spec.meta.background_image_url;
   });
 
   function mmToPx(mm: number): number {
@@ -278,6 +292,17 @@
     <!-- Canvas -->
     <div class="lg:col-span-2 border border-thin rounded-sm p-4 bg-white">
       <div class="overflow-auto" style="max-height: 800px;">
+        <!-- Canvas - always render but hide when loading/error -->
+        <canvas
+          bind:this={canvas}
+          onmousedown={handleCanvasMouseDown}
+          onmousemove={handleCanvasMouseMove}
+          onmouseup={handleCanvasMouseUp}
+          style="cursor: crosshair; width: {canvas?.width ? canvas.width * scale : 0}px; height: {canvas?.height ? canvas.height * scale : 0}px; display: {imageLoaded ? 'block' : 'none'};"
+          class="border border-gray-200"
+        ></canvas>
+
+        <!-- Loading/Error States -->
         {#if imageError}
           <div class="flex flex-col items-center justify-center h-96 text-red-600 text-xs p-4 text-center">
             <div class="mb-2 font-medium">Image Loading Error</div>
@@ -286,16 +311,7 @@
               Debug info: Check browser console for details
             </div>
           </div>
-        {:else if imageLoaded}
-          <canvas
-            bind:this={canvas}
-            onmousedown={handleCanvasMouseDown}
-            onmousemove={handleCanvasMouseMove}
-            onmouseup={handleCanvasMouseUp}
-            style="cursor: crosshair; width: {canvas.width * scale}px; height: {canvas.height * scale}px;"
-            class="border border-gray-200"
-          ></canvas>
-        {:else}
+        {:else if !imageLoaded}
           <div class="flex items-center justify-center h-96 text-gray-400 text-xs">
             <div class="flex flex-col items-center gap-2">
               <div>Loading template image...</div>
