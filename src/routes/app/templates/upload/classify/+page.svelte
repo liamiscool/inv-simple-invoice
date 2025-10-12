@@ -57,12 +57,12 @@
       loading = true;
       error = null;
 
-      // Fetch PDF from URL
-      const response = await fetch(data.pdfUrl);
-      const arrayBuffer = await response.arrayBuffer();
+      // Fetch PDF from URL (need to fetch twice - ArrayBuffer gets detached after first use)
+      const response1 = await fetch(data.pdfUrl);
+      const arrayBuffer1 = await response1.arrayBuffer();
 
       // Extract text
-      const extracted = await extractTextFromPdf(arrayBuffer);
+      const extracted = await extractTextFromPdf(arrayBuffer1);
       extractedText = extracted;
 
       console.log('Extracted text items:', extracted.items.length);
@@ -77,8 +77,12 @@
         classifiedItems.set(index, { classification, fieldMapping });
       });
 
+      // Fetch PDF again for rendering (ArrayBuffer was consumed by text extraction)
+      const response2 = await fetch(data.pdfUrl);
+      const arrayBuffer2 = await response2.arrayBuffer();
+
       // Render PDF to canvas
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer2 }).promise;
       const page = await pdf.getPage(1);
 
       // Calculate scale to fit canvas
