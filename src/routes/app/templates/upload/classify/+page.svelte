@@ -42,6 +42,18 @@
   let popupX = $state(0);
   let popupY = $state(0);
 
+  // Custom areas drawn by user
+  type CustomArea = {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    fieldMapping: string | null;
+    classification: 'static' | 'dynamic';
+  };
+  let customAreas = $state<CustomArea[]>([]);
+  let selectedAreaIndex = $state<number | null>(null);
+
   // Area definitions for field mapping
   const fieldOptions = [
     { value: '__ignore__', label: '🗑️ Ignore / Delete' },
@@ -148,9 +160,6 @@
 
     // Draw selection rectangle if dragging
     if (isDragging) {
-      const rect = canvas.getBoundingClientRect();
-      const actualScale = rect.width / canvas.width;
-
       const x1 = Math.min(dragStartX, dragEndX);
       const y1 = Math.min(dragStartY, dragEndY);
       const x2 = Math.max(dragStartX, dragEndX);
@@ -158,10 +167,60 @@
 
       ctx.strokeStyle = '#3b82f6';
       ctx.lineWidth = 2;
+      ctx.setLineDash([5, 5]); // Dashed line
       ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
       ctx.fillStyle = 'rgba(59, 130, 246, 0.1)';
       ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+      ctx.setLineDash([]); // Reset to solid lines
     }
+
+    // Draw custom areas
+    customAreas.forEach((area, index) => {
+      const isSelected = selectedAreaIndex === index;
+      const isStatic = area.classification === 'static';
+      const isMapped = area.fieldMapping && area.fieldMapping !== '' && area.fieldMapping !== '__ignore__';
+
+      let strokeColor: string;
+      let fillColor: string;
+
+      if (isStatic) {
+        strokeColor = isSelected ? '#6b7280' : '#9ca3af';
+        fillColor = 'rgba(107, 114, 128, 0.15)';
+      } else if (isMapped) {
+        // Mapped dynamic - green
+        strokeColor = isSelected ? '#10b981' : '#6ee7b7';
+        fillColor = 'rgba(16, 185, 129, 0.15)';
+      } else {
+        // Unmapped dynamic - blue
+        strokeColor = isSelected ? '#3b82f6' : '#93c5fd';
+        fillColor = 'rgba(59, 130, 246, 0.15)';
+      }
+
+      ctx.strokeStyle = strokeColor;
+      ctx.lineWidth = isSelected ? 3 : 2;
+      ctx.strokeRect(area.x, area.y, area.width, area.height);
+      ctx.fillStyle = fillColor;
+      ctx.fillRect(area.x, area.y, area.width, area.height);
+
+      // Draw label
+      if (isMapped || isSelected) {
+        const label = isMapped
+          ? (fieldOptions.find(f => f.value === area.fieldMapping)?.label || area.fieldMapping)
+          : 'Click to map';
+
+        ctx.fillStyle = strokeColor;
+        ctx.font = 'bold 14px monospace';
+        const textWidth = ctx.measureText(label).width;
+
+        // Draw background for label
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.fillRect(area.x + 5, area.y + 5, textWidth + 10, 20);
+
+        // Draw label text
+        ctx.fillStyle = strokeColor;
+        ctx.fillText(label, area.x + 10, area.y + 20);
+      }
+    });
 
     // Draw text boxes
     extractedText.items.forEach((item, index) => {
@@ -172,7 +231,7 @@
       const isInMultiSelect = selectedItems.has(index);
       const isStatic = classification.classification === 'static';
       const isDynamic = classification.classification === 'dynamic';
-      const isMapped = isDynamic && classification.fieldMapping && classification.fieldMapping !== '';
+      const isMapped = isDynamic && classification.fieldMapping && classification.fieldMapping !== '' && classification.fieldMapping !== '__ignore__';
       const isIgnored = classification.fieldMapping === '__ignore__';
       const isUnmapped = isDynamic && !isMapped && !isIgnored;
 
@@ -182,7 +241,7 @@
       const w = item.width;
       const h = item.height;
 
-      // Color scheme: gray=static, blue=dynamic, red=validation error for unmapped
+      // Color scheme: gray=static, green=mapped, blue=unmapped dynamic, red=validation error
       let strokeColor: string;
       let fillColor: string;
 
@@ -198,8 +257,12 @@
         // Validation error - unmapped dynamic field - red
         strokeColor = isSelected ? '#ef4444' : '#fca5a5';
         fillColor = 'rgba(239, 68, 68, 0.15)';
+      } else if (isMapped) {
+        // Mapped dynamic - green
+        strokeColor = isSelected ? '#10b981' : '#6ee7b7';
+        fillColor = 'rgba(16, 185, 129, 0.1)';
       } else {
-        // Dynamic - blue
+        // Unmapped dynamic - blue
         strokeColor = isSelected ? '#3b82f6' : '#93c5fd';
         fillColor = 'rgba(59, 130, 246, 0.1)';
       }
@@ -239,17 +302,84 @@
     const x = (event.clientX - rect.left) / actualScale;
     const y = (event.clientY - rect.top) / actualScale;
 
-    isDragging = true;
-    dragStartX = x;
-    dragStartY = y;
-    dragEndX = x;
-    dragEndY = y;
-    selectedItems = new Set();
-    showMultiSelectPopup = false;
+    // Check if clicking on an existing custom area
+    let clickedAreaIndex: number | null = null;
+    for (let i = customAreas.length - 1; i >= 0; i--) {
+      const area = customAreas[i];
+      if (x >= area.x && x <= area.x + area.width &&
+          y >= area.y && y <= area.y + area.height) {
+        clickedAreaIndex = i;
+        break;
+      }
+    }
 
-    // Store popup position at mouse down (first click) - use clientX/Y for fixed positioning
-    popupX = event.clientX;
-    popupY = event.clientY;
+    // Check if clicking on an existing text item box
+    let clickedTextIndex: number | null = null;
+    if (clickedAreaIndex === null) {
+      extractedText.items.forEach((item, index) => {
+        if (x >= item.x && x <= item.x + item.width &&
+            y >= item.y && y <= item.y + item.height) {
+          clickedTextIndex = index;
+        }
+      });
+    }
+
+    if (clickedAreaIndex !== null) {
+      // Clicked on existing custom area - show popup
+      selectedAreaIndex = clickedAreaIndex;
+      const area = customAreas[clickedAreaIndex];
+
+      // Position popup to right of area
+      const popupWidth = 192;
+      const x2Screen = rect.left + ((area.x + area.width) * actualScale);
+      const y1Screen = rect.top + (area.y * actualScale);
+
+      popupX = x2Screen + 10;
+      popupY = y1Screen;
+
+      // Boundary checks
+      if (popupX + popupWidth > window.innerWidth) {
+        popupX = rect.left + (area.x * actualScale) - popupWidth - 10;
+      }
+
+      showMultiSelectPopup = true;
+      redraw();
+    } else if (clickedTextIndex !== null) {
+      // Clicked on existing text item - show popup
+      selectedItemIndex = clickedTextIndex;
+      const item = extractedText.items[clickedTextIndex];
+
+      // Position popup to right of text item
+      const popupWidth = 192;
+      const x2Screen = rect.left + ((item.x + item.width) * actualScale);
+      const y1Screen = rect.top + (item.y * actualScale);
+
+      popupX = x2Screen + 10;
+      popupY = y1Screen;
+
+      // Boundary checks
+      if (popupX + popupWidth > window.innerWidth) {
+        popupX = rect.left + (item.x * actualScale) - popupWidth - 10;
+      }
+
+      showMultiSelectPopup = true;
+      redraw();
+    } else {
+      // Start drawing new area
+      isDragging = true;
+      dragStartX = x;
+      dragStartY = y;
+      dragEndX = x;
+      dragEndY = y;
+      selectedItems = new Set();
+      showMultiSelectPopup = false;
+      selectedAreaIndex = null;
+      selectedItemIndex = null;
+
+      // Store popup position at mouse down
+      popupX = event.clientX;
+      popupY = event.clientY;
+    }
   }
 
   function handleCanvasMouseMove(event: MouseEvent) {
@@ -260,25 +390,6 @@
     dragEndX = (event.clientX - rect.left) / actualScale;
     dragEndY = (event.clientY - rect.top) / actualScale;
 
-    // Find items within selection rectangle
-    const x1 = Math.min(dragStartX, dragEndX);
-    const y1 = Math.min(dragStartY, dragEndY);
-    const x2 = Math.max(dragStartX, dragEndX);
-    const y2 = Math.max(dragStartY, dragEndY);
-
-    selectedItems = new Set();
-    extractedText.items.forEach((item, index) => {
-      const itemX = item.x;
-      const itemY = item.y;
-      const itemW = item.width;
-      const itemH = item.height;
-
-      // Check if item intersects with selection rectangle
-      if (itemX + itemW >= x1 && itemX <= x2 && itemY + itemH >= y1 && itemY <= y2) {
-        selectedItems.add(index);
-      }
-    });
-
     redraw();
   }
 
@@ -287,28 +398,45 @@
 
     isDragging = false;
 
-    // If multiple items selected, show popup
-    if (selectedItems.size > 1) {
+    // Calculate area dimensions
+    const x1 = Math.min(dragStartX, dragEndX);
+    const y1 = Math.min(dragStartY, dragEndY);
+    const x2 = Math.max(dragStartX, dragEndX);
+    const y2 = Math.max(dragStartY, dragEndY);
+    const width = x2 - x1;
+    const height = y2 - y1;
+
+    // Only create area if drag was significant (at least 10px)
+    if (width > 10 && height > 10) {
+      // Create new custom area
+      const newArea: CustomArea = {
+        x: x1,
+        y: y1,
+        width,
+        height,
+        fieldMapping: null,
+        classification: 'dynamic'
+      };
+
+      customAreas = [...customAreas, newArea];
+      selectedAreaIndex = customAreas.length - 1;
+
       // Position popup to the right of the selection box
       const rect = canvas.getBoundingClientRect();
       const actualScale = rect.width / canvas.width;
 
-      // Calculate selection box bounds in screen coordinates
-      const x1Screen = rect.left + (Math.min(dragStartX, dragEndX) * actualScale);
-      const x2Screen = rect.left + (Math.max(dragStartX, dragEndX) * actualScale);
-      const y1Screen = rect.top + (Math.min(dragStartY, dragEndY) * actualScale);
-      const y2Screen = rect.top + (Math.max(dragStartY, dragEndY) * actualScale);
+      const x2Screen = rect.left + (x2 * actualScale);
+      const y1Screen = rect.top + (y1 * actualScale);
 
-      // Position to the right of selection box
-      const popupWidth = 192; // w-48 = 12rem = 192px
-      const popupHeight = 256; // max-h-64 = 16rem = 256px (max)
+      const popupWidth = 192;
+      const popupHeight = 256;
 
-      let x = x2Screen + 10; // 10px gap from selection
+      let x = x2Screen + 10;
       let y = y1Screen;
 
-      // Check right boundary - if popup goes off screen, show on left side instead
+      // Check right boundary
       if (x + popupWidth > window.innerWidth) {
-        x = x1Screen - popupWidth - 10;
+        x = rect.left + (x1 * actualScale) - popupWidth - 10;
       }
 
       // Check bottom boundary
@@ -324,10 +452,6 @@
       popupX = x;
       popupY = y;
       showMultiSelectPopup = true;
-    } else if (selectedItems.size === 1) {
-      // Single item - select it normally
-      selectedItemIndex = Array.from(selectedItems)[0];
-      selectedItems = new Set();
     }
 
     redraw();
@@ -432,42 +556,78 @@
     customFieldSuggestion = null;
   }
 
-  function applyToMultipleItems(fieldMapping: string) {
-    if (selectedItems.size === 0) return;
+  function applyToArea(fieldMapping: string) {
+    if (selectedAreaIndex === null) return;
 
-    // Create new Map to trigger reactivity
-    classifiedItems = new Map(classifiedItems);
-
-    selectedItems.forEach((index) => {
-      const current = classifiedItems.get(index);
-      if (current) {
-        classifiedItems.set(index, {
-          classification: 'dynamic',
-          fieldMapping
-        });
+    customAreas = customAreas.map((area, index) => {
+      if (index === selectedAreaIndex) {
+        return {
+          ...area,
+          fieldMapping,
+          classification: 'dynamic'
+        };
       }
+      return area;
     });
 
-    // Clear selection and close popup
-    selectedItems = new Set();
     showMultiSelectPopup = false;
+    selectedAreaIndex = null;
     redraw();
   }
 
-  function setMultipleAsStatic() {
-    if (selectedItems.size === 0) return;
+  function setAreaAsStatic() {
+    if (selectedAreaIndex === null) return;
 
-    classifiedItems = new Map(classifiedItems);
-
-    selectedItems.forEach((index) => {
-      classifiedItems.set(index, {
-        classification: 'static',
-        fieldMapping: null
-      });
+    customAreas = customAreas.map((area, index) => {
+      if (index === selectedAreaIndex) {
+        return {
+          ...area,
+          fieldMapping: null,
+          classification: 'static'
+        };
+      }
+      return area;
     });
 
-    selectedItems = new Set();
     showMultiSelectPopup = false;
+    selectedAreaIndex = null;
+    redraw();
+  }
+
+  function deleteArea() {
+    if (selectedAreaIndex === null) return;
+
+    customAreas = customAreas.filter((_, index) => index !== selectedAreaIndex);
+    showMultiSelectPopup = false;
+    selectedAreaIndex = null;
+    redraw();
+  }
+
+  function applyToTextItem(fieldMapping: string) {
+    if (selectedItemIndex === null) return;
+
+    classifiedItems = new Map(classifiedItems);
+    classifiedItems.set(selectedItemIndex, {
+      classification: 'dynamic',
+      fieldMapping
+    });
+
+    showMultiSelectPopup = false;
+    selectedItemIndex = null;
+    redraw();
+  }
+
+  function setTextItemAsStatic() {
+    if (selectedItemIndex === null) return;
+
+    classifiedItems = new Map(classifiedItems);
+    classifiedItems.set(selectedItemIndex, {
+      classification: 'static',
+      fieldMapping: null
+    });
+
+    showMultiSelectPopup = false;
+    selectedItemIndex = null;
     redraw();
   }
 
@@ -831,17 +991,22 @@
               {@const isIgnored = classification?.fieldMapping === '__ignore__'}
 
               <div
-                class="border rounded-sm p-2 text-xs cursor-pointer transition-colors {isSelected ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'} {isDynamic && !isIgnored ? 'bg-blue-50' : ''}"
+                class="border rounded-sm p-2 text-xs cursor-pointer transition-colors {isSelected ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'} {isMapped ? 'bg-green-50' : isDynamic && !isIgnored ? 'bg-blue-50' : ''}"
                 onclick={() => { selectedItemIndex = index; redraw(); }}
               >
                 <div class="flex items-start justify-between gap-2 mb-2">
-                  <div class="flex-1 font-mono text-xs break-all {isIgnored ? 'text-gray-400 line-through' : isStatic ? 'text-gray-700' : 'text-blue-700'}">
-                    {item.text}
+                  <div class="flex items-center gap-1.5 flex-1 min-w-0">
+                    {#if isMapped}
+                      <span class="text-green-600 text-sm flex-shrink-0">✓</span>
+                    {/if}
+                    <div class="font-mono text-xs break-all {isIgnored ? 'text-gray-400 line-through' : isStatic ? 'text-gray-700' : isMapped ? 'text-green-700' : 'text-blue-700'}">
+                      {item.text}
+                    </div>
                   </div>
                   <!-- Toggle Switch -->
                   <button
                     onclick={(e) => { e.stopPropagation(); toggleClassification(index); }}
-                    class="flex items-center gap-1.5 text-xs"
+                    class="flex items-center gap-1.5 text-xs flex-shrink-0"
                     title="Toggle between static and dynamic"
                   >
                     <span class="text-gray-600 text-[10px] uppercase tracking-wide {isStatic ? 'font-medium' : ''}">Static</span>
@@ -920,20 +1085,20 @@
     </div>
   </div>
 
-  <!-- Multi-select popup -->
-  {#if showMultiSelectPopup}
+  <!-- Mapping popup (for both areas and text items) -->
+  {#if showMultiSelectPopup && (selectedAreaIndex !== null || selectedItemIndex !== null)}
     <div
       class="fixed bg-white border border-gray-300 rounded-sm shadow-lg z-50 w-48"
       style="left: {popupX}px; top: {popupY}px; position: fixed;"
     >
       <div class="text-xs font-medium px-3 py-2 border-b border-gray-200 bg-gray-50">
-        Apply to {selectedItems.size} items
+        {selectedAreaIndex !== null ? 'Map Area' : 'Map Field'}
       </div>
 
       <div class="max-h-64 overflow-y-auto">
         <div class="p-1">
           <button
-            onclick={() => setMultipleAsStatic()}
+            onclick={() => selectedAreaIndex !== null ? setAreaAsStatic() : setTextItemAsStatic()}
             class="w-full text-left px-2 py-1.5 text-xs hover:bg-gray-100 rounded-sm"
           >
             Set as Static
@@ -946,19 +1111,35 @@
           </div>
 
           {#each fieldOptions as field}
+            {@const isUsed = usedFields.has(field.value)}
+            {@const canReuse = field.value === 'payment_info' || field.value === '__ignore__'}
+            {@const currentFieldMapping = selectedAreaIndex !== null ? customAreas[selectedAreaIndex]?.fieldMapping : (selectedItemIndex !== null ? classifiedItems.get(selectedItemIndex)?.fieldMapping : null)}
+            {@const isCurrent = currentFieldMapping === field.value}
             <button
-              onclick={() => applyToMultipleItems(field.value)}
-              class="w-full text-left px-2 py-1.5 text-xs hover:bg-gray-100 rounded-sm"
+              onclick={() => selectedAreaIndex !== null ? applyToArea(field.value) : applyToTextItem(field.value)}
+              class="w-full text-left px-2 py-1.5 text-xs hover:bg-gray-100 rounded-sm flex items-center justify-between gap-2"
+              disabled={isUsed && !canReuse && !isCurrent}
             >
-              {field.label}
+              <span class={isUsed && !canReuse && !isCurrent ? 'text-gray-400' : ''}>{field.label}</span>
+              {#if isUsed && !isCurrent}
+                <span class="text-green-600 text-sm">✓</span>
+              {/if}
             </button>
           {/each}
         </div>
       </div>
 
       <div class="border-t border-gray-200 p-1">
+        {#if selectedAreaIndex !== null}
+          <button
+            onclick={() => deleteArea()}
+            class="w-full text-left px-2 py-1.5 text-xs text-red-600 hover:bg-red-50 rounded-sm"
+          >
+            Delete Area
+          </button>
+        {/if}
         <button
-          onclick={() => { showMultiSelectPopup = false; selectedItems = new Set(); redraw(); }}
+          onclick={() => { showMultiSelectPopup = false; selectedAreaIndex = null; selectedItemIndex = null; redraw(); }}
           class="w-full text-left px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded-sm"
         >
           Cancel
