@@ -60,10 +60,10 @@ export const actions = {
       return fail(400, { error: 'Missing file or template name' });
     }
 
-    // Validate file type (images only - PDFs are converted client-side before upload)
-    const allowedTypes = ['image/png', 'image/jpeg'];
+    // Validate file type (accept PDF for text extraction, or images for manual mapping)
+    const allowedTypes = ['image/png', 'image/jpeg', 'application/pdf'];
     if (!allowedTypes.includes(file.type)) {
-      return fail(400, { error: 'Invalid file type. Only PNG and JPEG are supported.' });
+      return fail(400, { error: 'Invalid file type. Only PNG, JPEG, and PDF are supported.' });
     }
 
     // Validate file size (10MB)
@@ -156,8 +156,13 @@ export const actions = {
         return fail(500, { error: `Template creation failed: ${templateError.message}` });
       }
 
-      // Redirect to mapping interface
-      throw redirect(303, `/app/templates/${templateData.id}/map`);
+      // If PDF, redirect to classification page to extract text and create blank template
+      // If image (PNG/JPEG), skip directly to manual mapping
+      if (file.type === 'application/pdf') {
+        throw redirect(303, `/app/templates/upload/classify?id=${templateData.id}&pdf=${encodeURIComponent(publicUrl)}`);
+      } else {
+        throw redirect(303, `/app/templates/${templateData.id}/map`);
+      }
     } catch (error) {
       // Re-throw redirect errors (they're not actual errors)
       if (error instanceof Response || (error && typeof error === 'object' && 'status' in error && 'location' in error)) {

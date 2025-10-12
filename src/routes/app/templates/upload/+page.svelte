@@ -77,13 +77,24 @@
       return;
     }
 
-    // Convert PDF to PNG if needed
+    // Generate preview for PDFs (will be processed server-side for text extraction)
     if (file.type === 'application/pdf') {
       try {
-        file = await convertPdfToPng(file);
+        // Convert to PNG just for preview (original PDF will be used for text extraction)
+        const previewFile = await convertPdfToPng(file);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewUrl = e.target?.result as string;
+        };
+        reader.readAsDataURL(previewFile);
+
+        // Keep original PDF for upload
+        selectedFile = file;
+        error = '';
+        return;
       } catch (err) {
-        console.error('PDF conversion error:', err);
-        error = 'Failed to convert PDF. Please try converting to PNG manually.';
+        console.error('PDF preview error:', err);
+        error = 'Failed to generate PDF preview.';
         selectedFile = null;
         return;
       }
@@ -92,7 +103,7 @@
     error = '';
     selectedFile = file;
 
-    // Generate preview
+    // Generate preview for images
     if (file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (e) => {
