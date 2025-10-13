@@ -1,0 +1,167 @@
+{
+  "meta": {
+    "name": "Bold",
+    "description": "Strong, impactful design with Poppins font",
+    "width": 210,
+    "height": 297,
+    "dpi": 300,
+    "margins": {
+      "top": 25,
+      "right": 25,
+      "bottom": 25,
+      "left": 25
+    }
+  },
+  "styles": {
+    "fonts": {
+      "primary": "Poppins, sans-serif"
+    },
+    "colors": {
+      "primary": "#0A0A0A",
+      "secondary": "#52525B",
+      "accent": "#18181B"
+    },
+    "sizes": {
+      "default": 10,
+      "small": 8,
+      "large": 14,
+      "title": 32
+    }
+  },
+  "areas": {
+    "invoice_title": {
+      "x": 25,
+      "y": 25,
+      "font_size": 32,
+      "font_weight": "bold"
+    },
+    "invoice_number": {
+      "x": 145,
+      "y": 28,
+      "w": 40,
+      "align": "right",
+      "font_size": 13,
+      "font_weight": "bold"
+    },
+    "company_info": {
+      "x": 25,
+      "y": 55,
+      "w": 75,
+      "h": 30,
+      "font_size": 9,
+      "color": "#52525B"
+    },
+    "issue_date": {
+      "x": 125,
+      "y": 55,
+      "font_size": 9,
+      "color": "#52525B"
+    },
+    "due_date": {
+      "x": 125,
+      "y": 62,
+      "font_size": 9,
+      "color": "#52525B"
+    },
+    "client_name": {
+      "x": 25,
+      "y": 90,
+      "font_weight": "bold",
+      "font_size": 14
+    },
+    "client_company": {
+      "x": 25,
+      "y": 97,
+      "font_size": 11
+    },
+    "client_email": {
+      "x": 25,
+      "y": 103,
+      "font_size": 9,
+      "color": "#52525B"
+    },
+    "items_table": {
+      "x": 25,
+      "y": 125,
+      "w": 160,
+      "row_height": 11,
+      "header_height": 15,
+      "border_color": "#D4D4D8",
+      "border_width": 1.5,
+      "header_bg": "#FAFAFA",
+      "header_font_size": 10,
+      "header_font_weight": "bold",
+      "header_color": "#18181B",
+      "columns": [
+        {
+          "key": "description",
+          "label": "DESCRIPTION",
+          "w": 75,
+          "align": "left"
+        },
+        {
+          "key": "qty",
+          "label": "QTY",
+          "w": 20,
+          "align": "center"
+        },
+        {
+          "key": "unit_price",
+          "label": "PRICE",
+          "w": 27,
+          "align": "right"
+        },
+        {
+          "key": "tax_rate",
+          "label": "TAX",
+          "w": 15,
+          "align": "right"
+        },
+        {
+          "key": "line_total",
+          "label": "TOTAL",
+          "w": 23,
+          "align": "right"
+        }
+      ]
+    },
+    "subtotal": {
+      "x": 127,
+      "y": 215,
+      "w": 58,
+      "align": "right",
+      "font_size": 10
+    },
+    "tax_total": {
+      "x": 127,
+      "y": 223,
+      "w": 58,
+      "align": "right",
+      "font_size": 10
+    },
+    "grand_total": {
+      "x": 127,
+      "y": 235,
+      "w": 58,
+      "align": "right",
+      "font_weight": "bold",
+      "font_size": 16
+    },
+    "notes": {
+      "x": 25,
+      "y": 257,
+      "w": 160,
+      "h": 18,
+      "font_size": 8,
+      "color": "#52525B"
+    },
+    "payment_info": {
+      "x": 25,
+      "y": 268,
+      "w": 160,
+      "h": 10,
+      "font_size": 7,
+      "color": "#71717A"
+    }
+  }
+}

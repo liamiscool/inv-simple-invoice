@@ -1,6 +1,9 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import minimalTemplate from './minimal.json';
 import modernTemplate from './modern.json';
+import elegantTemplate from './elegant.json';
+import boldTemplate from './bold.json';
+import techTemplate from './tech.json';
 
 export interface AreaSpec {
   x: number;
@@ -115,6 +118,24 @@ export const CURATED_TEMPLATES: Array<Omit<Template, 'id' | 'created_at'>> = [
     title: 'Modern',
     kind: 'curated',
     spec: modernTemplate as TemplateSpec
+  },
+  {
+    org_id: undefined,
+    title: 'Elegant',
+    kind: 'curated',
+    spec: elegantTemplate as TemplateSpec
+  },
+  {
+    org_id: undefined,
+    title: 'Bold',
+    kind: 'curated',
+    spec: boldTemplate as TemplateSpec
+  },
+  {
+    org_id: undefined,
+    title: 'Tech',
+    kind: 'curated',
+    spec: techTemplate as TemplateSpec
   }
 ];
 
