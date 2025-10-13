@@ -17,31 +17,33 @@
       "primary": "Poppins, sans-serif"
     },
     "colors": {
-      "primary": "#0A0A0A",
-      "secondary": "#52525B",
-      "accent": "#18181B"
+      "primary": "#000000",
+      "secondary": "#737373",
+      "accent": "#F97316"
     },
     "sizes": {
       "default": 10,
       "small": 8,
       "large": 14,
-      "title": 32
+      "title": 36
     }
   },
   "areas": {
     "invoice_title": {
       "x": 25,
       "y": 25,
-      "font_size": 32,
-      "font_weight": "bold"
+      "font_size": 36,
+      "font_weight": "bold",
+      "color": "#000000"
     },
     "invoice_number": {
       "x": 145,
-      "y": 28,
+      "y": 32,
       "w": 40,
       "align": "right",
-      "font_size": 13,
-      "font_weight": "bold"
+      "font_size": 14,
+      "font_weight": "bold",
+      "color": "#F97316"
     },
     "company_info": {
       "x": 25,
@@ -86,12 +88,12 @@
       "w": 160,
       "row_height": 11,
       "header_height": 15,
-      "border_color": "#D4D4D8",
-      "border_width": 1.5,
-      "header_bg": "#FAFAFA",
+      "border_color": "#000000",
+      "border_width": 2,
+      "header_bg": "#FFFBEB",
       "header_font_size": 10,
       "header_font_weight": "bold",
-      "header_color": "#18181B",
+      "header_color": "#000000",
       "columns": [
         {
           "key": "description",
