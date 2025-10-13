@@ -36,6 +36,41 @@ PDFs uploaded by users are converted to PNG **in the browser** (not server-side)
 
 ---
 
+## 🔌 MCP (Model Context Protocol) Setup
+
+**Status**: Configured for remote HTTP-based access to Supabase
+
+The project has Supabase MCP configured for direct database access in Claude Code sessions. This allows Claude to query the database schema, inspect tables, and help with migrations.
+
+**Configuration Location**: `~/.claude.json` (CLI) or `~/Library/Application Support/Claude/claude_desktop_config.json` (Desktop)
+
+**Current Setup**:
+```json
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=kaijqyzmpqzdctbjlvxf"
+    }
+  }
+}
+```
+
+**Authentication**: Requires OAuth flow (use `/mcp` command in Claude Code to trigger authentication)
+
+**Security**: Configured for development project only (not production). MCP allows Claude to:
+- Query database schema
+- Inspect table structures
+- Run read-only queries (when configured)
+- Help create migrations
+
+**Note**: If MCP authentication doesn't work, Claude can still access the database via:
+- Environment variables in `.env.local`
+- Supabase CLI commands
+- Direct TypeScript type definitions in `src/lib/types/database.types.ts`
+
+---
+
 ## Key Commands
 
 ### Development

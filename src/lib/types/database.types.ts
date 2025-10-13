@@ -70,9 +70,13 @@ export interface Database {
           org_id: string
           name: string
           company: string | null
+          company_address: string | null
           email: string | null
           currency: string | null
+          legal_name: string | null
+          tax_id: string | null
           notes: string | null
+          deleted_at: string | null
           created_at: string | null
         }
         Insert: {
@@ -80,9 +84,13 @@ export interface Database {
           org_id: string
           name: string
           company?: string | null
+          company_address?: string | null
           email?: string | null
           currency?: string | null
+          legal_name?: string | null
+          tax_id?: string | null
           notes?: string | null
+          deleted_at?: string | null
           created_at?: string | null
         }
         Update: {
@@ -90,9 +98,13 @@ export interface Database {
           org_id?: string
           name?: string
           company?: string | null
+          company_address?: string | null
           email?: string | null
           currency?: string | null
+          legal_name?: string | null
+          tax_id?: string | null
           notes?: string | null
+          deleted_at?: string | null
           created_at?: string | null
         }
       }

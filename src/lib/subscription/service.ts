@@ -39,23 +39,23 @@ export async function getSubscriptionInfo(
       .eq('org_id', profile.org_id)
       .single();
 
-    // Get client count
-    const { data: counter } = await supabase
-      .from('client_counter')
-      .select('client_count')
+    // Count active clients (where deleted_at is null)
+    const { count: clientCount } = await supabase
+      .from('client')
+      .select('*', { count: 'exact', head: true })
       .eq('org_id', profile.org_id)
-      .single();
+      .is('deleted_at', null);
 
     const plan = subscription?.plan || 'free';
-    const clientCount = counter?.client_count || 0;
+    const activeClientCount = clientCount || 0;
     const isPro = plan === 'pro' && subscription?.status === 'active';
 
     return {
       plan,
       status: subscription?.status || 'active',
-      clientCount,
+      clientCount: activeClientCount,
       clientLimit: isPro ? Infinity : FREE_CLIENT_LIMIT,
-      canAddClients: isPro || clientCount < FREE_CLIENT_LIMIT,
+      canAddClients: isPro || activeClientCount < FREE_CLIENT_LIMIT,
       canUploadTemplates: isPro
     };
 

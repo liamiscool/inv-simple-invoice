@@ -328,6 +328,15 @@
           {#if data.invoice.client.company}
             <div class="text-gray-600">{data.invoice.client.company}</div>
           {/if}
+          {#if data.invoice.client.legal_name}
+            <div class="text-gray-600">Legal: {data.invoice.client.legal_name}</div>
+          {/if}
+          {#if data.invoice.client.company_address}
+            <div class="text-gray-500 whitespace-pre-wrap">{data.invoice.client.company_address}</div>
+          {/if}
+          {#if data.invoice.client.tax_id}
+            <div class="text-gray-500">Tax ID: {data.invoice.client.tax_id}</div>
+          {/if}
           {#if data.invoice.client.email}
             <div class="text-gray-500">{data.invoice.client.email}</div>
           {/if}

@@ -180,7 +180,7 @@
   <title>Create Invoice - inv</title>
 </svelte:head>
 
-<div class="max-w-6xl space-y-8">
+<div class="max-w-3xl space-y-8">
   <!-- Header -->
   <div>
     <h1 class="text-base font-medium mb-1">Create Invoice</h1>

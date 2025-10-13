@@ -1,24 +1,20 @@
 <script lang="ts">
   import type { PageData } from './$types';
-  import UpgradeModal from '$lib/components/UpgradeModal.svelte';
-  import { STRIPE_MONTHLY_LINK, STRIPE_YEARLY_LINK } from '$lib/config/stripe';
-  import { canAddClient } from '$lib/subscription/service';
 
   let { data }: { data: PageData } = $props();
 
   let isLoading = $state(false);
   let error = $state('');
-  let showUpgradeModal = $state(false);
 
-  // Form data
-  let name = $state('');
-  let company = $state('');
-  let company_address = $state('');
-  let email = $state('');
-  let currency = $state('EUR');
-  let legal_name = $state('');
-  let tax_id = $state('');
-  let notes = $state('');
+  // Form data - initialize with existing client data
+  let name = $state(data.client.name);
+  let company = $state(data.client.company || '');
+  let company_address = $state(data.client.company_address || '');
+  let email = $state(data.client.email || '');
+  let currency = $state(data.client.currency || 'EUR');
+  let legal_name = $state(data.client.legal_name || '');
+  let tax_id = $state(data.client.tax_id || '');
+  let notes = $state(data.client.notes || '');
 
   const currencies = [
     { code: 'EUR', name: 'Euro (€)' },
@@ -34,31 +30,10 @@
     error = '';
 
     try {
-      const { data: user } = await data.supabase.auth.getUser();
-      if (!user.user) throw new Error('No user found');
-
-      // Check if user can add more clients
-      const allowed = await canAddClient(data.supabase, user.user.id);
-      if (!allowed) {
-        isLoading = false;
-        showUpgradeModal = true;
-        return;
-      }
-
-      // Get user's org_id
-      const { data: profile } = await data.supabase
-        .from('app_user')
-        .select('org_id')
-        .eq('id', user.user.id)
-        .single();
-
-      if (!profile) throw new Error('Profile not found');
-
-      // Create client
-      const { error: insertError } = await data.supabase
+      // Update client
+      const { error: updateError } = await data.supabase
         .from('client')
-        .insert({
-          org_id: profile.org_id,
+        .update({
           name,
           company: company || null,
           company_address: company_address || null,
@@ -67,12 +42,13 @@
           legal_name: legal_name || null,
           tax_id: tax_id || null,
           notes: notes || null
-        });
+        })
+        .eq('id', data.client.id);
 
-      if (insertError) throw insertError;
+      if (updateError) throw updateError;
 
-      // Redirect to clients page
-      window.location.href = '/app/clients';
+      // Redirect to client detail page
+      window.location.href = `/app/clients/${data.client.id}`;
 
     } catch (err: any) {
       error = err.message || 'Something went wrong. Please try again.';
@@ -83,21 +59,21 @@
 </script>
 
 <svelte:head>
-  <title>Add Client - inv</title>
+  <title>Edit {data.client.name} - inv</title>
 </svelte:head>
 
 <div class="max-w-3xl space-y-8">
   <!-- Header -->
   <div>
-    <h1 class="text-base font-medium mb-1">Add Client</h1>
+    <h1 class="text-base font-medium mb-1">Edit Client</h1>
     <p class="text-xs text-gray-500">
-      Add a new client to start creating invoices
+      Update client information
     </p>
   </div>
 
   <form onsubmit={handleSubmit} class="space-y-8">
     <!-- Contact Information -->
-    <div class="space-y-4">
+    <div class="space-y-5">
       <h2 class="text-sm font-medium pb-2 border-b border-gray-200">Contact Information</h2>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -220,7 +196,7 @@
     <!-- Actions -->
     <div class="flex items-center justify-between pt-4">
       <a
-        href="/app/clients"
+        href="/app/clients/{data.client.id}"
         class="px-4 py-1.5 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75"
       >
         Cancel
@@ -231,7 +207,7 @@
         disabled={isLoading || !name}
         class="px-6 py-1.5 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isLoading ? 'Adding Client...' : 'Add Client'}
+        {isLoading ? 'Saving...' : 'Save Changes'}
       </button>
     </div>
 
@@ -242,12 +218,3 @@
     {/if}
   </form>
 </div>
-
-<!-- Upgrade Modal -->
-<UpgradeModal
-  bind:show={showUpgradeModal}
-  reason="client_limit"
-  onClose={() => showUpgradeModal = false}
-  monthlyLink={STRIPE_MONTHLY_LINK}
-  yearlyLink={STRIPE_YEARLY_LINK}
-/>

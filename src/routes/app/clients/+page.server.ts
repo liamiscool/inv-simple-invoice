@@ -22,11 +22,12 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
     };
   }
   
-  // Get clients for this org
+  // Get active clients for this org (not deleted)
   const { data: clients } = await supabase
     .from('client')
     .select('*')
     .eq('org_id', profile.org_id)
+    .is('deleted_at', null)
     .order('created_at', { ascending: false });
   
   return {

@@ -117,12 +117,23 @@ export const actions = {
     const specJson = formData.get('spec') as string;
     const blankTemplateUrl = formData.get('blank_template_url') as string;
 
+    console.log('=== SERVER: SAVE ACTION ===');
+    console.log('Template ID:', templateId);
+    console.log('Blank URL:', blankTemplateUrl);
+    console.log('Spec JSON length:', specJson?.length);
+
     if (!templateId || !specJson || !blankTemplateUrl) {
+      console.log('Missing fields:', { templateId: !!templateId, specJson: !!specJson, blankTemplateUrl: !!blankTemplateUrl });
       return fail(400, { error: 'Missing required fields' });
     }
 
     try {
       const spec: TemplateSpec = JSON.parse(specJson);
+
+      console.log('Parsed spec:', JSON.stringify(spec, null, 2));
+      console.log('Spec areas:', Object.keys(spec.areas));
+      console.log('Items table:', spec.areas.items_table);
+      console.log('Grand total:', spec.areas.grand_total);
 
       // Update template with blank background and generated spec
       spec.meta.background_image_url = blankTemplateUrl;
@@ -134,13 +145,17 @@ export const actions = {
 
       if (error) {
         console.error('Update error:', error);
+        console.error('Error details:', JSON.stringify(error, null, 2));
         return fail(500, { error: `Failed to save template: ${error.message}` });
       }
 
+      console.log('Template saved successfully, redirecting to map page');
       // Redirect to mapping page for fine-tuning (or templates list to skip)
       redirect(303, `/app/templates/${templateId}/map`);
     } catch (error) {
       console.error('Parse error:', error);
+      console.error('Error message:', error instanceof Error ? error.message : 'Unknown error');
+      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
       return fail(400, { error: 'Invalid template specification' });
     }
   }

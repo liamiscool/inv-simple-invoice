@@ -15,21 +15,22 @@
   );
   
   async function deleteClient(clientId: string, clientName: string) {
-    if (!confirm(`Are you sure you want to delete ${clientName}? This action cannot be undone.`)) {
+    if (!confirm(`Are you sure you want to delete ${clientName}? You can add them back later if needed.`)) {
       return;
     }
-    
+
     try {
+      // Soft delete: set deleted_at timestamp
       const { error } = await data.supabase
         .from('client')
-        .delete()
+        .update({ deleted_at: new Date().toISOString() })
         .eq('id', clientId);
-        
+
       if (error) throw error;
-      
+
       // Refresh the page data
       window.location.reload();
-      
+
     } catch (err) {
       alert('Failed to delete client. Please try again.');
     }

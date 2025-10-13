@@ -22,6 +22,7 @@
   let selectedItemIndex = $state<number | null>(null);
   let loading = $state(true);
   let generating = $state(false);
+  let generatingProgress = $state<string>('');
   let error = $state<string | null>(null);
   let scale = $state(1);
   let pdfRendered = $state(false);
@@ -1236,6 +1237,7 @@
 
     try {
       generating = true;
+      generatingProgress = 'Creating blank template...';
       error = null;
       validationError = false;
 
@@ -1274,6 +1276,7 @@
       });
 
       // Step 2: Upload blank template to Supabase
+      generatingProgress = 'Uploading blank template...';
       const timestamp = Date.now();
       const fileName = `blank_${timestamp}_${data.template.title.replace(/[^a-z0-9]/gi, '_')}.png`;
       const filePath = `${data.userId}/${fileName}`;
@@ -1299,7 +1302,16 @@
       const { publicUrl } = await uploadResponse.json();
 
       // Step 3: Generate TemplateSpec from classified items
+      generatingProgress = 'Saving template configuration...';
       const spec = generateTemplateSpec(publicUrl);
+
+      // Debug: Log the generated spec
+      console.log('=== GENERATED TEMPLATE SPEC ===');
+      console.log('Full spec:', JSON.stringify(spec, null, 2));
+      console.log('Areas:', spec.areas);
+      console.log('Items table:', spec.areas.items_table);
+      console.log('Grand total:', spec.areas.grand_total);
+      console.log('===============================');
 
       // Step 4: Save to database via form
       const saveForm = document.getElementById('saveForm') as HTMLFormElement;
@@ -1312,6 +1324,7 @@
       console.error('Failed to generate template:', err);
       error = `Failed to generate template: ${err instanceof Error ? err.message : 'Unknown error'}`;
       generating = false;
+      generatingProgress = '';
     }
   }
 
@@ -1397,6 +1410,60 @@
       }
     });
 
+    // Add custom areas (boxes drawn by user)
+    customAreas.forEach((area) => {
+      if (!area.fieldMapping || area.fieldMapping === '__ignore__') {
+        return;
+      }
+
+      const fieldMapping = area.fieldMapping;
+
+      // Handle line items table - add as items_table and skip adding __line_items_table__
+      if (fieldMapping === '__line_items_table__' && area.isLineItemsTable && area.tableConfig) {
+        spec.areas.items_table = {
+          x: pxToMm(area.x),
+          y: pxToMm(area.y),
+          w: pxToMm(area.width),
+          row_height: pxToMm(area.tableConfig.rowHeight),
+          columns: area.tableConfig.columns.map(col => ({
+            key: col.field === 'custom' ? (col.customLabel || 'custom') : col.field,
+            label: col.field === 'custom' ? (col.customLabel || 'Custom') : col.field.charAt(0).toUpperCase() + col.field.slice(1),
+            w: (col.widthPercent / 100) * pxToMm(area.width),
+            align: col.align
+          }))
+        };
+        return; // Skip - don't add __line_items_table__ as a field
+      }
+
+      // Skip internal field mappings that shouldn't be in the spec
+      if (fieldMapping === '__line_items_table__') {
+        return;
+      }
+
+      const fieldKey = fieldMapping as keyof typeof spec.areas;
+
+      // Handle other custom areas
+      if (fieldKey === 'grand_total') {
+        spec.areas.grand_total = {
+          x: pxToMm(area.x),
+          y: pxToMm(area.y),
+          w: pxToMm(area.width),
+          h: pxToMm(area.height),
+          align: 'right',
+          font_weight: 'bold'
+        };
+      } else if (fieldKey !== 'items_table') {
+        // Add as regular area
+        (spec.areas as any)[fieldKey] = {
+          x: pxToMm(area.x),
+          y: pxToMm(area.y),
+          w: pxToMm(area.width),
+          h: pxToMm(area.height),
+          align: 'left'
+        };
+      }
+    });
+
     return spec;
   }
 
@@ -1431,6 +1498,7 @@
     let unmappedCount = 0;
     let ignoredCount = 0;
 
+    // Count text items
     classifiedItems.forEach((classification) => {
       if (classification.fieldMapping === '__ignore__') {
         ignoredCount++;
@@ -1446,8 +1514,24 @@
       }
     });
 
+    // Count custom areas (boxes)
+    customAreas.forEach((area) => {
+      if (area.classification === 'static') {
+        staticCount++;
+      } else if (area.fieldMapping && area.fieldMapping !== '' && area.fieldMapping !== '__ignore__') {
+        dynamicCount++;
+        mappedCount++;
+      } else if (area.fieldMapping === '__ignore__') {
+        ignoredCount++;
+      } else {
+        // Dynamic but unmapped
+        dynamicCount++;
+        unmappedCount++;
+      }
+    });
+
     return {
-      total: extractedText.items.length,
+      total: extractedText.items.length + customAreas.length,
       static: staticCount,
       dynamic: dynamicCount,
       mapped: mappedCount,
@@ -1490,7 +1574,7 @@
         disabled={generating || loading || stats.dynamic === 0}
         class="px-6 py-2 bg-black text-white text-xs rounded-sm hover:bg-gray-800 disabled:bg-gray-300"
       >
-        {generating ? 'Generating Template...' : 'Generate Template'}
+        {generating ? (generatingProgress || 'Generating Template...') : 'Generate Template'}
       </button>
     </div>
   </div>
@@ -1913,9 +1997,18 @@
   action="?/save"
   use:enhance={() => {
     generating = true;
-    return async ({ update }) => {
-      generating = false;
-      await update();
+    return async ({ result, update }) => {
+      if (result.type === 'redirect') {
+        // Successfully saved - navigate to map page
+        window.location.href = result.location;
+      } else if (result.type === 'failure') {
+        // Show error
+        generating = false;
+        error = result.data?.error || 'Failed to save template';
+      } else {
+        generating = false;
+        await update();
+      }
     };
   }}
   class="hidden"
@@ -1981,7 +2074,12 @@
                   <div>
                     <label class="block text-xs text-gray-600 mb-1">Field</label>
                     <select
-                      bind:value={column.field}
+                      value={column.field}
+                      onchange={(e) => {
+                        column.field = e.currentTarget.value as any;
+                        customAreas = [...customAreas];
+                        redraw();
+                      }}
                       class="w-full px-2 py-1 text-xs border border-gray-300 rounded-sm"
                     >
                       <option value="description">Description</option>
@@ -1994,7 +2092,11 @@
                     {#if column.field === 'custom'}
                       <input
                         type="text"
-                        bind:value={column.customLabel}
+                        value={column.customLabel || ''}
+                        oninput={(e) => {
+                          column.customLabel = e.currentTarget.value;
+                          customAreas = [...customAreas];
+                        }}
                         placeholder="Custom label..."
                         class="w-full px-2 py-1 text-xs border border-gray-300 rounded-sm mt-1"
                       />
@@ -2005,7 +2107,12 @@
                   <div>
                     <label class="block text-xs text-gray-600 mb-1">Align</label>
                     <select
-                      bind:value={column.align}
+                      value={column.align}
+                      onchange={(e) => {
+                        column.align = e.currentTarget.value as any;
+                        customAreas = [...customAreas];
+                        redraw();
+                      }}
                       class="w-full px-2 py-1 text-xs border border-gray-300 rounded-sm"
                     >
                       <option value="left">Left</option>
@@ -2025,7 +2132,11 @@
                     min="5"
                     max="80"
                     step="0.5"
-                    bind:value={column.widthPercent}
+                    value={column.widthPercent}
+                    oninput={(e) => {
+                      column.widthPercent = parseFloat(e.currentTarget.value);
+                      customAreas = [...customAreas];
+                    }}
                     onchange={() => {
                       // Normalize widths to 100%
                       const total = tableConfig.columns.reduce((sum, c) => sum + c.widthPercent, 0);
@@ -2036,6 +2147,7 @@
                         });
                       }
                       customAreas = [...customAreas];
+                      redraw();
                     }}
                     class="w-full"
                   />
@@ -2072,7 +2184,12 @@
             <label class="block text-xs font-medium text-gray-700 mb-1">Row Height (px)</label>
             <input
               type="number"
-              bind:value={tableConfig.rowHeight}
+              value={tableConfig.rowHeight}
+              oninput={(e) => {
+                tableConfig.rowHeight = parseInt(e.currentTarget.value) || 24;
+                customAreas = [...customAreas];
+                redraw();
+              }}
               min="10"
               max="100"
               class="w-full px-2 py-1 text-xs border border-gray-300 rounded-sm"
@@ -2083,7 +2200,12 @@
             <label class="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
-                bind:checked={tableConfig.headerRow}
+                checked={tableConfig.headerRow}
+                onchange={(e) => {
+                  tableConfig.headerRow = e.currentTarget.checked;
+                  customAreas = [...customAreas];
+                  redraw();
+                }}
                 class="w-4 h-4"
               />
               <span class="text-xs text-gray-700">First row is headers</span>
