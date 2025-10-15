@@ -241,9 +241,10 @@
       <a href="/app" class="text-lg tracking-tight font-medium">inv</a>
     </div>
 
-    <!-- Nav -->
-    <div class="flex-1 overflow-y-auto flex flex-col">
-      <nav class="px-3 py-4 space-y-0.5">
+    <!-- Nav + bottom items container (no overflow on parent) -->
+    <div class="flex-1 flex flex-col">
+      <!-- Scrollable nav section only -->
+      <nav class="px-3 py-4 space-y-0.5 overflow-y-auto flex-1">
         {#each navItems as item}
           <a
             href={item.href}
@@ -257,10 +258,7 @@
         {/each}
       </nav>
 
-      <!-- Spacer -->
-      <div class="flex-1"></div>
-
-      <!-- What's New Button -->
+      <!-- What's New Button (outside scroll, can overflow) -->
       <div
         class="px-3 pb-2 relative"
         onmouseenter={() => showChangelogWidget = true}

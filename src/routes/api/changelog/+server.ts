@@ -1,18 +1,18 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import changelogEntries from '$lib/generated/changelog.json';
 
-// Static changelog data (will be updated manually or via build process)
-const CHANGELOG_ENTRIES = [
-  {
-    date: '2025-10-15',
-    added: ['Email template improvements with better formatting'],
-    changed: ['Improved invoice page UX flow'],
-    fixed: ['Duplicate invoice creation bug', 'PDF generation on Cloudflare Pages']
-  }
-];
+/**
+ * Changelog API endpoint
+ *
+ * This endpoint serves changelog data parsed from CHANGELOG.md
+ * The JSON file is auto-generated at build time by scripts/parse-changelog.ts
+ *
+ * Single source of truth: CHANGELOG.md
+ */
 
 export const GET: RequestHandler = async () => {
   return json({
-    entries: CHANGELOG_ENTRIES
+    entries: changelogEntries
   });
 };

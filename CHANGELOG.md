@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Breadcrumb navigation across all sub-pages (invoices, clients)
 - Bell icon "What's New" changelog widget in sidebar
 - Heroicons integration for clean, minimal iconography
+- Automated changelog syncing from CHANGELOG.md to widget
 
 ### Changed
 - Removed Settings from main navigation (now in profile dropdown only)
@@ -21,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Updated typography scale: body text 14px, interactive elements 16px, titles 18px
 - Sidebar width increased from 192px to 224px for better readability
 - Invoice PDFs can now be viewed by anyone with the link (no account required)
+- "What's New" widget now displays properly when hovering
 
 ### Fixed
 - Mobile sidebar closing div tag error
@@ -28,6 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - PDF generation with Supabase Storage integration
 - Email subject line pre-fill bug
 - Clients can now view invoice PDFs from email links without creating an account
+- Changelog widget dropdown visibility (no longer clipped by sidebar)
 
 ---
 

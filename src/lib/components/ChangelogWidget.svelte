@@ -34,7 +34,7 @@
 </script>
 
 <!-- Dropdown -->
-<div class="absolute left-full ml-4 bottom-0 w-[480px] bg-white border border-gray-200 shadow-lg max-h-[600px] overflow-y-auto">
+<div class="absolute left-full ml-4 bottom-0 w-[480px] bg-white border border-gray-200 shadow-lg max-h-[600px] overflow-y-auto z-50">
   <!-- Header -->
   <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
     <div class="text-base font-medium">What's New</div>
