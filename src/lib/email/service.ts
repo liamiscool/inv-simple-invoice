@@ -90,6 +90,13 @@ export async function sendInvoiceEmail(
  * Send a test email to verify configuration
  */
 export async function sendTestEmail(to: string): Promise<EmailDeliveryResult> {
+  if (!resend) {
+    return {
+      success: false,
+      error: 'Resend API key not configured'
+    };
+  }
+
   try {
     const { data, error } = await resend.emails.send({
       from: 'inv <invoices@send.inv.so>',

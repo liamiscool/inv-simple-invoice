@@ -4,7 +4,7 @@ import Stripe from 'stripe';
 import { env } from '$env/dynamic/private';
 
 const stripe = env.STRIPE_SECRET_KEY ? new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-12-18.acacia'
+  apiVersion: '2025-09-30.clover'
 }) : null;
 
 // Your Stripe Price IDs (get these from Stripe dashboard)
@@ -32,13 +32,13 @@ export const POST: RequestHandler = async ({ request, locals: { supabase, safeGe
     }
 
     // Get user's org_id
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('app_user')
       .select('org_id')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
-    if (!profile) {
+    if (profileError || !profile?.org_id) {
       return json({ error: 'Profile not found' }, { status: 404 });
     }
 
@@ -56,12 +56,12 @@ export const POST: RequestHandler = async ({ request, locals: { supabase, safeGe
       customer_email: user.email,
       subscription_data: {
         metadata: {
-          org_id: profile.org_id,
+          org_id: profile.org_id as string,
           user_id: user.id
         }
       },
       metadata: {
-        org_id: profile.org_id,
+        org_id: profile.org_id as string,
         user_id: user.id
       }
     });

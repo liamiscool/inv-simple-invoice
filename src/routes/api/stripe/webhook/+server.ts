@@ -4,7 +4,7 @@ import Stripe from 'stripe';
 import { env } from '$env/dynamic/private';
 
 const stripe = env.STRIPE_SECRET_KEY ? new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-12-18.acacia'
+  apiVersion: '2025-09-30.clover'
 }) : null;
 
 const webhookSecret = env.STRIPE_WEBHOOK_SECRET;
