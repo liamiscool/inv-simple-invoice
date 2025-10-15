@@ -271,7 +271,7 @@
 
         {#if showChangelogWidget}
           <!-- Invisible bridge to prevent hover gap -->
-          <div class="absolute left-[100%] top-0 w-4 h-full"></div>
+          <div class="absolute left-[100%] top-0 w-2 h-full"></div>
           <ChangelogWidget onClose={() => showChangelogWidget = false} />
         {/if}
       </div>
