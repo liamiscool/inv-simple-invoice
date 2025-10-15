@@ -1,10 +1,13 @@
 <script lang="ts">
   import type { PageData } from './$types';
-  
+  import { EllipsisVertical } from '@steeze-ui/heroicons';
+  import { Icon } from '@steeze-ui/svelte-icon';
+
   let { data }: { data: PageData } = $props();
-  
+
   let searchQuery = $state('');
   let statusFilter = $state('all');
+  let openDropdownId = $state<string | null>(null);
   
   const statusColors = {
     draft: 'text-gray-600 bg-gray-100',
@@ -48,30 +51,53 @@
     return new Date(dateString).toLocaleDateString();
   }
   
-  async function duplicateInvoice(invoiceId: string) {
+  function toggleDropdown(invoiceId: string) {
+    openDropdownId = openDropdownId === invoiceId ? null : invoiceId;
+  }
+
+  function closeDropdown() {
+    openDropdownId = null;
+  }
+
+  async function updateInvoiceStatus(invoiceId: string, newStatus: string) {
     try {
-      // This will be implemented later
-      alert('Duplicate feature coming soon!');
+      const { error } = await data.supabase
+        .from('invoice')
+        .update({ status: newStatus })
+        .eq('id', invoiceId);
+
+      if (error) throw error;
+
+      window.location.reload();
     } catch (err) {
-      alert('Failed to duplicate invoice');
+      alert('Failed to update status. Please try again.');
     }
   }
-  
+
+  async function duplicateInvoice(invoiceId: string) {
+    try {
+      // Redirect to the detail page which has duplicate functionality
+      window.location.href = `/app/invoices/${invoiceId}`;
+    } catch (err) {
+      alert('Failed to navigate to invoice');
+    }
+  }
+
   async function deleteInvoice(invoiceId: string, invoiceNumber: string) {
     if (!confirm(`Are you sure you want to delete invoice ${invoiceNumber}? This action cannot be undone.`)) {
       return;
     }
-    
+
     try {
       const { error } = await data.supabase
         .from('invoice')
         .delete()
         .eq('id', invoiceId);
-        
+
       if (error) throw error;
-      
+
       window.location.reload();
-      
+
     } catch (err) {
       alert('Failed to delete invoice. Please try again.');
     }
@@ -215,19 +241,65 @@
                 </span>
               </td>
               <td class="px-4 py-4">
-                <div class="flex items-center gap-3">
+                <div class="relative">
                   <button
-                    onclick={() => duplicateInvoice(invoice.id)}
-                    class="text-sm text-gray-500 hover:text-black transition-colors"
+                    onclick={() => toggleDropdown(invoice.id)}
+                    class="p-1 text-gray-500 hover:text-black transition-colors"
                   >
-                    Copy
+                    <Icon src={EllipsisVertical} class="w-5 h-5" />
                   </button>
-                  <button
-                    onclick={() => deleteInvoice(invoice.id, invoice.number)}
-                    class="text-sm text-gray-500 hover:text-red-600 transition-colors"
-                  >
-                    Delete
-                  </button>
+
+                  {#if openDropdownId === invoice.id}
+                    <div
+                      class="absolute right-0 top-8 w-48 bg-white border border-gray-200 shadow-lg z-10"
+                      onmouseleave={closeDropdown}
+                    >
+                      <div class="py-1">
+                        <button
+                          onclick={() => { duplicateInvoice(invoice.id); closeDropdown(); }}
+                          class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                          Duplicate
+                        </button>
+
+                        {#if invoice.status === 'draft'}
+                          <button
+                            onclick={() => { updateInvoiceStatus(invoice.id, 'sent'); closeDropdown(); }}
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          >
+                            Mark as Sent
+                          </button>
+                        {/if}
+
+                        {#if ['sent', 'partially_paid'].includes(invoice.status)}
+                          <button
+                            onclick={() => { updateInvoiceStatus(invoice.id, 'paid'); closeDropdown(); }}
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          >
+                            Mark as Paid
+                          </button>
+                        {/if}
+
+                        {#if invoice.status !== 'void'}
+                          <button
+                            onclick={() => { updateInvoiceStatus(invoice.id, 'void'); closeDropdown(); }}
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          >
+                            Mark as Void
+                          </button>
+                        {/if}
+
+                        <div class="border-t border-gray-200 my-1"></div>
+
+                        <button
+                          onclick={() => { deleteInvoice(invoice.id, invoice.number); closeDropdown(); }}
+                          class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  {/if}
                 </div>
               </td>
             </tr>
