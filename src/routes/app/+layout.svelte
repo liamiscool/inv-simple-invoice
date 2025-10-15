@@ -4,11 +4,16 @@
   import { onMount } from 'svelte';
   import { STRIPE_MONTHLY_LINK, STRIPE_YEARLY_LINK } from '$lib/config/stripe';
   import UpgradeModal from '$lib/components/UpgradeModal.svelte';
+  import Settings from 'svelte-material-icons/Settings.svelte';
+  import StarOutline from 'svelte-material-icons/StarOutline.svelte';
+  import MessageTextOutline from 'svelte-material-icons/MessageTextOutline.svelte';
+  import Logout from 'svelte-material-icons/Logout.svelte';
 
   let { data, children }: { data: LayoutData; children: any } = $props();
   let showMobileSidebar = $state(false);
   let showUpgradeModal = $state(false);
   let subscriptionPlan = $state<'free' | 'pro'>('free');
+  let showProfileMenu = $state(false);
 
   onMount(async () => {
     try {
@@ -35,6 +40,19 @@
     } catch (err) {
       console.error('Error fetching subscription:', err);
     }
+
+    // Close profile menu when clicking outside
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.profile-menu-container')) {
+        showProfileMenu = false;
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
   });
 
   async function handleLogout() {
@@ -44,6 +62,16 @@
 
   function closeMobileSidebar() {
     showMobileSidebar = false;
+  }
+
+  function toggleProfileMenu() {
+    showProfileMenu = !showProfileMenu;
+  }
+
+  function getInitials(email: string | undefined): string {
+    if (!email) return 'U';
+    const username = email.split('@')[0];
+    return username.charAt(0).toUpperCase();
   }
 
   const navItems = [
@@ -73,109 +101,215 @@
   {#if showMobileSidebar}
     <div class="md:hidden fixed inset-0 z-50">
       <div class="fixed inset-0 bg-black/20" onclick={closeMobileSidebar}></div>
-      <div class="fixed left-0 top-0 h-full w-56 bg-white border-r border-thin">
-        <div class="py-6 px-4">
-          <a href="/app" class="text-lg tracking-tight font-medium block mb-6">inv</a>
-          <nav class="space-y-3">
+      <div class="fixed left-0 top-0 h-full w-56 bg-white border-r border-gray-200 flex flex-col">
+        <!-- Logo -->
+        <div class="px-6 py-6 border-b border-gray-200">
+          <a href="/app" class="text-lg tracking-tight font-medium">inv</a>
+        </div>
+
+        <!-- Nav -->
+        <div class="flex-1 overflow-y-auto">
+          <nav class="px-3 py-4 space-y-0.5">
             {#each navItems as item}
               <a
                 href={item.href}
                 onclick={closeMobileSidebar}
-                class="block text-sm hover:text-black transition-colors {
+                class="block px-3 py-2 text-sm hover:bg-gray-50 transition-colors rounded {
                   (item.exact ? $page.url.pathname === item.href : $page.url.pathname.startsWith(item.href))
-                    ? 'text-black font-medium' : 'text-gray-600'
+                    ? 'text-black font-medium bg-gray-50' : 'text-gray-600'
                 }"
               >
                 {item.label}
               </a>
             {/each}
-
-            <!-- Mobile Upgrade button -->
-            {#if subscriptionPlan === 'free'}
-              <button
-                onclick={() => { showUpgradeModal = true; closeMobileSidebar(); }}
-                class="block w-full px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors font-medium mt-4"
-              >
-                Upgrade to Pro
-              </button>
-            {:else}
-              <div class="mt-4 px-5 py-2.5 bg-black text-white text-sm text-center font-medium">
-                Pro Plan
-              </div>
-            {/if}
-
-            <button
-              onclick={handleLogout}
-              class="block text-sm text-gray-600 hover:text-black transition-colors mt-6 pt-3 border-t border-thin"
-            >
-              Sign out
-            </button>
           </nav>
+        </div>
+
+        <!-- Mobile Profile section -->
+        <div class="flex-shrink-0 relative profile-menu-container border-t border-gray-200">
+          <button
+            onclick={toggleProfileMenu}
+            class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+          >
+            <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-sm font-medium flex-shrink-0">
+              {getInitials(data.session?.user?.email)}
+            </div>
+            <div class="flex-1 min-w-0 text-left">
+              <div class="text-sm font-medium truncate">
+                {data.session?.user?.email?.split('@')[0] || 'User'}
+              </div>
+              <div class="text-xs text-gray-500">
+                {subscriptionPlan === 'pro' ? 'Pro Plan' : 'Free Plan'}
+              </div>
+            </div>
+          </button>
+
+          {#if showProfileMenu}
+            <div class="absolute bottom-full left-0 right-0 mb-2 bg-white border border-gray-200 shadow-lg">
+              <div class="px-4 py-3 border-b border-gray-200">
+                <div class="text-sm font-medium truncate">
+                  {data.session?.user?.email?.split('@')[0] || 'User'}
+                </div>
+                <div class="text-xs text-gray-500 truncate">
+                  {data.session?.user?.email || ''}
+                </div>
+              </div>
+
+              <div class="py-1">
+                <a
+                  href="/app/settings"
+                  onclick={() => { showProfileMenu = false; closeMobileSidebar(); }}
+                  class="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
+                >
+                  <Settings size="18" class="text-gray-600" />
+                  <span>Settings</span>
+                </a>
+
+                {#if subscriptionPlan === 'free'}
+                  <button
+                    onclick={() => { showUpgradeModal = true; showProfileMenu = false; closeMobileSidebar(); }}
+                    class="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
+                  >
+                    <StarOutline size="18" class="text-gray-600" />
+                    <span>Upgrade Plan</span>
+                  </button>
+                {/if}
+
+                <a
+                  href="https://github.com/anthropics/claude-code/issues"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center gap-3 px-4 py-2.5 text-sm bg-gradient-to-r from-purple-50 via-pink-50 to-orange-50 hover:from-purple-100 hover:via-pink-100 hover:to-orange-100 transition-colors border-y border-gray-100"
+                >
+                  <MessageTextOutline size="18" class="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600" />
+                  <span class="font-medium bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
+                    Give Feedback
+                  </span>
+                </a>
+
+                <button
+                  onclick={handleLogout}
+                  class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+                >
+                  <Logout size="18" class="text-gray-600" />
+                  <span>Sign out</span>
+                </button>
+              </div>
+            </div>
+          {/if}
+        </div>
         </div>
       </div>
     </div>
   {/if}
   
   <!-- Desktop sidebar -->
-  <div class="hidden md:fixed md:left-0 md:top-0 md:h-full md:w-56 md:border-r md:border-thin md:bg-white md:flex md:flex-col">
-    <div class="py-8 px-6 flex-1 flex flex-col">
-      <!-- Logo and Nav -->
-      <div class="flex-shrink-0">
-        <a href="/app" class="text-lg tracking-tight block mb-8 font-medium">inv</a>
-        <nav class="space-y-1">
-          {#each navItems as item}
-            <a
-              href={item.href}
-              class="block text-sm hover:text-black transition-colors py-2 {
-                (item.exact ? $page.url.pathname === item.href : $page.url.pathname.startsWith(item.href))
-                  ? 'text-black font-medium' : 'text-gray-500'
-              }"
-            >
-              {item.label}
-            </a>
-          {/each}
-        </nav>
-      </div>
+  <div class="hidden md:fixed md:left-0 md:top-0 md:h-full md:w-56 md:border-r md:border-gray-200 md:bg-white md:flex md:flex-col">
+    <!-- Logo -->
+    <div class="px-6 py-6 border-b border-gray-200">
+      <a href="/app" class="text-lg tracking-tight font-medium">inv</a>
+    </div>
 
-      <!-- Spacer to push bottom content down -->
-      <div class="flex-1"></div>
+    <!-- Nav -->
+    <div class="flex-1 overflow-y-auto">
+      <nav class="px-3 py-4 space-y-0.5">
+        {#each navItems as item}
+          <a
+            href={item.href}
+            class="block px-3 py-2 text-sm hover:bg-gray-50 transition-colors rounded {
+              (item.exact ? $page.url.pathname === item.href : $page.url.pathname.startsWith(item.href))
+                ? 'text-black font-medium bg-gray-50' : 'text-gray-600'
+            }"
+          >
+            {item.label}
+          </a>
+        {/each}
+      </nav>
+    </div>
 
-      <!-- Upgrade section -->
-      <div class="flex-shrink-0">
-        {#if subscriptionPlan === 'free'}
-          <div class="bg-gradient-to-br from-gray-900 to-black p-4 mb-4 text-white">
-            <div class="text-sm font-medium mb-2">Upgrade to Pro</div>
-            <div class="text-sm text-gray-300 mb-3 leading-relaxed">
-              Unlimited invoices, custom templates, and priority support
-            </div>
-            <button
-              onclick={() => showUpgradeModal = true}
-              class="w-full px-5 py-2.5 bg-white text-black text-sm hover:bg-gray-100 transition-colors duration-75 font-medium"
-            >
-              Upgrade Now
-            </button>
-          </div>
-        {:else}
-          <div class="pb-4 mb-4 border-b border-thin">
-            <div class="text-sm font-medium text-green-600">
-              ✓ Pro Plan Active
-            </div>
-          </div>
-        {/if}
+    <!-- Profile section with popup -->
+    <div class="flex-shrink-0 relative profile-menu-container border-t border-gray-200">
+      <!-- Profile button -->
+      <button
+        onclick={toggleProfileMenu}
+        class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+      >
+        <!-- Avatar circle -->
+        <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-sm font-medium flex-shrink-0">
+          {getInitials(data.session?.user?.email)}
+        </div>
 
-        <!-- User section -->
-        <div class="pb-4">
-          <div class="text-sm text-gray-500 mb-2 truncate">
+        <!-- User info -->
+        <div class="flex-1 min-w-0 text-left">
+          <div class="text-sm font-medium truncate">
             {data.session?.user?.email?.split('@')[0] || 'User'}
           </div>
-          <button
-            onclick={handleLogout}
-            class="text-sm text-gray-500 hover:text-black transition-colors"
-          >
-            Sign out
-          </button>
+          <div class="text-xs text-gray-500">
+            {subscriptionPlan === 'pro' ? 'Pro Plan' : 'Free Plan'}
+          </div>
         </div>
-      </div>
+      </button>
+
+      <!-- Popup menu (appears above) -->
+      {#if showProfileMenu}
+        <div class="absolute bottom-full left-0 right-0 mb-2 bg-white border border-gray-200 shadow-lg">
+          <!-- User info header (non-clickable) -->
+          <div class="px-4 py-3 border-b border-gray-200">
+            <div class="text-sm font-medium truncate">
+              {data.session?.user?.email?.split('@')[0] || 'User'}
+            </div>
+            <div class="text-xs text-gray-500 truncate">
+              {data.session?.user?.email || ''}
+            </div>
+          </div>
+
+          <!-- Menu items -->
+          <div class="py-1">
+            <!-- Settings -->
+            <a
+              href="/app/settings"
+              onclick={() => showProfileMenu = false}
+              class="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
+            >
+              <Settings size="18" class="text-gray-600" />
+              <span>Settings</span>
+            </a>
+
+            <!-- Upgrade Plan (only show for free users) -->
+            {#if subscriptionPlan === 'free'}
+              <button
+                onclick={() => { showUpgradeModal = true; showProfileMenu = false; }}
+                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
+              >
+                <StarOutline size="18" class="text-gray-600" />
+                <span>Upgrade Plan</span>
+              </button>
+            {/if}
+
+            <!-- Give Feedback (highlighted) -->
+            <a
+              href="https://github.com/anthropics/claude-code/issues"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center gap-3 px-4 py-2.5 text-sm bg-gradient-to-r from-purple-50 via-pink-50 to-orange-50 hover:from-purple-100 hover:via-pink-100 hover:to-orange-100 transition-colors border-y border-gray-100"
+            >
+              <MessageTextOutline size="18" class="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600" />
+              <span class="font-medium bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
+                Give Feedback
+              </span>
+            </a>
+
+            <!-- Sign out -->
+            <button
+              onclick={handleLogout}
+              class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+            >
+              <Logout size="18" class="text-gray-600" />
+              <span>Sign out</span>
+            </button>
+          </div>
+        </div>
+      {/if}
     </div>
   </div>
   

@@ -33,6 +33,7 @@
 		"pdfjs-dist": "^5.4.296",
 		"puppeteer": "^23.11.1",
 		"resend": "^6.1.2",
-		"stripe": "^19.1.0"
+		"stripe": "^19.1.0",
+		"svelte-material-icons": "^3.0.5"
 	}
 }
