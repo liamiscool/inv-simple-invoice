@@ -65,10 +65,10 @@ You are an AI assistant tasked with creating well-structured GitHub issues for f
   - **Logical Grouping**: Use clear section headers with appropriate hierarchy
   - **Example-Rich**: Provide concrete examples of inputs, outputs, and user interactions
   - **Future-Proof**: Include "Related Features" and "Technical Considerations" sections
-  - **Service Integration**: Consider which longevity services (blood testing, hyperbaric, etc.) are affected
-  - **Map Features**: Document any changes to Mapbox implementation or location clustering
-  - **Admin Panel**: Note if admin functionality needs updates
-  - **SEO Impact**: Consider effects on sitemap, structured data, or content pages
+  - **Integration Impact**: Consider how changes affect existing features and workflows
+  - **Data Model Changes**: Note if database schema or data structures need updates
+  - **User Experience**: Document UI/UX implications and user flows
+  - **Testing Requirements**: Specify what needs to be tested (unit, integration, E2E)
 
   ## 3. Present a plan:
   - Based on your research, outline a plan for creating the GitHub issue
@@ -101,12 +101,8 @@ You are an AI assistant tasked with creating well-structured GitHub issues for f
     ```
 
   Remember to think carefully about the feature description and how to best present it as a
-  GitHub issue. Consider the Longevity project's focus on:
-  - Location-based service discovery
-  - Interactive map interface
-  - SEO-optimized content
-  - Admin panel functionality
-  - Cloudflare deployment
+  GitHub issue. Consider the project's architecture and let CLAUDE.md guide you on specific
+  technical implementation details.
 
   Your final output should consist of only the content within the github_issue tags, ready to be copied and
   pasted directly into GitHub.

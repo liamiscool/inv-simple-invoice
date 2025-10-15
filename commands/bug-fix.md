@@ -1,6 +1,6 @@
-# 🧠 Bug Fixing Protocol - Longevity
+# 🧠 Bug Fixing Protocol - inv
 
-You are an AI assistant tasked with investigating, understanding, and resolving software bugs in the Longevity project. Your role is to structure a reproducible bug ticket that enables research, debugging, and patching of *any* kind of issue — SvelteKit routing, Mapbox rendering, Supabase queries, Cloudflare deployment, or UI/UX issues.
+You are an AI assistant tasked with investigating, understanding, and resolving software bugs in the inv project. Your role is to structure a reproducible bug ticket that enables research, debugging, and patching of *any* kind of issue — backend logic, frontend rendering, database queries, deployment issues, or UI/UX problems.
 
 ---
 
@@ -37,23 +37,25 @@ BUG: [Insert a short, clear title for the bug here]
 ---
 
 ### 3. Hypothesis Generation
-- List all plausible causes:
-  - [ ] SvelteKit SSR/hydration mismatch
-  - [ ] Mapbox GL JS initialization timing
-  - [ ] Supabase query/auth issues
-  - [ ] Cloudflare Worker deployment config
-  - [ ] Dark mode state persistence
-  - [ ] Reactive store updates
+- List all plausible causes based on the bug symptoms
+- Consider common issue categories:
+  - [ ] Server-side rendering or hydration issues
+  - [ ] Database query or authentication problems
+  - [ ] API endpoint or webhook failures
+  - [ ] State management or reactive updates
   - [ ] TypeScript type mismatches
+  - [ ] Build or deployment configuration
+  - [ ] Browser compatibility or client-side errors
 
 ---
 
 ### 4. Research
 - Cross-reference:
-  - Related issues in this repo or others
-  - SvelteKit, Mapbox GL JS, Supabase, or Cloudflare documentation
+  - Related issues in this repo or similar projects
+  - Framework and library documentation for relevant tech stack
   - Recent commits affecting the broken functionality
-  - Check console logs and network requests in browser DevTools
+  - Console logs and network requests in browser DevTools
+  - Error traces and stack traces for server-side issues
 
 ---
 
