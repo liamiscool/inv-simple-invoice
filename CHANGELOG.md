@@ -9,29 +9,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
-- Feedback button in sidebar navigation linking to feedback@inv.so
-- Profile menu popup at bottom of sidebar with user info and quick actions
+- Quick actions dropdown menu on invoice list (duplicate, change status, delete)
+- Edit button for draft invoices
 - Breadcrumb navigation across all sub-pages (invoices, clients)
 - Bell icon "What's New" changelog widget in sidebar
 - Heroicons integration for clean, minimal iconography
 - Automated changelog syncing from CHANGELOG.md to widget
 
 ### Changed
-- Removed Settings from main navigation (now in profile dropdown only)
-- Improved sidebar design with better spacing and visual hierarchy
-- Updated typography scale: body text 14px, interactive elements 16px, titles 18px
-- Sidebar width increased from 192px to 224px for better readability
+- Invoice line items now display on single line when creating invoices
 - Invoice PDFs can now be viewed by anyone with the link (no account required)
 - "What's New" widget now displays properly when hovering
 - Cleaner invoice detail page with more whitespace and fewer boxes
+- Improved sidebar design with better spacing and visual hierarchy
+- Updated typography scale: body text 14px, interactive elements 16px, titles 18px
 
 ### Fixed
-- Mobile sidebar closing div tag error
-- Icon import syntax for Svelte 5 compatibility
 - PDF generation with Supabase Storage integration
 - Email subject line pre-fill bug
 - Clients can now view invoice PDFs from email links without creating an account
 - Changelog widget dropdown visibility (no longer clipped by sidebar)
+- Icon import syntax for Svelte 5 compatibility
+- Mobile sidebar closing div tag error
 
 ---
 
