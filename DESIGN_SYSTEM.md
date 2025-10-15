@@ -4,12 +4,13 @@
 
 ## Design Philosophy
 
-**Yeezy-inspired stark minimalism** × **terminal vibe** (light mode only)
+**Yeezy-inspired stark minimalism** × **terminal vibe** (light & dark mode)
 - Lots of white space
 - Light UI chrome
 - Dense, informative architecture
 - Small type, restrained weights
 - Selective micro-animations only
+- **Dark mode**: True black (#0A0A0A) with subtle hierarchy
 
 ---
 
@@ -36,14 +37,14 @@ font-family: 'JetBrains Mono', 'IBM Plex Mono', 'ui-monospace', 'SFMono-Regular'
 
 ## Colors
 
-### Palette (Extremely minimal)
+### Light Mode Palette
 ```css
 /* Primary */
 --white: #FFFFFF        /* Dominant background */
 --black: #000000        /* Text, borders, accents */
 --border: #EAEAEA       /* Thin neutral borders */
 
-/* Grays (sparingly) */  
+/* Grays (sparingly) */
 --gray-400: #9CA3AF     /* Inactive/disabled */
 --gray-500: #6B7280     /* Placeholder text */
 --gray-600: #4B5563     /* Secondary text */
@@ -53,12 +54,47 @@ font-family: 'JetBrains Mono', 'IBM Plex Mono', 'ui-monospace', 'SFMono-Regular'
 --red-600: #DC2626      /* Errors only */
 ```
 
+### Dark Mode Palette
+```css
+/* Core Colors (Tailwind custom colors) */
+--dark-bg: #0A0A0A              /* Main background (sidebar, page) */
+--dark-input: #171717           /* Form inputs, dropdowns, menus */
+--dark-button: #1A1A1A          /* Primary buttons (matches background tone) */
+--dark-button-hover: #242424    /* Button hover state */
+--dark-hover: #0F0F0F           /* Hover states (nav, rows) */
+
+/* Text Hierarchy */
+--text-primary: #FFFFFF    /* Headings, numbers, amounts (dark:text-white) */
+--text-secondary: #D1D5DB  /* Dates, labels, client names (dark:text-gray-300) */
+--text-tertiary: #9CA3AF   /* Timestamps, counts (dark:text-gray-400) */
+
+/* Borders */
+--border-primary: #374151  /* Tables, cards (dark:border-gray-700) */
+--border-subtle: #1F2937   /* Sidebar (dark:border-gray-800) */
+
+/* Status Colors (with /30 opacity backgrounds) */
+--draft-text: #D1D5DB on #374151      /* dark:text-gray-300 dark:bg-gray-700 */
+--sent-text: #60A5FA on blue-900/30   /* dark:text-blue-400 dark:bg-blue-900/30 */
+--paid-text: #4ADE80 on green-900/30  /* dark:text-green-400 dark:bg-green-900/30 */
+--overdue-text: #F87171 on red-900/30 /* dark:text-red-400 dark:bg-red-900/30 */
+```
+
 ### Usage Rules
+
+**Light Mode**:
 - **90% white backgrounds** - embrace the void
 - **Thin #EAEAEA borders** everywhere (1px only)
-- **Pure black** for text and active states  
+- **Pure black** for text and active states
 - **Gray-600** for secondary/meta information
 - **NO gradients, shadows, or colorful accents**
+
+**Dark Mode**:
+- **True black (#0A0A0A)** - not gray-900
+- **Subtle hierarchy** - #171717 for inputs/menus, #1A1A1A for buttons (matches tone)
+- **Bright white text** for primary content, gray-300 for secondary
+- **#0F0F0F hover states** - barely perceptible but tactile (nav/rows)
+- **#242424 button hovers** - subtle lift on interaction
+- **Gray-700 borders** - visible but not harsh
 
 ---
 

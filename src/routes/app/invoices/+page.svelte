@@ -10,12 +10,12 @@
   let openDropdownId = $state<string | null>(null);
   
   const statusColors = {
-    draft: 'text-gray-600 bg-gray-100',
-    sent: 'text-blue-600 bg-blue-100', 
-    partially_paid: 'text-orange-600 bg-orange-100',
-    paid: 'text-green-600 bg-green-100',
-    overdue: 'text-red-600 bg-red-100',
-    void: 'text-gray-600 bg-gray-100'
+    draft: 'text-gray-600 bg-gray-100 dark:text-gray-300 dark:bg-gray-700',
+    sent: 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30',
+    partially_paid: 'text-orange-600 bg-orange-100 dark:text-orange-400 dark:bg-orange-900/30',
+    paid: 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30',
+    overdue: 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30',
+    void: 'text-gray-600 bg-gray-100 dark:text-gray-300 dark:bg-gray-700'
   };
   
   const statusLabels = {
@@ -112,14 +112,14 @@
   <!-- Header -->
   <div class="flex items-center justify-between">
     <div>
-      <h1 class="text-lg font-medium mb-1">Invoices</h1>
-      <p class="text-sm text-gray-500">
+      <h1 class="text-lg font-medium mb-1 dark:text-white">Invoices</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
         {data.invoices?.length || 0} total
       </p>
     </div>
     <a
       href="/app/invoices/new"
-      class="px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75"
+      class="px-5 py-2.5 bg-black dark:bg-dark-button text-white text-sm hover:bg-gray-800 dark:hover:bg-dark-button-hover transition-colors duration-75"
     >
       Create Invoice
     </a>
@@ -132,14 +132,14 @@
         type="text"
         bind:value={searchQuery}
         placeholder="Search invoices..."
-        class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+        class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-black dark:focus:border-white transition-colors dark:bg-dark-input dark:text-white"
       />
     </div>
 
     <div>
       <select
         bind:value={statusFilter}
-        class="px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+        class="px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-black dark:focus:border-white transition-colors dark:bg-dark-input dark:text-white"
       >
         <option value="all">All Status</option>
         <option value="draft">Draft</option>
@@ -156,14 +156,14 @@
     <!-- Empty state -->
     <div class="py-16 text-center">
       <div class="space-y-4">
-        <h2 class="text-base font-medium">No invoices yet</h2>
-        <p class="text-sm text-gray-500 max-w-sm mx-auto">
+        <h2 class="text-base font-medium dark:text-white">No invoices yet</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
           Create your first invoice to start getting paid
         </p>
         {#if data.clients && data.clients.length > 0}
           <a
             href="/app/invoices/new"
-            class="inline-flex items-center px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75"
+            class="inline-flex items-center px-5 py-2.5 bg-black dark:bg-dark-button text-white text-sm hover:bg-gray-800 dark:hover:bg-dark-button-hover transition-colors duration-75"
           >
             Create Your First Invoice
           </a>
@@ -174,7 +174,7 @@
             </p>
             <a
               href="/app/clients/new"
-              class="inline-flex items-center px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75"
+              class="inline-flex items-center px-5 py-2.5 bg-black dark:bg-dark-button text-white text-sm hover:bg-gray-800 dark:hover:bg-dark-button-hover transition-colors duration-75"
             >
               Add Your First Client
             </a>
@@ -185,43 +185,43 @@
   {:else if filteredInvoices.length === 0}
     <!-- No search results -->
     <div class="py-12 text-center">
-      <p class="text-sm text-gray-500">
+      <p class="text-sm text-gray-500 dark:text-gray-400">
         No invoices match your current filters
       </p>
     </div>
   {:else}
     <!-- Desktop: Invoices table -->
-    <div class="hidden md:block border-t border-b border-gray-200">
+    <div class="hidden md:block border-t border-b border-gray-200 dark:border-gray-700">
       <table class="w-full">
-        <thead class="border-b border-gray-200">
+        <thead class="border-b border-gray-200 dark:border-gray-700">
           <tr>
-            <th class="text-left text-sm text-gray-500 px-4 py-4 font-medium">Number</th>
-            <th class="text-left text-sm text-gray-500 px-4 py-4 font-medium">Client</th>
-            <th class="text-left text-sm text-gray-500 px-4 py-4 font-medium">Amount</th>
-            <th class="text-left text-sm text-gray-500 px-4 py-4 font-medium">Status</th>
-            <th class="text-left text-sm text-gray-500 px-4 py-4 font-medium">Issue Date</th>
-            <th class="text-left text-sm text-gray-500 px-4 py-4 font-medium">Due Date</th>
+            <th class="text-left text-sm text-gray-500 dark:text-gray-400 px-4 py-4 font-medium">Number</th>
+            <th class="text-left text-sm text-gray-500 dark:text-gray-400 px-4 py-4 font-medium">Client</th>
+            <th class="text-left text-sm text-gray-500 dark:text-gray-400 px-4 py-4 font-medium">Amount</th>
+            <th class="text-left text-sm text-gray-500 dark:text-gray-400 px-4 py-4 font-medium">Status</th>
+            <th class="text-left text-sm text-gray-500 dark:text-gray-400 px-4 py-4 font-medium">Issue Date</th>
+            <th class="text-left text-sm text-gray-500 dark:text-gray-400 px-4 py-4 font-medium">Due Date</th>
             <th class="w-24"></th>
           </tr>
         </thead>
         <tbody>
           {#each filteredInvoices as invoice}
-            <tr class="border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50">
+            <tr class="border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50/50 dark:hover:bg-dark-hover">
               <td class="px-4 py-4">
                 <a
                   href="/app/invoices/{invoice.id}"
-                  class="text-sm hover:text-black transition-colors font-medium"
+                  class="text-sm hover:text-black dark:hover:text-white transition-colors font-medium dark:text-white"
                 >
                   {invoice.number}
                 </a>
               </td>
               <td class="px-4 py-4">
-                <span class="text-sm text-gray-600">
+                <span class="text-sm text-gray-600 dark:text-gray-300">
                   {invoice.client_name}
                 </span>
               </td>
               <td class="px-4 py-4">
-                <span class="text-sm font-medium">
+                <span class="text-sm font-medium dark:text-white">
                   {formatCurrency(invoice.total, invoice.currency)}
                 </span>
               </td>
@@ -231,12 +231,12 @@
                 </span>
               </td>
               <td class="px-4 py-4">
-                <span class="text-sm text-gray-500">
+                <span class="text-sm text-gray-500 dark:text-gray-300">
                   {formatDate(invoice.issue_date)}
                 </span>
               </td>
               <td class="px-4 py-4">
-                <span class="text-sm text-gray-500">
+                <span class="text-sm text-gray-500 dark:text-gray-300">
                   {invoice.due_date ? formatDate(invoice.due_date) : '—'}
                 </span>
               </td>
@@ -244,20 +244,20 @@
                 <div class="relative">
                   <button
                     onclick={() => toggleDropdown(invoice.id)}
-                    class="p-1 text-gray-500 hover:text-black transition-colors"
+                    class="p-1 text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
                   >
                     <Icon src={EllipsisVertical} class="w-5 h-5" />
                   </button>
 
                   {#if openDropdownId === invoice.id}
                     <div
-                      class="absolute right-0 top-8 w-48 bg-white border border-gray-200 shadow-lg z-10"
+                      class="absolute right-0 top-8 w-48 bg-white dark:bg-dark-input border border-gray-200 dark:border-gray-700 shadow-lg z-10"
                       onmouseleave={closeDropdown}
                     >
                       <div class="py-1">
                         <button
                           onclick={() => { duplicateInvoice(invoice.id); closeDropdown(); }}
-                          class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors"
                         >
                           Duplicate
                         </button>
@@ -265,7 +265,7 @@
                         {#if invoice.status === 'draft'}
                           <button
                             onclick={() => { updateInvoiceStatus(invoice.id, 'sent'); closeDropdown(); }}
-                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors"
                           >
                             Mark as Sent
                           </button>
@@ -274,7 +274,7 @@
                         {#if ['sent', 'partially_paid'].includes(invoice.status)}
                           <button
                             onclick={() => { updateInvoiceStatus(invoice.id, 'paid'); closeDropdown(); }}
-                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors"
                           >
                             Mark as Paid
                           </button>
@@ -283,17 +283,17 @@
                         {#if invoice.status !== 'void'}
                           <button
                             onclick={() => { updateInvoiceStatus(invoice.id, 'void'); closeDropdown(); }}
-                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors"
                           >
                             Mark as Void
                           </button>
                         {/if}
 
-                        <div class="border-t border-gray-200 my-1"></div>
+                        <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
 
                         <button
                           onclick={() => { deleteInvoice(invoice.id, invoice.number); closeDropdown(); }}
-                          class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                          class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
                         >
                           Delete
                         </button>
@@ -311,11 +311,11 @@
     <!-- Mobile: Invoices cards -->
     <div class="block md:hidden space-y-3">
       {#each filteredInvoices as invoice}
-        <div class="border border-gray-200 p-4 hover:bg-gray-50/50 transition-colors">
+        <div class="border border-gray-200 dark:border-gray-700 p-4 hover:bg-gray-50/50 dark:hover:bg-dark-hover transition-colors">
           <a href="/app/invoices/{invoice.id}" class="block">
             <!-- Header: Number + Status -->
             <div class="flex items-center justify-between mb-3">
-              <div class="text-sm font-medium hover:text-black transition-colors">
+              <div class="text-sm font-medium hover:text-black dark:hover:text-white transition-colors dark:text-white">
                 {invoice.number}
               </div>
               <span class="inline-flex px-2.5 py-1 text-sm {statusColors[invoice.status as keyof typeof statusColors]}">
@@ -325,16 +325,16 @@
 
             <!-- Client + Amount -->
             <div class="mb-3">
-              <div class="text-sm text-gray-600 mb-1">
+              <div class="text-sm text-gray-600 dark:text-gray-300 mb-1">
                 {invoice.client_name}
               </div>
-              <div class="text-base font-medium">
+              <div class="text-base font-medium dark:text-white">
                 {formatCurrency(invoice.total, invoice.currency)}
               </div>
             </div>
 
             <!-- Dates -->
-            <div class="flex items-center gap-4 text-sm text-gray-500 mb-3">
+            <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-3">
               <div>Issued: {formatDate(invoice.issue_date)}</div>
               {#if invoice.due_date}
                 <div>Due: {formatDate(invoice.due_date)}</div>
@@ -343,16 +343,16 @@
           </a>
 
           <!-- Actions -->
-          <div class="flex items-center gap-3 pt-3 border-t border-gray-100">
+          <div class="flex items-center gap-3 pt-3 border-t border-gray-100 dark:border-gray-700">
             <button
               onclick={() => duplicateInvoice(invoice.id)}
-              class="text-sm text-gray-500 hover:text-black transition-colors"
+              class="text-sm text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
             >
               Copy
             </button>
             <button
               onclick={() => deleteInvoice(invoice.id, invoice.number)}
-              class="text-sm text-gray-500 hover:text-red-600 transition-colors"
+              class="text-sm text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
             >
               Delete
             </button>
@@ -362,15 +362,15 @@
     </div>
 
     <!-- Summary -->
-    <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500 dark:text-gray-400">
       <div>
         Showing {filteredInvoices.length} of {data.invoices?.length || 0} invoices
       </div>
 
       {#if data.stats}
         <div class="flex items-center gap-6">
-          <div>Outstanding: <span class="font-medium text-black">{formatCurrency(data.stats.total_outstanding, 'EUR')}</span></div>
-          <div>Paid: <span class="font-medium text-black">{formatCurrency(data.stats.total_paid, 'EUR')}</span></div>
+          <div>Outstanding: <span class="font-medium text-black dark:text-white">{formatCurrency(data.stats.total_outstanding, 'EUR')}</span></div>
+          <div>Paid: <span class="font-medium text-black dark:text-white">{formatCurrency(data.stats.total_paid, 'EUR')}</span></div>
         </div>
       {/if}
     </div>

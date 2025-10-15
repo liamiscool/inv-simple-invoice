@@ -137,56 +137,56 @@
 <div class="max-w-6xl space-y-8">
   <!-- Welcome -->
   <div>
-    <h1 class="text-lg font-medium mb-1">Dashboard</h1>
-    <p class="text-sm text-gray-500">
+    <h1 class="text-lg font-medium mb-1 dark:text-white">Dashboard</h1>
+    <p class="text-sm text-gray-500 dark:text-gray-400">
       Welcome back, {data.session?.user?.email?.split('@')[0] || 'User'}
     </p>
   </div>
 
   {#if loading}
     <div class="text-center py-12">
-      <p class="text-sm text-gray-500">Loading...</p>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Loading...</p>
     </div>
   {:else}
     <!-- Quick stats -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="border-l-2 border-black pl-4 py-2">
-        <div class="text-2xl font-light mb-1">{stats.drafts}</div>
-        <div class="text-sm text-gray-500">Draft invoices</div>
+      <div class="border-l-2 border-black dark:border-white pl-4 py-2">
+        <div class="text-2xl font-light mb-1 dark:text-white">{stats.drafts}</div>
+        <div class="text-sm text-gray-500 dark:text-gray-400">Draft invoices</div>
       </div>
-      <div class="border-l-2 border-black pl-4 py-2">
-        <div class="text-2xl font-light mb-1">{formatCurrency(stats.earnings)}</div>
-        <div class="text-sm text-gray-500">Total earnings</div>
+      <div class="border-l-2 border-black dark:border-white pl-4 py-2">
+        <div class="text-2xl font-light mb-1 dark:text-white">{formatCurrency(stats.earnings)}</div>
+        <div class="text-sm text-gray-500 dark:text-gray-400">Total earnings</div>
       </div>
-      <div class="border-l-2 border-black pl-4 py-2">
-        <div class="text-2xl font-light mb-1">{formatCurrency(stats.outstanding)}</div>
-        <div class="text-sm text-gray-500">Outstanding</div>
+      <div class="border-l-2 border-black dark:border-white pl-4 py-2">
+        <div class="text-2xl font-light mb-1 dark:text-white">{formatCurrency(stats.outstanding)}</div>
+        <div class="text-sm text-gray-500 dark:text-gray-400">Outstanding</div>
       </div>
-      <div class="border-l-2 border-black pl-4 py-2">
-        <div class="text-2xl font-light mb-1">{stats.clients}</div>
-        <div class="text-sm text-gray-500">Clients</div>
+      <div class="border-l-2 border-black dark:border-white pl-4 py-2">
+        <div class="text-2xl font-light mb-1 dark:text-white">{stats.clients}</div>
+        <div class="text-sm text-gray-500 dark:text-gray-400">Clients</div>
       </div>
     </div>
 
     <!-- Quick actions -->
     <div class="space-y-4">
-      <h2 class="text-base font-medium">Quick actions</h2>
+      <h2 class="text-base font-medium dark:text-white">Quick actions</h2>
       <div class="flex flex-wrap gap-2">
         <a
           href="/app/invoices/new"
-          class="inline-flex items-center px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75"
+          class="inline-flex items-center px-5 py-2.5 bg-black dark:bg-dark-button text-white text-sm hover:bg-gray-800 dark:hover:bg-dark-button-hover transition-colors duration-75"
         >
           Create invoice
         </a>
         <a
           href="/app/clients/new"
-          class="inline-flex items-center px-5 py-2.5 text-sm text-gray-700 hover:text-black transition-colors"
+          class="inline-flex items-center px-5 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
         >
           Add client
         </a>
         <a
           href="/app/templates"
-          class="inline-flex items-center px-5 py-2.5 text-sm text-gray-700 hover:text-black transition-colors"
+          class="inline-flex items-center px-5 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
         >
           Browse templates
         </a>
@@ -196,47 +196,47 @@
     <!-- Recent invoices -->
     <div class="space-y-4">
       <div class="flex items-center justify-between">
-        <h2 class="text-base font-medium">Recent invoices</h2>
-        <a href="/app/invoices" class="text-sm text-gray-500 hover:text-black transition-colors">
+        <h2 class="text-base font-medium dark:text-white">Recent invoices</h2>
+        <a href="/app/invoices" class="text-sm text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
           View all →
         </a>
       </div>
 
       {#if recentInvoices.length === 0}
         <div class="py-12 text-center">
-          <p class="text-sm text-gray-500 mb-4">No invoices yet</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">No invoices yet</p>
           <a
             href="/app/invoices/new"
-            class="inline-flex items-center px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75"
+            class="inline-flex items-center px-5 py-2.5 bg-black dark:bg-dark-button text-white text-sm hover:bg-gray-800 dark:hover:bg-dark-button-hover transition-colors duration-75"
           >
             Create your first invoice
           </a>
         </div>
       {:else}
-        <div class="border-t border-b border-gray-200 divide-y divide-gray-100">
+        <div class="border-t border-b border-gray-200 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700">
           {#each recentInvoices as invoice}
             <a
               href="/app/invoices/{invoice.id}"
-              class="block py-4 hover:bg-gray-50/50 transition-colors"
+              class="block py-4 hover:bg-gray-50/50 dark:hover:bg-dark-hover transition-colors"
             >
               <div class="flex items-center justify-between">
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-3">
-                    <div class="text-sm font-medium">{invoice.number}</div>
+                    <div class="text-sm font-medium dark:text-white">{invoice.number}</div>
                     <div class="text-sm {getStatusColor(invoice.status)} capitalize">
                       {invoice.status.replace('_', ' ')}
                     </div>
                   </div>
-                  <div class="text-sm text-gray-500 mt-0.5">
+                  <div class="text-sm text-gray-500 dark:text-gray-300 mt-0.5">
                     {invoice.client?.company || invoice.client?.name || 'Unknown client'}
                   </div>
                 </div>
                 <div class="text-right">
-                  <div class="text-sm font-medium">
+                  <div class="text-sm font-medium dark:text-white">
                     {formatCurrency(invoice.total, invoice.currency)}
                   </div>
                   {#if invoice.due_date}
-                    <div class="text-sm text-gray-500 mt-0.5">
+                    <div class="text-sm text-gray-500 dark:text-gray-300 mt-0.5">
                       Due {formatDate(invoice.due_date)}
                     </div>
                   {/if}

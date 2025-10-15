@@ -70,22 +70,47 @@ You are an AI assistant tasked with creating well-structured GitHub issues for f
   - **User Experience**: Document UI/UX implications and user flows
   - **Testing Requirements**: Specify what needs to be tested (unit, integration, E2E)
 
-  ## 3. Present a plan:
-  - Based on your research, outline a plan for creating the GitHub issue
-  - Include the proposed structure of the issue, any labels or milestones you plan to use, and
-  how you'll incorporate project-specific conventions
-  - Present this plan in <plan> tags
+  ## 3. Decision-Making for Multiple Solutions
 
-  ## 4. Create the GitHub issue:
-  - Once the plan is approved, draft the GitHub issue content
+  **IMPORTANT**: When there are multiple viable approaches or implementation options:
+
+  - **DO NOT include multiple options in the final GitHub issue**
+  - **INSTEAD**: Present options in the chat first for discussion and decision
+  - **DISCUSS**: Trade-offs, pros/cons, effort estimates, and recommendations
+  - **WAIT**: For user to choose preferred approach before creating the issue
+  - **THEN**: Create a clean, focused issue with only the approved solution
+
+  **Why**: GitHub issues should be clear, executable work items, not design documents with open questions. Multiple options create confusion during implementation and make acceptance criteria ambiguous.
+
+  **Example Flow**:
+  1. Research reveals 3 possible approaches (client-side, server-side, hybrid)
+  2. Present all 3 options in chat with recommendation
+  3. User chooses server-side approach
+  4. Create GitHub issue documenting only the server-side solution with clear implementation steps
+
+  **Exception**: Phased rollouts (Phase 1 → Phase 2) are acceptable in a single issue when phases are sequential and build on each other, not alternatives.
+
+  ## 4. Present a plan or options
+
+  - Based on your research, outline implementation approach(es)
+  - **If single clear solution**: Present plan with proposed structure, labels, milestones
+  - **If multiple viable options**: Present options in chat for discussion FIRST (see step 3)
+  - Only proceed to creating the issue once the approach is decided
+  - Present this plan/options in `<plan>` tags for user approval
+
+  ## 5. Create the GitHub issue
+
+  - **ONLY after the approach is decided and plan is approved**
   - Include a clear title, detailed description, acceptance criteria, and any additional context
   or resources that would be helpful for developers
+  - **Single solution only**: No "Option A vs Option B" in the issue body
   - Use appropriate formatting (e.g., Markdown) to enhance readability
   - Add any relevant labels, milestones, or assignees based on the project's conventions
   - Consider the current state of the repository and how this issue fits into the overall project
    goals
 
-  ## 5. Final output and project board integration:
+  ## 6. Final output and project board integration
+
   - Present the complete GitHub issue content in <github_issue> tags
   - Do not include any explanations or notes outside of these tags in your final output
   - Make sure the content is ready to be copied and pasted directly into GitHub

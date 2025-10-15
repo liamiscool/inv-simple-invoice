@@ -363,23 +363,23 @@
   <!-- Header -->
   <div class="flex items-start justify-between">
     <div>
-      <h1 class="text-lg font-medium mb-1">Create Invoice</h1>
+      <h1 class="text-lg font-medium mb-1 dark:text-white">Create Invoice</h1>
       <!-- Breadcrumbs -->
       <div class="flex items-center gap-2 text-xs">
-        <a href="/app/invoices" class="text-gray-400 hover:text-black transition-colors">Invoices</a>
+        <a href="/app/invoices" class="text-gray-400 hover:text-black dark:hover:text-white transition-colors">Invoices</a>
         <span class="text-gray-400">/</span>
-        <span class="text-gray-600">New</span>
+        <span class="text-gray-600 dark:text-gray-400">New</span>
       </div>
     </div>
 
     <!-- Auto-save indicator -->
     <div class="flex items-center gap-2">
       {#if saveStatus === 'saving'}
-        <span class="text-sm text-gray-600">Saving...</span>
+        <span class="text-sm text-gray-600 dark:text-gray-400">Saving...</span>
       {:else if saveStatus === 'saved'}
-        <span class="text-sm text-green-600">✓ Saved</span>
+        <span class="text-sm text-green-600 dark:text-green-400">✓ Saved</span>
       {:else if saveStatus === 'error'}
-        <span class="text-sm text-red-600">Save failed</span>
+        <span class="text-sm text-red-600 dark:text-red-400">Save failed</span>
       {/if}
     </div>
   </div>
@@ -388,13 +388,13 @@
     <!-- No clients state -->
     <div class="py-16 text-center">
       <div class="space-y-4">
-        <h2 class="text-base font-medium">No clients available</h2>
-        <p class="text-sm text-gray-500 max-w-sm mx-auto">
+        <h2 class="text-base font-medium dark:text-white">No clients available</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
           You need to add at least one client before creating an invoice
         </p>
         <a
           href="/app/clients/new"
-          class="inline-flex items-center px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75"
+          class="inline-flex items-center px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 dark:bg-dark-button dark:hover:bg-dark-button-hover transition-colors duration-75"
         >
           Add Your First Client
         </a>
@@ -404,17 +404,17 @@
     <form onsubmit={handleSubmit} class="space-y-8">
       <!-- Client and Basic Info -->
       <div class="space-y-5">
-        <h2 class="text-base font-medium pb-2 border-b border-gray-200">Basic Information</h2>
+        <h2 class="text-base font-medium pb-2 border-b border-gray-200 dark:text-white dark:border-gray-700">Basic Information</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <label for="client" class="block text-sm text-gray-500 mb-1.5">
-              Client <span class="text-red-600">*</span>
+            <label for="client" class="block text-sm text-gray-500 dark:text-gray-400 mb-1.5">
+              Client <span class="text-red-600 dark:text-red-400">*</span>
             </label>
             <select
               id="client"
               bind:value={selectedClientId}
-              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors"
               required
             >
               <option value="">Select a client</option>
@@ -427,13 +427,13 @@
           </div>
 
           <div>
-            <label for="template" class="block text-sm text-gray-500 mb-1.5">
-              Template <span class="text-red-600">*</span>
+            <label for="template" class="block text-sm text-gray-500 dark:text-gray-400 mb-1.5">
+              Template <span class="text-red-600 dark:text-red-400">*</span>
             </label>
             <select
               id="template"
               bind:value={selectedTemplateId}
-              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors"
               required
             >
               <option value="">Select a template</option>
@@ -448,11 +448,11 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <label for="currency" class="block text-sm text-gray-500 mb-1.5">Currency</label>
+            <label for="currency" class="block text-sm text-gray-500 dark:text-gray-400 mb-1.5">Currency</label>
             <select
               id="currency"
               bind:value={currency}
-              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors"
             >
               {#each currencies as curr}
                 <option value={curr.code}>{curr.name}</option>
@@ -462,8 +462,8 @@
 
           {#if selectedTemplate}
             <div>
-              <label class="block text-sm text-gray-500 mb-1.5">Template Preview</label>
-              <div class="px-4 py-2.5 text-sm border border-gray-300 bg-gray-50 text-gray-500">
+              <label class="block text-sm text-gray-500 dark:text-gray-400 mb-1.5">Template Preview</label>
+              <div class="px-4 py-2.5 text-sm border border-gray-300 bg-gray-50 text-gray-500 dark:bg-dark-input dark:border-gray-600 dark:text-gray-400">
                 {selectedTemplate.title}
               </div>
             </div>
@@ -472,25 +472,25 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <label for="issueDate" class="block text-sm text-gray-500 mb-1.5">
-              Issue Date <span class="text-red-600">*</span>
+            <label for="issueDate" class="block text-sm text-gray-500 dark:text-gray-400 mb-1.5">
+              Issue Date <span class="text-red-600 dark:text-red-400">*</span>
             </label>
             <input
               id="issueDate"
               type="date"
               bind:value={issueDate}
-              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors"
               required
             />
           </div>
 
           <div>
-            <label for="dueDate" class="block text-sm text-gray-500 mb-1.5">Due Date</label>
+            <label for="dueDate" class="block text-sm text-gray-500 dark:text-gray-400 mb-1.5">Due Date</label>
             <input
               id="dueDate"
               type="date"
               bind:value={dueDate}
-              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors"
             />
           </div>
         </div>
@@ -498,12 +498,12 @@
 
       <!-- Line Items -->
       <div class="space-y-5">
-        <div class="flex items-center justify-between pb-2 border-b border-gray-200">
-          <h2 class="text-base font-medium">Line Items</h2>
+        <div class="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-700">
+          <h2 class="text-base font-medium dark:text-white">Line Items</h2>
           <button
             type="button"
             onclick={addLineItem}
-            class="px-5 py-2.5 text-sm text-gray-500 hover:text-black transition-colors"
+            class="px-5 py-2.5 text-sm text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors"
           >
             Add Item
           </button>
@@ -511,53 +511,53 @@
 
         <div class="space-y-6">
           {#each lineItems as item, index}
-            <div class="border border-gray-200 p-4 space-y-4 md:border-0 md:p-0">
+            <div class="border border-gray-200 dark:border-gray-700 p-4 space-y-4 md:border-0 md:p-0">
               <!-- Desktop: Single line with all fields -->
               <div class="hidden md:grid md:grid-cols-12 md:gap-3 md:items-end">
                 <div class="md:col-span-4">
-                  <label class="block text-sm text-gray-500 mb-1.5">Description</label>
+                  <label class="block text-sm text-gray-500 dark:text-gray-400 mb-1.5">Description</label>
                   <input
                     type="text"
                     bind:value={item.description}
                     placeholder="Description"
-                    class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                    class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors"
                     required
                   />
                 </div>
 
                 <div class="md:col-span-2">
-                  <label class="block text-sm text-gray-500 mb-1.5">Qty</label>
+                  <label class="block text-sm text-gray-500 dark:text-gray-400 mb-1.5">Qty</label>
                   <input
                     type="number"
                     bind:value={item.qty}
                     min="0"
                     step="0.01"
-                    class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                    class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors"
                     required
                   />
                 </div>
 
                 <div class="md:col-span-2">
-                  <label class="block text-sm text-gray-500 mb-1.5">Unit Price</label>
+                  <label class="block text-sm text-gray-500 dark:text-gray-400 mb-1.5">Unit Price</label>
                   <input
                     type="number"
                     bind:value={item.unitPrice}
                     min="0"
                     step="0.01"
-                    class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                    class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors"
                     required
                   />
                 </div>
 
                 <div class="md:col-span-2">
-                  <label class="block text-sm text-gray-500 mb-1.5">Tax %</label>
+                  <label class="block text-sm text-gray-500 dark:text-gray-400 mb-1.5">Tax %</label>
                   <input
                     type="number"
                     bind:value={item.taxRate}
                     min="0"
                     max="100"
                     step="0.1"
-                    class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                    class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors"
                   />
                 </div>
 
@@ -566,7 +566,7 @@
                     <button
                       type="button"
                       onclick={() => removeLineItem(index)}
-                      class="w-full px-2 py-2.5 text-sm text-gray-500 hover:text-red-600 transition-colors"
+                      class="w-full px-2 py-2.5 text-sm text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 transition-colors"
                     >
                       Remove
                     </button>
@@ -577,12 +577,12 @@
               <!-- Mobile: Stacked layout with description first -->
               <div class="md:hidden space-y-3">
                 <div>
-                  <label class="block text-sm text-gray-500 mb-1.5">Description</label>
+                  <label class="block text-sm text-gray-500 dark:text-gray-400 mb-1.5">Description</label>
                   <input
                     type="text"
                     bind:value={item.description}
                     placeholder="Description of work or product"
-                    class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                    class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors"
                     required
                   />
                 </div>
@@ -590,38 +590,38 @@
                 <!-- Mobile: 2-column grid for qty/price/tax -->
                 <div class="grid grid-cols-2 gap-3">
                   <div>
-                    <label class="block text-sm text-gray-500 mb-1.5">Qty</label>
+                    <label class="block text-sm text-gray-500 dark:text-gray-400 mb-1.5">Qty</label>
                     <input
                       type="number"
                       bind:value={item.qty}
                       min="0"
                       step="0.01"
-                      class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                      class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors"
                       required
                     />
                   </div>
 
                   <div>
-                    <label class="block text-sm text-gray-500 mb-1.5">Unit Price</label>
+                    <label class="block text-sm text-gray-500 dark:text-gray-400 mb-1.5">Unit Price</label>
                     <input
                       type="number"
                       bind:value={item.unitPrice}
                       min="0"
                       step="0.01"
-                      class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                      class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors"
                       required
                     />
                   </div>
 
                   <div>
-                    <label class="block text-sm text-gray-500 mb-1.5">Tax %</label>
+                    <label class="block text-sm text-gray-500 dark:text-gray-400 mb-1.5">Tax %</label>
                     <input
                       type="number"
                       bind:value={item.taxRate}
                       min="0"
                       max="100"
                       step="0.1"
-                      class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                      class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors"
                     />
                   </div>
 
@@ -630,7 +630,7 @@
                       <button
                         type="button"
                         onclick={() => removeLineItem(index)}
-                        class="w-full px-4 py-2.5 text-sm text-gray-600 hover:text-red-600 border border-gray-300 hover:border-red-300 transition-colors"
+                        class="w-full px-4 py-2.5 text-sm text-gray-600 hover:text-red-600 border border-gray-300 hover:border-red-300 dark:border-gray-600 dark:text-white dark:hover:text-red-400 dark:hover:border-red-400 transition-colors"
                       >
                         Remove
                       </button>
@@ -645,19 +645,19 @@
 
       <!-- Totals -->
       <div class="space-y-5">
-        <h2 class="text-base font-medium pb-2 border-b border-gray-200">Summary</h2>
+        <h2 class="text-base font-medium pb-2 border-b border-gray-200 dark:text-white dark:border-gray-700">Summary</h2>
 
         <div class="max-w-sm ml-auto space-y-2">
           <div class="flex justify-between text-sm">
-            <span class="text-gray-500">Subtotal:</span>
-            <span class="font-medium">{formatCurrency(totals().subtotal)}</span>
+            <span class="text-gray-500 dark:text-gray-400">Subtotal:</span>
+            <span class="font-medium dark:text-white">{formatCurrency(totals().subtotal)}</span>
           </div>
           <div class="flex justify-between text-sm">
-            <span class="text-gray-500">Tax:</span>
-            <span class="font-medium">{formatCurrency(totals().taxTotal)}</span>
+            <span class="text-gray-500 dark:text-gray-400">Tax:</span>
+            <span class="font-medium dark:text-white">{formatCurrency(totals().taxTotal)}</span>
           </div>
-          <div class="border-t border-gray-200 pt-2">
-            <div class="flex justify-between text-base font-medium">
+          <div class="border-t border-gray-200 dark:border-gray-700 pt-2">
+            <div class="flex justify-between text-base font-medium dark:text-white">
               <span>Total:</span>
               <span>{formatCurrency(totals().total)}</span>
             </div>
@@ -667,16 +667,16 @@
 
       <!-- Notes -->
       <div class="space-y-5">
-        <h2 class="text-base font-medium pb-2 border-b border-gray-200">Additional Information</h2>
+        <h2 class="text-base font-medium pb-2 border-b border-gray-200 dark:text-white dark:border-gray-700">Additional Information</h2>
 
         <div>
-          <label for="notes" class="block text-sm text-gray-500 mb-1.5">Notes</label>
+          <label for="notes" class="block text-sm text-gray-500 dark:text-gray-400 mb-1.5">Notes</label>
           <textarea
             id="notes"
             bind:value={notes}
             placeholder="Additional notes or payment terms..."
             rows="3"
-            class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors resize-none"
+            class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors resize-none"
           ></textarea>
         </div>
       </div>
@@ -685,7 +685,7 @@
       <div class="flex items-center justify-between pt-4">
         <a
           href="/app/invoices"
-          class="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm hover:bg-gray-50 transition-colors duration-75"
+          class="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm hover:bg-gray-50 dark:border-gray-600 dark:text-white dark:hover:bg-dark-hover transition-colors duration-75"
         >
           Cancel
         </a>
@@ -695,7 +695,7 @@
             type="button"
             onclick={() => showPreview = true}
             disabled={!selectedClientId || !selectedTemplateId || totals().total <= 0}
-            class="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm hover:bg-gray-50 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm hover:bg-gray-50 dark:border-gray-600 dark:text-white dark:hover:bg-dark-hover transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Preview
           </button>
@@ -703,7 +703,7 @@
           <button
             type="submit"
             disabled={isLoading || !selectedClientId || !selectedTemplateId || totals().total <= 0}
-            class="px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 dark:bg-dark-button dark:hover:bg-dark-button-hover transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Creating Invoice...' : 'Create Invoice'}
           </button>
@@ -712,7 +712,7 @@
 
       {#if error}
         <div class="text-center">
-          <p class="text-sm text-red-600">{error}</p>
+          <p class="text-sm text-red-600 dark:text-red-400">{error}</p>
         </div>
       {/if}
     </form>
@@ -722,25 +722,25 @@
 <!-- Preview Modal -->
 {#if showPreview && selectedClient && selectedTemplate}
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onclick={() => showPreview = false}>
-    <div class="bg-white w-full h-full md:w-[90vw] md:h-[90vh] md:max-w-5xl flex flex-col" onclick={(e) => e.stopPropagation()}>
+    <div class="bg-white dark:bg-dark-bg w-full h-full md:w-[90vw] md:h-[90vh] md:max-w-5xl flex flex-col" onclick={(e) => e.stopPropagation()}>
       <!-- Modal Header -->
-      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <div>
-          <h2 class="text-sm font-medium">Invoice Preview</h2>
-          <p class="text-xs text-gray-500 mt-0.5">
+          <h2 class="text-sm font-medium dark:text-white">Invoice Preview</h2>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             {selectedTemplate.title} • {selectedClient.company || selectedClient.name}
           </p>
         </div>
         <button
           onclick={() => showPreview = false}
-          class="px-3 py-1.5 text-xs text-gray-500 hover:text-black transition-colors"
+          class="px-3 py-1.5 text-xs text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors"
         >
           Close
         </button>
       </div>
 
       <!-- Preview Content -->
-      <div class="flex-1 overflow-auto bg-gray-100 p-6">
+      <div class="flex-1 overflow-auto bg-gray-100 dark:bg-dark-input p-6">
         <div class="max-w-3xl mx-auto bg-white shadow-lg">
           <iframe
             src={`/app/invoices/preview?` + new URLSearchParams({

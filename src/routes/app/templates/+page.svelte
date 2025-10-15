@@ -48,8 +48,8 @@
   <!-- Header -->
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
-      <h1 class="text-lg font-medium mb-1">Templates</h1>
-      <p class="text-sm text-gray-500">
+      <h1 class="text-lg font-medium mb-1 dark:text-white">Templates</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
         Manage your invoice templates and design layouts
       </p>
     </div>
@@ -57,24 +57,24 @@
     <div class="flex items-center gap-3">
       <a
         href="/app/settings"
-        class="px-5 py-2.5 border border-gray-300 text-sm hover:bg-gray-50 transition-colors duration-75"
+        class="px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-sm hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors duration-75 dark:text-white"
       >
         Manage Custom Fields
       </a>
       {#if import.meta.env.DEV}
         <a
           href="/app/templates/upload"
-          class="px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75"
+          class="px-5 py-2.5 bg-black dark:bg-dark-button text-white text-sm hover:bg-gray-800 dark:hover:bg-dark-button-hover transition-colors duration-75"
         >
           Upload Custom Template
         </a>
       {:else}
         <div
-          class="px-5 py-2.5 bg-gray-400 text-white text-sm cursor-not-allowed relative group"
+          class="px-5 py-2.5 bg-gray-400 dark:bg-gray-600 text-white text-sm cursor-not-allowed relative group"
           title="Coming soon"
         >
           Upload Custom Template
-          <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+          <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 dark:bg-dark-input text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
             Coming soon
           </div>
         </div>
@@ -86,8 +86,8 @@
     <!-- Empty state -->
     <div class="py-16 text-center">
       <div class="space-y-4">
-        <h2 class="text-base font-medium">No templates available</h2>
-        <p class="text-sm text-gray-500 max-w-sm mx-auto">
+        <h2 class="text-base font-medium dark:text-white">No templates available</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
           Templates should be automatically created. Please refresh the page or contact support.
         </p>
       </div>
@@ -100,32 +100,32 @@
     <!-- Custom Templates Section -->
     {#if customTemplates.length > 0}
       <div class="space-y-5">
-        <div class="flex items-center justify-between pb-3 border-b border-gray-200">
-          <h2 class="text-base font-medium">My Custom Templates</h2>
-          <span class="text-sm text-gray-500">{customTemplates.length} template{customTemplates.length !== 1 ? 's' : ''}</span>
+        <div class="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700">
+          <h2 class="text-base font-medium dark:text-white">My Custom Templates</h2>
+          <span class="text-sm text-gray-500 dark:text-gray-400">{customTemplates.length} template{customTemplates.length !== 1 ? 's' : ''}</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {#each customTemplates as template}
-            <div class="border border-gray-200 hover:border-gray-400 transition-colors p-4 group">
+            <div class="border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-colors p-4 group">
               <a href="/app/templates/{template.id}/map" class="block">
                 <div class="flex items-start justify-between mb-2">
                   <div>
-                    <h3 class="text-base font-medium mb-0.5 group-hover:text-black transition-colors">{template.title}</h3>
-                    <span class="text-sm text-green-600">Custom template</span>
+                    <h3 class="text-base font-medium mb-0.5 group-hover:text-black dark:group-hover:text-white transition-colors dark:text-white">{template.title}</h3>
+                    <span class="text-sm text-green-600 dark:text-green-400">Custom template</span>
                   </div>
                 </div>
 
                 {#if template.spec?.meta?.description}
-                  <p class="text-sm text-gray-500 mb-3">
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">
                     {template.spec.meta.description}
                   </p>
                 {/if}
               </a>
 
-              <div class="flex items-center gap-3 pt-3 border-t border-gray-100">
+              <div class="flex items-center gap-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                 <a
                   href="/app/templates/{template.id}/map"
-                  class="text-sm text-gray-500 hover:text-black transition-colors"
+                  class="text-sm text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
                 >
                   Edit Mapping
                 </a>
@@ -140,7 +140,7 @@
                   <button
                     type="submit"
                     disabled={deletingId === template.id}
-                    class="text-sm text-gray-500 hover:text-red-600 transition-colors disabled:opacity-50"
+                    class="text-sm text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors disabled:opacity-50"
                   >
                     {deletingId === template.id ? 'Deleting...' : 'Delete'}
                   </button>
@@ -155,9 +155,9 @@
     <!-- Built-in Templates Section -->
     {#if curatedTemplates.length > 0}
       <div class="space-y-5">
-        <div class="flex items-center justify-between pb-3 border-b border-gray-200">
-          <h2 class="text-base font-medium">Built-in Templates</h2>
-          <span class="text-sm text-gray-500">{curatedTemplates.length} template{curatedTemplates.length !== 1 ? 's' : ''}</span>
+        <div class="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700">
+          <h2 class="text-base font-medium dark:text-white">Built-in Templates</h2>
+          <span class="text-sm text-gray-500 dark:text-gray-400">{curatedTemplates.length} template{curatedTemplates.length !== 1 ? 's' : ''}</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {#each curatedTemplates as template}
@@ -166,14 +166,14 @@
             {@const borderWidth = template.spec?.areas?.items_table?.border_width || 0.5}
             {@const hasHeaderBg = template.spec?.areas?.items_table?.header_bg}
             {@const margins = template.spec?.meta?.margins || { top: 20, right: 20, bottom: 20, left: 20 }}
-            <div class="border border-gray-200 hover:border-gray-400 transition-colors group cursor-pointer">
+            <div class="border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-colors group cursor-pointer">
               <!-- Preview Card -->
               <button
                 onclick={() => openPreview(template)}
                 class="w-full text-left"
               >
                 <!-- Mini preview visualization -->
-                <div class="h-56 bg-white border-b border-gray-200 flex flex-col justify-between overflow-hidden"
+                <div class="h-56 bg-white border-b border-gray-200 dark:border-gray-700 flex flex-col justify-between overflow-hidden"
                      style="font-family: {getPreviewFont(template)}; padding: {margins.top * 0.15}px {margins.right * 0.15}px {margins.bottom * 0.15}px {margins.left * 0.15}px;">
                   <div>
                     <!-- Invoice title - scaled based on template -->
@@ -233,13 +233,13 @@
                 <div class="p-4">
                   <div class="flex items-start justify-between mb-2">
                     <div>
-                      <h3 class="text-base font-medium mb-0.5 group-hover:text-black transition-colors">{template.title}</h3>
-                      <span class="text-sm text-blue-600">Built-in template</span>
+                      <h3 class="text-base font-medium mb-0.5 group-hover:text-black dark:group-hover:text-white transition-colors dark:text-white">{template.title}</h3>
+                      <span class="text-sm text-blue-600 dark:text-blue-400">Built-in template</span>
                     </div>
                   </div>
 
                   {#if template.spec?.meta?.description}
-                    <p class="text-sm text-gray-500">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
                       {template.spec.meta.description}
                     </p>
                   {/if}
@@ -252,9 +252,9 @@
     {/if}
     
     <!-- Template usage info -->
-    <div class="border border-thin rounded-sm p-6 bg-gray-50">
-      <h3 class="text-base font-medium mb-3">How Templates Work</h3>
-      <div class="space-y-2 text-sm text-gray-600">
+    <div class="border border-thin rounded-sm p-6 bg-gray-50 dark:bg-dark-input dark:border-gray-700">
+      <h3 class="text-base font-medium mb-3 dark:text-white">How Templates Work</h3>
+      <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
         <p>• <strong>Built-in templates</strong> are curated designs optimized for professional invoices</p>
         <p>• <strong>Custom templates</strong> allow you to upload your own PDF or image designs (Phase 9)</p>
         <p>• Templates control the exact positioning of invoice elements like company info, line items, and totals</p>
@@ -273,31 +273,31 @@
   {@const hasHeaderBg = previewingTemplate.spec?.areas?.items_table?.header_bg}
   {@const margins = previewingTemplate.spec?.meta?.margins || { top: 20, right: 20, bottom: 20, left: 20 }}
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 backdrop-blur-sm"
     onclick={closePreview}
   >
     <div
-      class="bg-white border border-gray-300 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+      class="bg-white dark:bg-dark-input border border-gray-300 dark:border-gray-700 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto"
       onclick={(e) => e.stopPropagation()}
     >
       <!-- Modal Header -->
-      <div class="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+      <div class="sticky top-0 bg-white dark:bg-dark-input border-b border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between">
         <div>
-          <h2 class="text-lg font-medium">{previewingTemplate.title}</h2>
-          <p class="text-sm text-gray-500 mt-0.5">
+          <h2 class="text-lg font-medium dark:text-white">{previewingTemplate.title}</h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
             {previewingTemplate.spec?.meta?.description || 'Template preview'}
           </p>
         </div>
         <button
           onclick={closePreview}
-          class="text-gray-500 hover:text-black text-xl leading-none w-6 h-6"
+          class="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white text-xl leading-none w-6 h-6"
         >
           ×
         </button>
       </div>
 
       <!-- Template Preview -->
-      <div class="p-8 bg-gray-50">
+      <div class="p-8 bg-gray-50 dark:bg-dark-bg">
         <div
           class="bg-white shadow-lg mx-auto aspect-[210/297]"
           style="font-family: {getPreviewFont(previewingTemplate)}; max-width: 600px; padding: {margins.top * 1.5}px {margins.right * 1.5}px {margins.bottom * 1.5}px {margins.left * 1.5}px;"
@@ -391,10 +391,10 @@
       </div>
 
       <!-- Modal Footer -->
-      <div class="border-t border-gray-200 p-4 flex justify-end gap-3">
+      <div class="border-t border-gray-200 dark:border-gray-700 p-4 flex justify-end gap-3">
         <button
           onclick={closePreview}
-          class="px-5 py-2.5 border border-gray-300 text-sm hover:bg-gray-50 transition-colors"
+          class="px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-sm hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors dark:text-white"
         >
           Close
         </button>

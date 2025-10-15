@@ -9,15 +9,15 @@
   }
 
   html {
-    @apply text-sm md:text-base;
+    @apply text-sm md:text-base bg-white dark:bg-dark-bg;
     font-family: 'JetBrains Mono', monospace !important;
   }
 
   body {
-    @apply bg-white text-black antialiased;
+    @apply bg-white dark:bg-dark-bg text-black dark:text-white antialiased;
     font-family: 'JetBrains Mono', monospace !important;
   }
-  
+
   h1 {
     @apply text-lg md:text-xl font-normal;
   }
@@ -32,6 +32,29 @@
 
   input, textarea, select {
     @apply text-sm md:text-base;
+  }
+}
+
+@layer components {
+  .dark input[type='text'],
+  .dark input[type='email'],
+  .dark input[type='password'],
+  .dark input[type='number'],
+  .dark input[type='date'],
+  .dark select,
+  .dark textarea {
+    @apply bg-dark-input border-gray-600 text-white;
+  }
+
+  .dark input:focus,
+  .dark select:focus,
+  .dark textarea:focus {
+    @apply border-white ring-white;
+  }
+
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    @apply text-gray-500;
   }
 }
 

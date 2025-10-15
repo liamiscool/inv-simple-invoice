@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./src/**/*.{html,js,svelte,ts}'],
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
@@ -8,6 +9,13 @@ export default {
       },
       colors: {
         border: '#EAEAEA',
+        'border-dark': '#374151',
+        'dark-bg': '#0A0A0A',
+        'dark-surface': '#1A1A1A',
+        'dark-input': '#171717',
+        'dark-button': '#1A1A1A',
+        'dark-button-hover': '#242424',
+        'dark-hover': '#0F0F0F',
       },
       animation: {
         'underline-sweep': 'underline-sweep 80ms ease-out forwards',

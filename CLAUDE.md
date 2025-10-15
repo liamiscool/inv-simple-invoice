@@ -171,6 +171,68 @@ Upload flow: PDF/PNG → mapping tool → structured template → reusable invoi
 - **Palette**: White-dominant, #EAEAEA borders, minimal accent colors
 - **Animations**: 80-120ms micro-interactions (underlines, pixel blinks, number odometers)
 
+#### Dark Mode Color System
+
+**Enabled**: Class-based dark mode (Tailwind `darkMode: 'class'`)
+
+**Core Colors** (defined in `tailwind.config.js`):
+- `dark-bg`: #0A0A0A (main background - sidebar, page background)
+- `dark-input`: #171717 (form inputs, dropdowns, menus)
+- `dark-button`: #1A1A1A (primary buttons - closer to background tone)
+- `dark-button-hover`: #242424 (button hover state)
+- `dark-hover`: #0F0F0F (hover states on rows, navigation)
+
+**Text Hierarchy**:
+- Primary text: `dark:text-white` (invoice numbers, amounts, headings)
+- Secondary text: `dark:text-gray-300` (client names, dates, labels)
+- Tertiary text: `dark:text-gray-400` (timestamps, counts, placeholders)
+
+**Borders**:
+- Primary borders: `dark:border-gray-700` (tables, cards)
+- Subtle borders: `dark:border-gray-800` (sidebar)
+- Focus borders: `dark:border-white`
+
+**Status Badge Colors**:
+- Draft/Void: `dark:text-gray-300 dark:bg-gray-700`
+- Sent: `dark:text-blue-400 dark:bg-blue-900/30`
+- Paid: `dark:text-green-400 dark:bg-green-900/30`
+- Overdue: `dark:text-red-400 dark:bg-red-900/30`
+- Partial: `dark:text-orange-400 dark:bg-orange-900/30`
+
+**Implementation Pattern** (use this for all new pages):
+```svelte
+<!-- Background -->
+<div class="bg-white dark:bg-dark-bg">
+
+<!-- Sidebar/Surface -->
+<div class="bg-white dark:bg-dark-bg">
+
+<!-- Inputs -->
+<input class="bg-white dark:bg-dark-input border-gray-300 dark:border-gray-600 text-black dark:text-white">
+
+<!-- Primary Buttons -->
+<button class="bg-black dark:bg-dark-button hover:bg-gray-800 dark:hover:bg-dark-button-hover">
+
+<!-- Dropdown Menus -->
+<div class="bg-white dark:bg-dark-input border-gray-200 dark:border-gray-700">
+
+<!-- Navigation Hover -->
+<a class="hover:bg-gray-50 dark:hover:bg-dark-hover">
+
+<!-- Active Navigation -->
+<a class="bg-gray-50 dark:bg-dark-input">
+
+<!-- Table Row Hover -->
+<tr class="hover:bg-gray-50/50 dark:hover:bg-dark-hover">
+
+<!-- Text Hierarchy -->
+<h1 class="text-black dark:text-white">  <!-- Primary -->
+<p class="text-gray-600 dark:text-gray-300">  <!-- Secondary -->
+<span class="text-gray-500 dark:text-gray-400">  <!-- Tertiary -->
+```
+
+**Theme Switcher**: Located in profile menu, cycles through Light → Dark → System
+
 ### Critical Implementation Details
 
 1. **RLS (Row-Level Security)**: All tables use org_id scoping

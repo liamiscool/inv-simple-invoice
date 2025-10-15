@@ -5,8 +5,9 @@
   import { STRIPE_MONTHLY_LINK, STRIPE_YEARLY_LINK } from '$lib/config/stripe';
   import UpgradeModal from '$lib/components/UpgradeModal.svelte';
   import { Icon } from '@steeze-ui/svelte-icon';
-  import { Cog6Tooth, Star, ChatBubbleLeftRight, ArrowRightOnRectangle, Bell } from '@steeze-ui/heroicons';
+  import { Cog6Tooth, Star, ChatBubbleLeftRight, ArrowRightOnRectangle, Bell, Sun, Moon, ComputerDesktop } from '@steeze-ui/heroicons';
   import ChangelogWidget from '$lib/components/ChangelogWidget.svelte';
+  import { theme } from '$lib/stores/theme';
 
   let { data, children }: { data: LayoutData; children: any } = $props();
   let showMobileSidebar = $state(false);
@@ -80,16 +81,32 @@
     { href: '/app/clients', label: 'Clients' },
     { href: '/app/templates', label: 'Templates' }
   ];
+
+  function cycleTheme() {
+    const next = $theme === 'light' ? 'dark' : $theme === 'dark' ? 'system' : 'light';
+    theme.set(next);
+  }
+
+  const themeIcon = $derived(
+    $theme === 'light' ? Sun : $theme === 'dark' ? Moon : ComputerDesktop
+  );
+
+  const themeLabel = $derived(
+    $theme === 'light' ? 'Light Mode' : $theme === 'dark' ? 'Dark Mode' : 'System Theme'
+  );
 </script>
 
-<div class="min-h-screen bg-white">
+<div class="min-h-screen bg-white dark:bg-dark-bg">
   <!-- Mobile header -->
-  <div class="md:hidden border-b border-thin px-4 py-3">
+  <div class="md:hidden border-b border-thin dark:border-gray-700 px-4 py-3 dark:bg-dark-bg">
     <div class="flex items-center justify-between">
-      <a href="/app" class="text-lg tracking-tight font-medium">inv</a>
+      <a href="/app" class="text-lg tracking-tight font-medium dark:text-white flex items-end gap-2">
+        <div class="w-12 h-7" style="background: #F58121; image-rendering: pixelated;"></div>
+        <span>inv</span>
+      </a>
       <button
         onclick={() => showMobileSidebar = !showMobileSidebar}
-        class="text-sm hover:text-black transition-colors"
+        class="text-sm hover:text-black dark:hover:text-white transition-colors dark:text-gray-300"
       >
         Menu
       </button>
@@ -99,11 +116,14 @@
   <!-- Mobile sidebar overlay -->
   {#if showMobileSidebar}
     <div class="md:hidden fixed inset-0 z-50">
-      <div class="fixed inset-0 bg-black/20" onclick={closeMobileSidebar}></div>
-      <div class="fixed left-0 top-0 h-full w-56 bg-white border-r border-gray-200 flex flex-col">
+      <div class="fixed inset-0 bg-black/20 dark:bg-black/70" onclick={closeMobileSidebar}></div>
+      <div class="fixed left-0 top-0 h-full w-56 bg-white dark:bg-dark-bg border-r border-gray-200 dark:border-gray-800 flex flex-col">
         <!-- Logo -->
-        <div class="px-6 py-6 border-b border-gray-200">
-          <a href="/app" class="text-lg tracking-tight font-medium">inv</a>
+        <div class="px-6 py-6 border-b border-gray-200 dark:border-gray-700">
+          <a href="/app" class="text-lg tracking-tight font-medium dark:text-white flex items-end gap-2">
+            <div class="w-12 h-7" style="background: #F58121; image-rendering: pixelated;"></div>
+            <span>inv</span>
+          </a>
         </div>
 
         <!-- Nav -->
@@ -113,9 +133,9 @@
               <a
                 href={item.href}
                 onclick={closeMobileSidebar}
-                class="block px-3 py-2 text-sm hover:bg-gray-50 transition-colors rounded {
+                class="block px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors rounded {
                   (item.exact ? $page.url.pathname === item.href : $page.url.pathname.startsWith(item.href))
-                    ? 'text-black font-medium bg-gray-50' : 'text-gray-600'
+                    ? 'text-black dark:text-white font-medium bg-gray-50 dark:bg-gray-700/50' : 'text-gray-600 dark:text-gray-300'
                 }"
               >
                 {item.label}
@@ -132,7 +152,7 @@
             onmouseenter={() => showChangelogWidget = true}
             onmouseleave={() => showChangelogWidget = false}
           >
-            <div class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors rounded cursor-pointer">
+            <div class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors rounded cursor-pointer">
               <Icon src={Bell} class="w-[16px] h-[16px]" />
               <span>What's New</span>
             </div>
@@ -149,7 +169,7 @@
             <a
               href="mailto:feedback@inv.so"
               onclick={closeMobileSidebar}
-              class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors rounded"
+              class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors rounded"
             >
               <Icon src={ChatBubbleLeftRight} class="w-[16px] h-[16px]" />
               <span>Feedback</span>
@@ -158,31 +178,31 @@
         </div>
 
         <!-- Mobile Profile section -->
-        <div class="flex-shrink-0 relative profile-menu-container border-t border-gray-200">
+        <div class="flex-shrink-0 relative profile-menu-container border-t border-gray-200 dark:border-gray-700">
           <button
             onclick={toggleProfileMenu}
-            class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+            class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
           >
-            <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-sm font-medium flex-shrink-0">
+            <div class="w-8 h-8 rounded-full bg-black dark:bg-gray-700 text-white dark:text-white flex items-center justify-center text-sm font-medium flex-shrink-0">
               {getInitials(data.session?.user?.email)}
             </div>
             <div class="flex-1 min-w-0 text-left">
-              <div class="text-sm font-medium truncate">
+              <div class="text-sm font-medium truncate dark:text-white">
                 {data.session?.user?.email?.split('@')[0] || 'User'}
               </div>
-              <div class="text-xs text-gray-500">
+              <div class="text-xs text-gray-500 dark:text-gray-400">
                 {subscriptionPlan === 'pro' ? 'Pro Plan' : 'Free Plan'}
               </div>
             </div>
           </button>
 
           {#if showProfileMenu}
-            <div class="absolute bottom-full left-0 right-0 mb-2 bg-white border border-gray-200 shadow-lg">
-              <div class="px-4 py-3 border-b border-gray-200">
-                <div class="text-sm font-medium truncate">
+            <div class="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-dark-input border border-gray-200 dark:border-gray-700 shadow-lg">
+              <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                <div class="text-sm font-medium truncate dark:text-white">
                   {data.session?.user?.email?.split('@')[0] || 'User'}
                 </div>
-                <div class="text-xs text-gray-500 truncate">
+                <div class="text-xs text-gray-500 dark:text-gray-400 truncate">
                   {data.session?.user?.email || ''}
                 </div>
               </div>
@@ -191,18 +211,26 @@
                 <a
                   href="/app/settings"
                   onclick={() => { showProfileMenu = false; closeMobileSidebar(); }}
-                  class="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
+                  class="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors dark:text-white"
                 >
-                  <Icon src={Cog6Tooth} class="w-[18px] h-[18px] text-gray-600" />
+                  <Icon src={Cog6Tooth} class="w-[18px] h-[18px] text-gray-600 dark:text-gray-400" />
                   <span>Settings</span>
                 </a>
+
+                <button
+                  onclick={() => { cycleTheme(); }}
+                  class="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors dark:text-white"
+                >
+                  <Icon src={themeIcon} class="w-[18px] h-[18px] text-gray-600 dark:text-gray-400" />
+                  <span>{themeLabel}</span>
+                </button>
 
                 {#if subscriptionPlan === 'free'}
                   <button
                     onclick={() => { showUpgradeModal = true; showProfileMenu = false; closeMobileSidebar(); }}
-                    class="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
+                    class="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors dark:text-white"
                   >
-                    <Icon src={Star} class="w-[18px] h-[18px] text-gray-600" />
+                    <Icon src={Star} class="w-[18px] h-[18px] text-gray-600 dark:text-gray-400" />
                     <span>Upgrade Plan</span>
                   </button>
                 {/if}
@@ -211,19 +239,19 @@
                   href="https://github.com/anthropics/claude-code/issues"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="flex items-center gap-3 px-4 py-2.5 text-sm bg-gradient-to-r from-purple-50 via-pink-50 to-orange-50 hover:from-purple-100 hover:via-pink-100 hover:to-orange-100 transition-colors border-y border-gray-100"
+                  class="flex items-center gap-3 px-4 py-2.5 text-sm bg-gradient-to-r from-purple-50 via-pink-50 to-orange-50 hover:from-purple-100 hover:via-pink-100 hover:to-orange-100 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-orange-900/20 dark:hover:from-purple-900/30 dark:hover:via-pink-900/30 dark:hover:to-orange-900/30 transition-colors border-y border-gray-100 dark:border-gray-700"
                 >
-                  <Icon src={ChatBubbleLeftRight} class="w-[18px] h-[18px] text-purple-600" />
-                  <span class="font-medium bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
+                  <Icon src={ChatBubbleLeftRight} class="w-[18px] h-[18px] text-purple-600 dark:text-purple-400" />
+                  <span class="font-medium bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 bg-clip-text text-transparent">
                     Give Feedback
                   </span>
                 </a>
 
                 <button
                   onclick={handleLogout}
-                  class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+                  class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
-                  <Icon src={ArrowRightOnRectangle} class="w-[18px] h-[18px] text-gray-600" />
+                  <Icon src={ArrowRightOnRectangle} class="w-[18px] h-[18px] text-gray-600 dark:text-gray-400" />
                   <span>Sign out</span>
                 </button>
               </div>
@@ -235,10 +263,13 @@
   {/if}
   
   <!-- Desktop sidebar -->
-  <div class="hidden md:fixed md:left-0 md:top-0 md:h-full md:w-56 md:border-r md:border-gray-200 md:bg-white md:flex md:flex-col">
+  <div class="hidden md:fixed md:left-0 md:top-0 md:h-full md:w-56 md:border-r md:border-gray-200 dark:md:border-gray-800 md:bg-white dark:md:bg-dark-bg md:flex md:flex-col">
     <!-- Logo -->
-    <div class="px-6 py-6 border-b border-gray-200">
-      <a href="/app" class="text-lg tracking-tight font-medium">inv</a>
+    <div class="px-6 py-6 border-b border-gray-200 dark:border-gray-700">
+      <a href="/app" class="text-lg tracking-tight font-medium dark:text-white flex items-end gap-2">
+        <div class="w-12 h-7" style="background: #F58121; image-rendering: pixelated;"></div>
+        <span>inv</span>
+      </a>
     </div>
 
     <!-- Nav + bottom items container (no overflow on parent) -->
@@ -248,9 +279,9 @@
         {#each navItems as item}
           <a
             href={item.href}
-            class="block px-3 py-2 text-sm hover:bg-gray-50 transition-colors rounded {
+            class="block px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors rounded {
               (item.exact ? $page.url.pathname === item.href : $page.url.pathname.startsWith(item.href))
-                ? 'text-black font-medium bg-gray-50' : 'text-gray-600'
+                ? 'text-black dark:text-white font-medium bg-gray-50 dark:bg-dark-input' : 'text-gray-600 dark:text-gray-300'
             }"
           >
             {item.label}
@@ -264,7 +295,7 @@
         onmouseenter={() => showChangelogWidget = true}
         onmouseleave={() => showChangelogWidget = false}
       >
-        <div class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors rounded cursor-pointer">
+        <div class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors rounded cursor-pointer">
           <Icon src={Bell} class="w-[16px] h-[16px]" />
           <span>What's New</span>
         </div>
@@ -280,7 +311,7 @@
       <div class="px-3 pb-4">
         <a
           href="mailto:feedback@inv.so"
-          class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors rounded"
+          class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors rounded"
         >
           <Icon src={ChatBubbleLeftRight} class="w-[16px] h-[16px]" />
           <span>Feedback</span>
@@ -289,23 +320,23 @@
     </div>
 
     <!-- Profile section with popup -->
-    <div class="flex-shrink-0 relative profile-menu-container border-t border-gray-200">
+    <div class="flex-shrink-0 relative profile-menu-container border-t border-gray-200 dark:border-gray-700">
       <!-- Profile button -->
       <button
         onclick={toggleProfileMenu}
-        class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+        class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors"
       >
         <!-- Avatar circle -->
-        <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-sm font-medium flex-shrink-0">
+        <div class="w-8 h-8 rounded-full bg-black dark:bg-gray-700 text-white dark:text-white flex items-center justify-center text-sm font-medium flex-shrink-0">
           {getInitials(data.session?.user?.email)}
         </div>
 
         <!-- User info -->
         <div class="flex-1 min-w-0 text-left">
-          <div class="text-sm font-medium truncate">
+          <div class="text-sm font-medium truncate dark:text-white">
             {data.session?.user?.email?.split('@')[0] || 'User'}
           </div>
-          <div class="text-xs text-gray-500">
+          <div class="text-xs text-gray-500 dark:text-gray-400">
             {subscriptionPlan === 'pro' ? 'Pro Plan' : 'Free Plan'}
           </div>
         </div>
@@ -313,13 +344,13 @@
 
       <!-- Popup menu (appears above) -->
       {#if showProfileMenu}
-        <div class="absolute bottom-full left-0 right-0 mb-2 bg-white border border-gray-200 shadow-lg">
+        <div class="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-dark-input border border-gray-200 dark:border-gray-700 shadow-lg">
           <!-- User info header (non-clickable) -->
-          <div class="px-4 py-3 border-b border-gray-200">
-            <div class="text-sm font-medium truncate">
+          <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+            <div class="text-sm font-medium truncate dark:text-white">
               {data.session?.user?.email?.split('@')[0] || 'User'}
             </div>
-            <div class="text-xs text-gray-500 truncate">
+            <div class="text-xs text-gray-500 dark:text-gray-400 truncate">
               {data.session?.user?.email || ''}
             </div>
           </div>
@@ -330,19 +361,28 @@
             <a
               href="/app/settings"
               onclick={() => showProfileMenu = false}
-              class="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
+              class="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors dark:text-white"
             >
-              <Icon src={Cog6Tooth} class="w-[18px] h-[18px] text-gray-600" />
+              <Icon src={Cog6Tooth} class="w-[18px] h-[18px] text-gray-600 dark:text-gray-400" />
               <span>Settings</span>
             </a>
+
+            <!-- Theme Switcher -->
+            <button
+              onclick={() => { cycleTheme(); }}
+              class="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors dark:text-white"
+            >
+              <Icon src={themeIcon} class="w-[18px] h-[18px] text-gray-600 dark:text-gray-400" />
+              <span>{themeLabel}</span>
+            </button>
 
             <!-- Upgrade Plan (only show for free users) -->
             {#if subscriptionPlan === 'free'}
               <button
                 onclick={() => { showUpgradeModal = true; showProfileMenu = false; }}
-                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
+                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors dark:text-white"
               >
-                <Icon src={Star} class="w-[18px] h-[18px] text-gray-600" />
+                <Icon src={Star} class="w-[18px] h-[18px] text-gray-600 dark:text-gray-400" />
                 <span>Upgrade Plan</span>
               </button>
             {/if}
@@ -352,10 +392,10 @@
               href="https://github.com/anthropics/claude-code/issues"
               target="_blank"
               rel="noopener noreferrer"
-              class="flex items-center gap-3 px-4 py-2.5 text-sm bg-gradient-to-r from-purple-50 via-pink-50 to-orange-50 hover:from-purple-100 hover:via-pink-100 hover:to-orange-100 transition-colors border-y border-gray-100"
+              class="flex items-center gap-3 px-4 py-2.5 text-sm bg-gradient-to-r from-purple-50 via-pink-50 to-orange-50 hover:from-purple-100 hover:via-pink-100 hover:to-orange-100 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-orange-900/20 dark:hover:from-purple-900/30 dark:hover:via-pink-900/30 dark:hover:to-orange-900/30 transition-colors border-y border-gray-100 dark:border-gray-700"
             >
-              <Icon src={ChatBubbleLeftRight} class="w-[18px] h-[18px] text-purple-600" />
-              <span class="font-medium bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
+              <Icon src={ChatBubbleLeftRight} class="w-[18px] h-[18px] text-purple-600 dark:text-purple-400" />
+              <span class="font-medium bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 bg-clip-text text-transparent">
                 Give Feedback
               </span>
             </a>
@@ -363,9 +403,9 @@
             <!-- Sign out -->
             <button
               onclick={handleLogout}
-              class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+              class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
-              <Icon src={ArrowRightOnRectangle} class="w-[18px] h-[18px] text-gray-600" />
+              <Icon src={ArrowRightOnRectangle} class="w-[18px] h-[18px] text-gray-600 dark:text-gray-400" />
               <span>Sign out</span>
             </button>
           </div>

@@ -35,50 +35,50 @@
       "font_weight": "bold"
     },
     "invoice_number": {
-      "x": 150,
+      "x": 140,
       "y": 20,
-      "w": 40,
+      "w": 50,
       "align": "right",
       "font_weight": "bold"
     },
     "company_info": {
       "x": 20,
-      "y": 40,
+      "y": 42,
       "w": 80,
       "h": 30,
       "font_size": 9
     },
     "issue_date": {
-      "x": 120,
-      "y": 40,
+      "x": 125,
+      "y": 42,
       "font_size": 9
     },
     "due_date": {
-      "x": 120,
-      "y": 45,
+      "x": 125,
+      "y": 49,
       "font_size": 9
     },
     "client_name": {
       "x": 20,
-      "y": 75,
+      "y": 80,
       "font_weight": "bold",
       "font_size": 11
     },
     "client_company": {
       "x": 20,
-      "y": 80,
+      "y": 87,
       "font_size": 9,
       "color": "#666666"
     },
     "client_email": {
       "x": 20,
-      "y": 85,
+      "y": 93,
       "font_size": 9,
       "color": "#666666"
     },
     "items_table": {
       "x": 20,
-      "y": 110,
+      "y": 118,
       "w": 170,
       "row_height": 8,
       "header_height": 10,
@@ -88,13 +88,13 @@
         {
           "key": "description",
           "label": "Description",
-          "w": 85,
+          "w": 95,
           "align": "left"
         },
         {
           "key": "qty",
           "label": "Qty",
-          "w": 20,
+          "w": 15,
           "align": "center"
         },
         {
@@ -112,28 +112,28 @@
         {
           "key": "line_total",
           "label": "Total",
-          "w": 25,
+          "w": 20,
           "align": "right"
         }
       ]
     },
     "subtotal": {
       "x": 140,
-      "y": 200,
+      "y": 210,
       "w": 50,
       "align": "right",
       "font_size": 9
     },
     "tax_total": {
       "x": 140,
-      "y": 205,
+      "y": 217,
       "w": 50,
       "align": "right",
       "font_size": 9
     },
     "grand_total": {
       "x": 140,
-      "y": 212,
+      "y": 226,
       "w": 50,
       "align": "right",
       "font_weight": "bold",
@@ -141,7 +141,7 @@
     },
     "notes": {
       "x": 20,
-      "y": 235,
+      "y": 245,
       "w": 170,
       "h": 30,
       "font_size": 8,
@@ -149,9 +149,9 @@
     },
     "payment_info": {
       "x": 20,
-      "y": 270,
+      "y": 278,
       "w": 170,
-      "h": 20,
+      "h": 15,
       "font_size": 8,
       "color": "#666666"
     }

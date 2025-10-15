@@ -82,47 +82,47 @@
 <div class="max-w-3xl space-y-8">
   <!-- Header -->
   <div>
-    <h1 class="text-lg font-medium mb-1">Edit Client</h1>
+    <h1 class="text-lg font-medium mb-1 dark:text-white">Edit Client</h1>
     <!-- Breadcrumbs -->
     <div class="flex items-center gap-2 text-xs">
-      <a href="/app/clients" class="text-gray-400 hover:text-black transition-colors">Clients</a>
+      <a href="/app/clients" class="text-gray-400 hover:text-black dark:hover:text-white transition-colors">Clients</a>
       <span class="text-gray-400">/</span>
-      <a href="/app/clients/{data.client.id}" class="text-gray-400 hover:text-black transition-colors">{data.client.name}</a>
+      <a href="/app/clients/{data.client.id}" class="text-gray-400 hover:text-black dark:hover:text-white transition-colors">{data.client.name}</a>
       <span class="text-gray-400">/</span>
-      <span class="text-gray-600">Edit</span>
+      <span class="text-gray-600 dark:text-gray-400">Edit</span>
     </div>
   </div>
 
   <form onsubmit={handleSubmit} class="space-y-8">
     <!-- Contact Information -->
     <div class="space-y-5">
-      <h2 class="text-base font-medium pb-2 border-b border-gray-200">Contact Information</h2>
+      <h2 class="text-base font-medium pb-2 border-b border-gray-200 dark:border-gray-700 dark:text-white">Contact Information</h2>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
-          <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
-            Contact Name <span class="text-red-600">*</span>
+          <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Contact Name <span class="text-red-600 dark:text-red-400">*</span>
           </label>
-          <p class="text-sm text-gray-500 mb-1.5">Primary contact person</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-1.5">Primary contact person</p>
           <input
             id="name"
             type="text"
             bind:value={name}
             placeholder="John Smith"
-            class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+            class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-black dark:focus:border-gray-500 transition-colors dark:bg-dark-input dark:text-white"
             required
           />
         </div>
 
         <div>
-          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-          <p class="text-sm text-gray-500 mb-1.5">For sending invoices</p>
+          <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-1.5">For sending invoices</p>
           <input
             id="email"
             type="email"
             bind:value={email}
             placeholder="john@acme.com"
-            class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+            class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-black dark:focus:border-gray-500 transition-colors dark:bg-dark-input dark:text-white"
           />
         </div>
       </div>
@@ -130,66 +130,66 @@
 
     <!-- Company Information -->
     <div class="space-y-5">
-      <h2 class="text-base font-medium pb-2 border-b border-gray-200">Company Information</h2>
+      <h2 class="text-base font-medium pb-2 border-b border-gray-200 dark:border-gray-700 dark:text-white">Company Information</h2>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
-          <label for="company" class="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
-          <p class="text-sm text-gray-500 mb-1.5">Trading or brand name</p>
+          <label for="company" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Name</label>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-1.5">Trading or brand name</p>
           <input
             id="company"
             type="text"
             bind:value={company}
             placeholder="Acme Inc"
-            class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+            class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-black dark:focus:border-gray-500 transition-colors dark:bg-dark-input dark:text-white"
           />
         </div>
 
         <div>
-          <label for="legal_name" class="block text-sm font-medium text-gray-700 mb-1">Legal Name</label>
-          <p class="text-sm text-gray-500 mb-1.5">Official registered entity name</p>
+          <label for="legal_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Legal Name</label>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-1.5">Official registered entity name</p>
           <input
             id="legal_name"
             type="text"
             bind:value={legal_name}
             placeholder="Acme Corporation Limited"
-            class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+            class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-black dark:focus:border-gray-500 transition-colors dark:bg-dark-input dark:text-white"
           />
         </div>
       </div>
 
       <div>
-        <label for="company_address" class="block text-sm font-medium text-gray-700 mb-1">Company Address</label>
-        <p class="text-sm text-gray-500 mb-1.5">Physical business address</p>
+        <label for="company_address" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Address</label>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-1.5">Physical business address</p>
         <textarea
           id="company_address"
           bind:value={company_address}
           placeholder="123 Main St&#10;London, UK&#10;SW1A 1AA"
           rows="2"
-          class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors resize-none"
+          class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-black dark:focus:border-gray-500 transition-colors resize-none dark:bg-dark-input dark:text-white"
         ></textarea>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
-          <label for="tax_id" class="block text-sm font-medium text-gray-700 mb-1">Tax ID / VAT Number</label>
-          <p class="text-sm text-gray-500 mb-1.5">For invoicing compliance</p>
+          <label for="tax_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tax ID / VAT Number</label>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-1.5">For invoicing compliance</p>
           <input
             id="tax_id"
             type="text"
             bind:value={tax_id}
             placeholder="GB123456789"
-            class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+            class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-black dark:focus:border-gray-500 transition-colors dark:bg-dark-input dark:text-white"
           />
         </div>
 
         <div>
-          <label for="currency" class="block text-sm font-medium text-gray-700 mb-1">Preferred Currency</label>
-          <p class="text-sm text-gray-500 mb-1.5">Default for invoices</p>
+          <label for="currency" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Preferred Currency</label>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-1.5">Default for invoices</p>
           <select
             id="currency"
             bind:value={currency}
-            class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+            class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-black dark:focus:border-gray-500 transition-colors dark:bg-dark-input dark:text-white"
           >
             {#each currencies as curr}
               <option value={curr.code}>{curr.name}</option>
@@ -201,16 +201,16 @@
 
     <!-- Additional Information -->
     <div class="space-y-5">
-      <h2 class="text-base font-medium pb-2 border-b border-gray-200">Additional Information</h2>
+      <h2 class="text-base font-medium pb-2 border-b border-gray-200 dark:border-gray-700 dark:text-white">Additional Information</h2>
 
       <div>
-        <label for="notes" class="block text-sm text-gray-500 mb-1.5">Notes</label>
+        <label for="notes" class="block text-sm text-gray-500 dark:text-gray-400 mb-1.5">Notes</label>
         <textarea
           id="notes"
           bind:value={notes}
           placeholder="Additional notes about this client..."
           rows="3"
-          class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors resize-none"
+          class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-black dark:focus:border-gray-500 transition-colors resize-none dark:bg-dark-input dark:text-white"
         ></textarea>
       </div>
     </div>
@@ -219,7 +219,7 @@
     <div class="flex items-center justify-between pt-4">
       <a
         href="/app/clients/{data.client.id}"
-        class="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm hover:bg-gray-50 transition-colors duration-75"
+        class="px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white text-sm hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors duration-75"
       >
         Cancel
       </a>
@@ -227,7 +227,7 @@
       <button
         type="submit"
         disabled={isLoading || !name}
-        class="px-6 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="px-6 py-2.5 bg-black dark:bg-dark-button text-white text-sm hover:bg-gray-800 dark:hover:bg-dark-button-hover transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isLoading ? 'Saving...' : 'Save Changes'}
       </button>
@@ -235,7 +235,7 @@
 
     {#if error}
       <div class="text-center">
-        <p class="text-sm text-red-600">{error}</p>
+        <p class="text-sm text-red-600 dark:text-red-400">{error}</p>
       </div>
     {/if}
   </form>

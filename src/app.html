@@ -3,6 +3,22 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<!-- Theme script (blocking, before any content to prevent FOUC) -->
+		<script>
+			// Read theme preference from localStorage or system
+			const theme = localStorage.theme || 'system';
+
+			// Determine if dark mode should be active
+			const isDark = theme === 'dark' ||
+				(theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+			// Apply dark class immediately (before render)
+			if (isDark) {
+				document.documentElement.classList.add('dark');
+			}
+		</script>
+
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">

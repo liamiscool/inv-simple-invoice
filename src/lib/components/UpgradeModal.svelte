@@ -69,16 +69,16 @@
 
 {#if show}
   <div
-    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+    class="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4"
     onclick={handleBackdropClick}
     role="dialog"
     aria-modal="true"
   >
-    <div class="bg-white rounded-sm max-w-lg w-full p-8 border border-thin">
+    <div class="bg-white dark:bg-dark-input rounded-sm max-w-lg w-full p-8 border border-thin dark:border-gray-700">
       <!-- Header -->
       <div class="mb-6">
-        <h2 class="text-2xl font-light mb-2">{currentReason.title}</h2>
-        <p class="text-sm text-gray-600">{currentReason.message}</p>
+        <h2 class="text-2xl font-light mb-2 dark:text-white">{currentReason.title}</h2>
+        <p class="text-sm text-gray-600 dark:text-gray-400">{currentReason.message}</p>
       </div>
 
       <!-- Plans -->
@@ -87,19 +87,19 @@
         <button
           onclick={() => handleUpgrade('monthly')}
           disabled={loading}
-          class="w-full text-left p-4 border border-thin rounded-sm hover:border-black transition-colors group disabled:opacity-50"
+          class="w-full text-left p-4 border border-thin dark:border-gray-600 rounded-sm hover:border-black dark:hover:border-white transition-colors group disabled:opacity-50 dark:text-white"
         >
           <div class="flex justify-between items-start mb-2">
             <div>
               <div class="text-lg font-medium">Monthly</div>
-              <div class="text-xs text-gray-600">Pay monthly, cancel anytime</div>
+              <div class="text-xs text-gray-600 dark:text-gray-400">Pay monthly, cancel anytime</div>
             </div>
             <div class="text-right">
               <div class="text-2xl font-light">$10</div>
-              <div class="text-xs text-gray-600">/month</div>
+              <div class="text-xs text-gray-600 dark:text-gray-400">/month</div>
             </div>
           </div>
-          <div class="text-xs text-gray-500 group-hover:text-black transition-colors">
+          <div class="text-xs text-gray-500 dark:text-gray-400 group-hover:text-black dark:group-hover:text-white transition-colors">
             Choose Monthly →
           </div>
         </button>
@@ -108,9 +108,9 @@
         <button
           onclick={() => handleUpgrade('yearly')}
           disabled={loading}
-          class="w-full text-left p-4 border-2 border-black rounded-sm hover:bg-black hover:text-white transition-all group relative disabled:opacity-50"
+          class="w-full text-left p-4 border-2 border-black dark:border-white rounded-sm hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black transition-all group relative disabled:opacity-50"
         >
-          <div class="absolute -top-2 right-4 bg-black text-white text-xs px-2 py-0.5 rounded-sm group-hover:bg-white group-hover:text-black">
+          <div class="absolute -top-2 right-4 bg-black dark:bg-white text-white dark:text-black text-xs px-2 py-0.5 rounded-sm group-hover:bg-white dark:group-hover:bg-black group-hover:text-black dark:group-hover:text-white">
             Save 20%
           </div>
           <div class="flex justify-between items-start mb-2">
@@ -130,9 +130,9 @@
       </div>
 
       <!-- Features -->
-      <div class="mb-6 pb-6 border-b border-thin">
-        <div class="text-xs font-medium mb-3 text-gray-600">What's included:</div>
-        <ul class="space-y-2 text-xs text-gray-700">
+      <div class="mb-6 pb-6 border-b border-thin dark:border-gray-700">
+        <div class="text-xs font-medium mb-3 text-gray-600 dark:text-gray-400">What's included:</div>
+        <ul class="space-y-2 text-xs text-gray-700 dark:text-gray-300">
           <li class="flex items-start">
             <span class="mr-2">✓</span>
             <span>Unlimited clients</span>
@@ -155,7 +155,7 @@
       <!-- Cancel -->
       <button
         onclick={onClose}
-        class="w-full text-sm text-gray-600 hover:text-black transition-colors"
+        class="w-full text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
       >
         Maybe later
       </button>
