@@ -33,50 +33,53 @@
   }
 </script>
 
+<!-- Backdrop -->
+<div class="fixed inset-0 bg-black/20 z-40" onclick={onClose}></div>
+
 <!-- Dropdown -->
-<div class="absolute bottom-full left-0 mb-2 w-80 bg-white border border-gray-200 shadow-lg max-h-96 overflow-y-auto">
+<div class="fixed left-[280px] bottom-[120px] w-[480px] bg-white border border-gray-200 shadow-xl max-h-[600px] overflow-y-auto z-50">
   <!-- Header -->
-  <div class="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-    <div class="text-sm font-medium">What's New</div>
+  <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+    <div class="text-base font-medium">What's New</div>
     <button
       onclick={onClose}
-      class="text-gray-500 hover:text-black transition-colors text-xs"
+      class="text-gray-500 hover:text-black transition-colors text-sm"
     >
       Close
     </button>
   </div>
 
   <!-- Content -->
-  <div class="p-4">
+  <div class="p-6">
     {#if loading}
-      <div class="text-center py-8 text-sm text-gray-500">
+      <div class="text-center py-12 text-sm text-gray-500">
         Loading updates...
       </div>
     {:else if error}
-      <div class="text-center py-8 text-sm text-red-600">
+      <div class="text-center py-12 text-sm text-red-600">
         {error}
       </div>
     {:else if changelogEntries.length === 0}
-      <div class="text-center py-8 text-sm text-gray-500">
+      <div class="text-center py-12 text-sm text-gray-500">
         No updates yet
       </div>
     {:else}
-      <div class="space-y-6">
+      <div class="space-y-8">
         {#each changelogEntries as entry}
-          <div class="border-l-2 border-black pl-4">
+          <div class="border-l-2 border-black pl-6">
             <!-- Version & Date -->
-            <div class="flex items-baseline gap-2 mb-2">
+            <div class="flex items-baseline gap-3 mb-3">
               {#if entry.version}
-                <div class="text-sm font-medium">{entry.version}</div>
+                <div class="text-base font-medium">{entry.version}</div>
               {/if}
-              <div class="text-xs text-gray-500">{formatDate(entry.date)}</div>
+              <div class="text-sm text-gray-500">{formatDate(entry.date)}</div>
             </div>
 
             <!-- Changes -->
             {#if entry.added && entry.added.length > 0}
-              <div class="mb-2">
-                <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Added</div>
-                <ul class="text-sm space-y-1">
+              <div class="mb-3">
+                <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Added</div>
+                <ul class="text-sm space-y-1.5">
                   {#each entry.added as item}
                     <li class="text-gray-700">• {item}</li>
                   {/each}
@@ -85,9 +88,9 @@
             {/if}
 
             {#if entry.changed && entry.changed.length > 0}
-              <div class="mb-2">
-                <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Changed</div>
-                <ul class="text-sm space-y-1">
+              <div class="mb-3">
+                <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Changed</div>
+                <ul class="text-sm space-y-1.5">
                   {#each entry.changed as item}
                     <li class="text-gray-700">• {item}</li>
                   {/each}
@@ -96,9 +99,9 @@
             {/if}
 
             {#if entry.fixed && entry.fixed.length > 0}
-              <div class="mb-2">
-                <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Fixed</div>
-                <ul class="text-sm space-y-1">
+              <div class="mb-3">
+                <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Fixed</div>
+                <ul class="text-sm space-y-1.5">
                   {#each entry.fixed as item}
                     <li class="text-gray-700">• {item}</li>
                   {/each}
@@ -109,17 +112,5 @@
         {/each}
       </div>
     {/if}
-  </div>
-
-  <!-- Footer -->
-  <div class="sticky bottom-0 bg-white border-t border-gray-200 px-4 py-3">
-    <a
-      href="https://github.com/yourusername/inv_simple_invoice/blob/main/CHANGELOG.md"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="text-sm text-gray-600 hover:text-black transition-colors"
-    >
-      View full changelog →
-    </a>
   </div>
 </div>
