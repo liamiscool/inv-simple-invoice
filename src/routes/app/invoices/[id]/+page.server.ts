@@ -9,16 +9,17 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, safeGet
     };
   }
   
-  // Get user's org_id first
+  // Get user's profile (including company name for email)
   const { data: profile } = await supabase
     .from('app_user')
-    .select('org_id')
+    .select('*')
     .eq('id', user.id)
     .single();
-    
+
   if (!profile) {
     return {
-      invoice: null
+      invoice: null,
+      userProfile: null
     };
   }
   
@@ -56,20 +57,22 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, safeGet
   
   if (!invoice) {
     return {
-      invoice: null
+      invoice: null,
+      userProfile: null
     };
   }
-  
+
   // Sort items by position and payments by date
   if (invoice.items) {
     invoice.items.sort((a: any, b: any) => a.position - b.position);
   }
-  
+
   if (invoice.payments) {
     invoice.payments.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }
-  
+
   return {
-    invoice
+    invoice,
+    userProfile: profile
   };
 };

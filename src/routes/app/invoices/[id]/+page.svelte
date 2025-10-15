@@ -166,12 +166,17 @@
   }
   
   function openEmailModal() {
+    // Build sender name for subject (matches send endpoint logic)
+    const senderName = data.userProfile?.company_name
+      ? `${data.userProfile.company_name} (${data.userProfile.full_name})`
+      : data.userProfile?.full_name || 'Your Company';
+
     // Pre-fill email form
     emailForm.to = data.invoice.client.email || '';
-    emailForm.subject = `Invoice ${data.invoice.number} from ${data.invoice.client.company || 'Your Company'}`;
+    emailForm.subject = `Invoice ${data.invoice.number} from ${senderName}`;
     emailForm.message = '';
     emailForm.includePdf = true;
-    
+
     emailError = '';
     emailSuccess = '';
     showEmailModal = true;
