@@ -2,6 +2,8 @@ export interface EmailTemplateData {
   invoiceNumber: string;
   clientName: string;
   companyName: string;
+  userName: string;
+  userEmail: string;
   dueDate?: string;
   total: string;
   currency: string;
@@ -128,12 +130,20 @@ export function generateInvoiceEmailHTML(data: EmailTemplateData): string {
       
       <div class="content">
         <p>Hi ${data.clientName},</p>
-        
+
         <p>Please find attached your invoice ${data.invoiceNumber}. You can also download a copy using the link below.</p>
-        
+
         <div class="invoice-details">
           <h3>Invoice Details</h3>
           <div class="detail-row">
+            <span class="detail-label">From:</span>
+            <span class="detail-value">${data.companyName}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">To:</span>
+            <span class="detail-value">${data.clientName}</span>
+          </div>
+          <div class="detail-row" style="border-bottom: 2px solid #ddd; margin-bottom: 12px; padding-bottom: 12px;">
             <span class="detail-label">Invoice Number:</span>
             <span class="detail-value">${data.invoiceNumber}</span>
           </div>
@@ -183,26 +193,46 @@ export function generateInvoiceEmailText(data: EmailTemplateData): string {
 Invoice ${data.invoiceNumber}
 from ${data.companyName}
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 Hi ${data.clientName},
 
-Please find attached your invoice ${data.invoiceNumber}. You can also download a copy using the link below.
+Please find attached your invoice ${data.invoiceNumber}.
+You can also download a copy using the link below.
 
-Invoice Details:
-- Invoice Number: ${data.invoiceNumber}
-${data.dueDate ? `- Due Date: ${data.dueDate}\n` : ''}- Total Amount: ${data.total}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Download Invoice: ${data.downloadUrl}
+INVOICE DETAILS
 
+From:           ${data.companyName}
+To:             ${data.clientName}
+
+Invoice Number: ${data.invoiceNumber}
+${data.dueDate ? `Due Date:       ${data.dueDate}\n` : ''}
+Total Amount:   ${data.total}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DOWNLOAD INVOICE
+
+${data.downloadUrl}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${data.paymentInstructions ? `
-Payment Instructions:
+PAYMENT INSTRUCTIONS
+
 ${data.paymentInstructions}
 
-` : ''}Thank you for your business!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+` : ''}
+Thank you for your business!
 
 Best regards,
 ${data.companyName}
 
----
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 This invoice was generated using inv • Beautiful invoices for designers
 Questions? Reply to this email
   `.trim();

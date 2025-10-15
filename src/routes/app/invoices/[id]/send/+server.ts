@@ -123,11 +123,18 @@ export const POST: RequestHandler = async ({ request, params, locals: { supabase
     // Use the Supabase Storage URL for downloads (not the /pdf endpoint)
     const downloadUrl = pdfResult.url || `${request.url.split('/send')[0]}/pdf`;
 
+    // Build sender name for subject line
+    const senderName = userProfile?.company_name
+      ? `${userProfile.company_name} (${userProfile.full_name})`
+      : userProfile?.full_name || 'Your Company';
+
     // Prepare email template data
     const templateData = {
       invoiceNumber: invoice.number,
       clientName: invoice.client.name,
       companyName: userProfile?.company_name || userProfile?.full_name || 'Your Company',
+      userName: userProfile?.full_name || '',
+      userEmail: userProfile?.email || '',
       dueDate: invoice.due_date ? formatDate(invoice.due_date) : undefined,
       total: formatCurrency(invoice.total, invoice.currency),
       currency: invoice.currency,
@@ -139,8 +146,8 @@ export const POST: RequestHandler = async ({ request, params, locals: { supabase
     const emailOptions = {
       to,
       from: userProfile?.email ? `${userProfile.company_name || userProfile.full_name} <invoices@send.inv.so>` : undefined,
-      replyTo: userProfile?.email || 'invoices@send.inv.so',
-      subject: subject || undefined,
+      replyTo: userProfile?.email || undefined, // Reply goes to user, not invoices@send.inv.so
+      subject: subject || `Invoice ${invoice.number} from ${senderName}`,
       attachmentBuffer: undefined as Buffer | undefined,
       attachmentFilename: undefined as string | undefined
     };
