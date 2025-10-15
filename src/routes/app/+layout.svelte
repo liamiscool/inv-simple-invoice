@@ -5,13 +5,15 @@
   import { STRIPE_MONTHLY_LINK, STRIPE_YEARLY_LINK } from '$lib/config/stripe';
   import UpgradeModal from '$lib/components/UpgradeModal.svelte';
   import { Icon } from '@steeze-ui/svelte-icon';
-  import { Cog6Tooth, Star, ChatBubbleLeftRight, ArrowRightOnRectangle } from '@steeze-ui/heroicons';
+  import { Cog6Tooth, Star, ChatBubbleLeftRight, ArrowRightOnRectangle, Bell } from '@steeze-ui/heroicons';
+  import ChangelogWidget from '$lib/components/ChangelogWidget.svelte';
 
   let { data, children }: { data: LayoutData; children: any } = $props();
   let showMobileSidebar = $state(false);
   let showUpgradeModal = $state(false);
   let subscriptionPlan = $state<'free' | 'pro'>('free');
   let showProfileMenu = $state(false);
+  let showChangelogWidget = $state(false);
 
   onMount(async () => {
     try {
@@ -123,6 +125,21 @@
 
           <!-- Spacer -->
           <div class="flex-1"></div>
+
+          <!-- What's New Button -->
+          <div class="px-3 pb-2 relative">
+            <button
+              onclick={() => showChangelogWidget = !showChangelogWidget}
+              class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors rounded w-full"
+            >
+              <Icon src={Bell} class="w-[16px] h-[16px]" />
+              <span>What's New</span>
+            </button>
+
+            {#if showChangelogWidget}
+              <ChangelogWidget onClose={() => showChangelogWidget = false} />
+            {/if}
+          </div>
 
           <!-- Feedback Button -->
           <div class="px-3 pb-4">
@@ -239,6 +256,21 @@
 
       <!-- Spacer -->
       <div class="flex-1"></div>
+
+      <!-- What's New Button -->
+      <div class="px-3 pb-2 relative">
+        <button
+          onclick={() => showChangelogWidget = !showChangelogWidget}
+          class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors rounded w-full"
+        >
+          <Icon src={Bell} class="w-[16px] h-[16px]" />
+          <span>What's New</span>
+        </button>
+
+        {#if showChangelogWidget}
+          <ChangelogWidget onClose={() => showChangelogWidget = false} />
+        {/if}
+      </div>
 
       <!-- Feedback Button -->
       <div class="px-3 pb-4">

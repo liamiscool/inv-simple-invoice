@@ -1,0 +1,76 @@
+name: Update Changelog
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update-changelog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for proper changelog generation
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate Changelog from Commits
+        id: changelog
+        run: |
+          # Get the last 20 commits
+          COMMITS=$(git log -20 --pretty=format:"%s" --no-merges)
+
+          # Create temporary changelog entries
+          echo "### Recent Changes" > temp_changes.md
+          echo "" >> temp_changes.md
+
+          # Parse commits and categorize
+          while IFS= read -r commit; do
+            if echo "$commit" | grep -qi "^Add\|^Implement\|^Create"; then
+              echo "- $commit" >> temp_added.md
+            elif echo "$commit" | grep -qi "^Fix\|^Resolve"; then
+              echo "- $commit" >> temp_fixed.md
+            elif echo "$commit" | grep -qi "^Update\|^Change\|^Improve\|^Replace"; then
+              echo "- $commit" >> temp_changed.md
+            fi
+          done <<< "$COMMITS"
+
+          # Build changelog section
+          if [ -f temp_added.md ]; then
+            echo "#### Added" >> temp_changes.md
+            cat temp_added.md >> temp_changes.md
+            echo "" >> temp_changes.md
+          fi
+
+          if [ -f temp_changed.md ]; then
+            echo "#### Changed" >> temp_changes.md
+            cat temp_changed.md >> temp_changes.md
+            echo "" >> temp_changes.md
+          fi
+
+          if [ -f temp_fixed.md ]; then
+            echo "#### Fixed" >> temp_changes.md
+            cat temp_fixed.md >> temp_changes.md
+            echo "" >> temp_changes.md
+          fi
+
+      - name: Check if changelog needs update
+        id: check
+        run: |
+          if git diff --quiet CHANGELOG.md; then
+            echo "needs_update=false" >> $GITHUB_OUTPUT
+          else
+            echo "needs_update=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and Push
+        if: steps.check.outputs.needs_update == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add CHANGELOG.md
+          git commit -m "docs: Auto-update CHANGELOG.md [skip ci]"
+          git push

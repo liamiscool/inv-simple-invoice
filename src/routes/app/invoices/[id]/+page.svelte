@@ -541,7 +541,7 @@
           disabled={isLoading}
           class="px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75 font-medium disabled:opacity-50"
         >
-          Send Invoice to Client
+          Send to Client
         </button>
       {/if}
     </div>
