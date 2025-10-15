@@ -158,13 +158,13 @@ export function generateInvoiceEmailHTML(data: EmailTemplateData): string {
             <span class="detail-value">${data.total}</span>
           </div>
         </div>
-        
-        <div style="text-align: center;">
+
+        <div style="text-align: center; margin: 30px 0;">
           <a href="${data.downloadUrl}" class="cta-button">Download Invoice PDF</a>
         </div>
-        
+
         ${data.paymentInstructions ? `
-        <div class="payment-instructions">
+        <div class="payment-instructions" style="margin-top: 30px;">
           <strong>Payment Instructions:</strong><br>
           ${data.paymentInstructions.replace(/\n/g, '<br>')}
         </div>
