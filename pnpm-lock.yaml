@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@steeze-ui/heroicons':
+        specifier: ^2.4.2
+        version: 2.4.2
+      '@steeze-ui/svelte-icon':
+        specifier: ^1.6.2
+        version: 1.6.2(svelte@5.39.9)
       '@stripe/stripe-js':
         specifier: ^8.0.0
         version: 8.0.0
@@ -29,9 +35,6 @@ importers:
       stripe:
         specifier: ^19.1.0
         version: 19.1.0(@types/node@24.7.0)
-      svelte-material-icons:
-        specifier: ^3.0.5
-        version: 3.0.5(svelte@5.39.9)
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: ^3.0.0
@@ -772,6 +775,14 @@ packages:
 
   '@standard-schema/spec@1.0.0':
     resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
+
+  '@steeze-ui/heroicons@2.4.2':
+    resolution: {integrity: sha512-66luL+uaxyC6mcZigewH4phfDxNWj4sH+n6qK2VnY3zcgpMmNAgVQbMGfZYfKhLqrUo13BlqpmhWuHqAUpehlA==}
+
+  '@steeze-ui/svelte-icon@1.6.2':
+    resolution: {integrity: sha512-Q2WP/RkM1JhMueX0FJogSj4J1bncSHaAiiPCqjcseRcHKqfpjYFPJa8bA50I+4KbyOVJ9fdUvTQ3ww9X0ITRxQ==}
+    peerDependencies:
+      svelte: ^5.0.0
 
   '@stripe/stripe-js@8.0.0':
     resolution: {integrity: sha512-dLvD55KT1cBmrqzgYRgY42qNcw6zW4HS5oRZs0xRvHw9gBWig5yDnWNop/E+/t2JK+OZO30zsnupVBN2MqW2mg==}
@@ -1837,11 +1848,6 @@ packages:
       svelte: ^4.0.0 || ^5.0.0-next.0
       typescript: '>=5.0.0'
 
-  svelte-material-icons@3.0.5:
-    resolution: {integrity: sha512-UbhAa+Btd5y6e6DMljVccP+cbJ8lvesltMippiCOvfIUtYe2TsQqM+P6osfrVsZHV47b1tY6AmqCuSpMKnwMOQ==}
-    peerDependencies:
-      svelte: ^3.0.0 || ^4.0.0
-
   svelte@5.39.9:
     resolution: {integrity: sha512-sVOie0sbU9F/Lh0IoUfaq9hLzujRKxiL7xTMbG0y8ROx/qErtbfmm6sLSlJUbUMW4NcIgqHQPFiHX4LakA8fzA==}
     engines: {node: '>=18'}
@@ -2514,6 +2520,12 @@ snapshots:
   '@speed-highlight/core@1.2.7': {}
 
   '@standard-schema/spec@1.0.0': {}
+
+  '@steeze-ui/heroicons@2.4.2': {}
+
+  '@steeze-ui/svelte-icon@1.6.2(svelte@5.39.9)':
+    dependencies:
+      svelte: 5.39.9
 
   '@stripe/stripe-js@8.0.0': {}
 
@@ -3648,10 +3660,6 @@ snapshots:
       typescript: 5.9.3
     transitivePeerDependencies:
       - picomatch
-
-  svelte-material-icons@3.0.5(svelte@5.39.9):
-    dependencies:
-      svelte: 5.39.9
 
   svelte@5.39.9:
     dependencies:

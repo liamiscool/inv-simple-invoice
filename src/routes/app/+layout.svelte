@@ -4,10 +4,8 @@
   import { onMount } from 'svelte';
   import { STRIPE_MONTHLY_LINK, STRIPE_YEARLY_LINK } from '$lib/config/stripe';
   import UpgradeModal from '$lib/components/UpgradeModal.svelte';
-  import Settings from 'svelte-material-icons/Settings.svelte';
-  import StarOutline from 'svelte-material-icons/StarOutline.svelte';
-  import MessageTextOutline from 'svelte-material-icons/MessageTextOutline.svelte';
-  import Logout from 'svelte-material-icons/Logout.svelte';
+  import Icon from '@steeze-ui/svelte-icon';
+  import { Cog6Tooth, Star, ChatBubbleLeftRight, ArrowRightOnRectangle } from '@steeze-ui/heroicons';
 
   let { data, children }: { data: LayoutData; children: any } = $props();
   let showMobileSidebar = $state(false);
@@ -161,7 +159,7 @@
                   onclick={() => { showProfileMenu = false; closeMobileSidebar(); }}
                   class="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
                 >
-                  <Settings size="18" class="text-gray-600" />
+                  <Icon src={Cog6Tooth} class="w-[18px] h-[18px] text-gray-600" />
                   <span>Settings</span>
                 </a>
 
@@ -170,7 +168,7 @@
                     onclick={() => { showUpgradeModal = true; showProfileMenu = false; closeMobileSidebar(); }}
                     class="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
                   >
-                    <StarOutline size="18" class="text-gray-600" />
+                    <Icon src={Star} class="w-[18px] h-[18px] text-gray-600" />
                     <span>Upgrade Plan</span>
                   </button>
                 {/if}
@@ -181,7 +179,7 @@
                   rel="noopener noreferrer"
                   class="flex items-center gap-3 px-4 py-2.5 text-sm bg-gradient-to-r from-purple-50 via-pink-50 to-orange-50 hover:from-purple-100 hover:via-pink-100 hover:to-orange-100 transition-colors border-y border-gray-100"
                 >
-                  <MessageTextOutline size="18" class="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600" />
+                  <Icon src={ChatBubbleLeftRight} class="w-[18px] h-[18px] text-purple-600" />
                   <span class="font-medium bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
                     Give Feedback
                   </span>
@@ -191,7 +189,7 @@
                   onclick={handleLogout}
                   class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
                 >
-                  <Logout size="18" class="text-gray-600" />
+                  <Icon src={ArrowRightOnRectangle} class="w-[18px] h-[18px] text-gray-600" />
                   <span>Sign out</span>
                 </button>
               </div>
@@ -270,7 +268,7 @@
               onclick={() => showProfileMenu = false}
               class="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
             >
-              <Settings size="18" class="text-gray-600" />
+              <Icon src={Cog6Tooth} class="w-[18px] h-[18px] text-gray-600" />
               <span>Settings</span>
             </a>
 
@@ -280,7 +278,7 @@
                 onclick={() => { showUpgradeModal = true; showProfileMenu = false; }}
                 class="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
               >
-                <StarOutline size="18" class="text-gray-600" />
+                <Icon src={Star} class="w-[18px] h-[18px] text-gray-600" />
                 <span>Upgrade Plan</span>
               </button>
             {/if}
@@ -292,7 +290,7 @@
               rel="noopener noreferrer"
               class="flex items-center gap-3 px-4 py-2.5 text-sm bg-gradient-to-r from-purple-50 via-pink-50 to-orange-50 hover:from-purple-100 hover:via-pink-100 hover:to-orange-100 transition-colors border-y border-gray-100"
             >
-              <MessageTextOutline size="18" class="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600" />
+              <Icon src={ChatBubbleLeftRight} class="w-[18px] h-[18px] text-purple-600" />
               <span class="font-medium bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
                 Give Feedback
               </span>
@@ -303,7 +301,7 @@
               onclick={handleLogout}
               class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
             >
-              <Logout size="18" class="text-gray-600" />
+              <Icon src={ArrowRightOnRectangle} class="w-[18px] h-[18px] text-gray-600" />
               <span>Sign out</span>
             </button>
           </div>
