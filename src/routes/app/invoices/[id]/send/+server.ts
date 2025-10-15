@@ -2,7 +2,7 @@ import {
   isEmailServiceConfigured,
   sendInvoiceEmail,
 } from '$lib/email/service';
-import { generateOptimizedInvoicePDF } from '$lib/pdf/generator';
+import { getOrGeneratePDF } from '$lib/pdf/storage';
 import { getTemplate } from '$lib/templates';
 
 import { json } from '@sveltejs/kit';
@@ -32,18 +32,18 @@ export const POST: RequestHandler = async ({ request, params, locals: { supabase
     }
 
     // Get user's org_id first
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('app_user')
       .select('org_id')
       .eq('id', user.id)
       .single();
-      
-    if (!profile) {
+
+    if (profileError || !profile) {
       return json({ error: 'Profile not found' }, { status: 404 });
     }
 
     // Get invoice with all related data
-    const { data: invoice } = await supabase
+    const { data: invoice, error: invoiceError } = await supabase
       .from('invoice')
       .select(`
         *,
@@ -67,16 +67,20 @@ export const POST: RequestHandler = async ({ request, params, locals: { supabase
       .eq('org_id', profile.org_id)
       .maybeSingle();
 
-    if (!invoice) {
+    if (invoiceError || !invoice) {
       return json({ error: 'Invoice not found' }, { status: 404 });
     }
 
     // Get user's company details
-    const { data: userProfile } = await supabase
+    const { data: userProfile, error: userProfileError } = await supabase
       .from('app_user')
       .select('*')
       .eq('id', user.id)
       .single();
+
+    if (userProfileError || !userProfile) {
+      return json({ error: 'User profile not found' }, { status: 404 });
+    }
 
     // Get template
     const template = await getTemplate(supabase, invoice.template_id);
@@ -102,6 +106,23 @@ export const POST: RequestHandler = async ({ request, params, locals: { supabase
       return new Date(dateString).toLocaleDateString();
     }
 
+    // Generate and store PDF (regardless of include_pdf setting, we need the URL)
+    const pdfResult = await getOrGeneratePDF(
+      supabase,
+      invoice,
+      userProfile,
+      template.spec,
+      profile.org_id
+    );
+
+    if (!pdfResult.success) {
+      console.error('PDF generation failed:', pdfResult.error);
+      // Continue anyway - we'll send email without PDF
+    }
+
+    // Use the Supabase Storage URL for downloads (not the /pdf endpoint)
+    const downloadUrl = pdfResult.url || `${request.url.split('/send')[0]}/pdf`;
+
     // Prepare email template data
     const templateData = {
       invoiceNumber: invoice.number,
@@ -110,7 +131,7 @@ export const POST: RequestHandler = async ({ request, params, locals: { supabase
       dueDate: invoice.due_date ? formatDate(invoice.due_date) : undefined,
       total: formatCurrency(invoice.total, invoice.currency),
       currency: invoice.currency,
-      downloadUrl: `${request.url.split('/send')[0]}/pdf`, // Link to PDF endpoint
+      downloadUrl, // Direct link to Supabase Storage PDF
       paymentInstructions: userProfile?.bank_details || undefined
     };
 
@@ -124,14 +145,18 @@ export const POST: RequestHandler = async ({ request, params, locals: { supabase
       attachmentFilename: undefined as string | undefined
     };
 
-    // Generate PDF attachment if requested
-    if (include_pdf) {
+    // Fetch PDF from storage for email attachment if requested
+    if (include_pdf && pdfResult.success && pdfResult.url) {
       try {
-        const pdfBuffer = await generateOptimizedInvoicePDF(invoice, userProfile, template.spec);
-        emailOptions.attachmentBuffer = pdfBuffer;
-        emailOptions.attachmentFilename = `invoice-${invoice.number}.pdf`;
+        // Download the PDF from Supabase Storage
+        const response = await fetch(pdfResult.url);
+        if (response.ok) {
+          const arrayBuffer = await response.arrayBuffer();
+          emailOptions.attachmentBuffer = Buffer.from(arrayBuffer);
+          emailOptions.attachmentFilename = `invoice-${invoice.number}.pdf`;
+        }
       } catch (error) {
-        console.error('PDF generation failed for email:', error);
+        console.error('Failed to fetch PDF for email attachment:', error);
         // Continue without PDF attachment
       }
     }

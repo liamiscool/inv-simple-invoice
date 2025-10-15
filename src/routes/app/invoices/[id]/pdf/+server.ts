@@ -1,33 +1,38 @@
-import { dev } from '$app/environment';
-import {
-  generateOptimizedInvoicePDF,
-  testPDFGeneration,
-} from '$lib/pdf/generator';
-import { renderInvoiceHTML } from '$lib/pdf/renderer';
+import { getOrGeneratePDF, getStoredPDFUrl } from '$lib/pdf/storage';
 import { getTemplate } from '$lib/templates';
+import { redirect } from '@sveltejs/kit';
 
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params, locals: { supabase, safeGetSession } }) => {
   const { user } = await safeGetSession();
-  
+
   if (!user) {
     return new Response('Unauthorized', { status: 401 });
   }
-  
+
   // Get user's org_id first
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('app_user')
     .select('org_id')
     .eq('id', user.id)
     .single();
-    
-  if (!profile) {
+
+  if (profileError || !profile) {
     return new Response('Profile not found', { status: 404 });
   }
-  
-  // Get invoice with all related data including template
-  const { data: invoice } = await supabase
+
+  // Check if PDF already exists in storage
+  const existingPdfUrl = await getStoredPDFUrl(supabase, params.id, profile.org_id);
+
+  if (existingPdfUrl) {
+    // Redirect to the stored PDF
+    throw redirect(302, existingPdfUrl);
+  }
+
+  // PDF doesn't exist yet - generate it
+  // Get invoice with all related data
+  const { data: invoice, error: invoiceError } = await supabase
     .from('invoice')
     .select(`
       *,
@@ -50,57 +55,50 @@ export const GET: RequestHandler = async ({ params, locals: { supabase, safeGetS
     .eq('id', params.id)
     .eq('org_id', profile.org_id)
     .maybeSingle();
-  
-  if (!invoice) {
+
+  if (invoiceError || !invoice) {
     return new Response('Invoice not found', { status: 404 });
   }
-  
+
   // Get user's company details
-  const { data: userProfile } = await supabase
+  const { data: userProfile, error: userProfileError } = await supabase
     .from('app_user')
     .select('*')
     .eq('id', user.id)
     .single();
-  
+
+  if (userProfileError || !userProfile) {
+    return new Response('User profile not found', { status: 404 });
+  }
+
   // Get the template used for this invoice
   const template = await getTemplate(supabase, invoice.template_id);
-  
+
   if (!template) {
     return new Response('Template not found', { status: 404 });
   }
-  
+
   // Sort items by position
   if (invoice.items) {
     invoice.items.sort((a: any, b: any) => a.position - b.position);
   }
-  
-  // Check if PDF generation is available and we're in production
-  const pdfAvailable = !dev && await testPDFGeneration();
-  
-  if (pdfAvailable) {
-    try {
-      // Generate actual PDF using Puppeteer
-      const pdfBuffer = await generateOptimizedInvoicePDF(invoice, userProfile, template.spec);
-      
-      return new Response(pdfBuffer, {
-        headers: {
-          'Content-Type': 'application/pdf',
-          'Content-Disposition': `attachment; filename="invoice-${invoice.number}.pdf"`
-        }
-      });
-    } catch (error) {
-      console.error('PDF generation failed, falling back to HTML:', error);
-      // Fall through to HTML generation
-    }
+
+  // Generate and store PDF
+  const result = await getOrGeneratePDF(
+    supabase,
+    invoice,
+    userProfile,
+    template.spec,
+    profile.org_id
+  );
+
+  if (!result.success || !result.url) {
+    return new Response(
+      `PDF generation failed: ${result.error || 'Unknown error'}`,
+      { status: 500 }
+    );
   }
-  
-  // Fallback: Generate HTML (for development or if PDF generation fails)
-  const html = renderInvoiceHTML(invoice, userProfile, template.spec);
-  
-  return new Response(html, {
-    headers: {
-      'Content-Type': 'text/html',
-      'Content-Disposition': `inline; filename="invoice-${invoice.number}.html"`
-    }
-  });
+
+  // Redirect to the stored PDF
+  throw redirect(302, result.url);
 };
