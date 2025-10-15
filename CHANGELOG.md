@@ -9,12 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- Dark mode support across entire application with system preference detection
 - Quick actions dropdown menu on invoice list (duplicate, change status, delete)
 - Edit button for draft invoices
 - Breadcrumb navigation across all sub-pages (invoices, clients)
 - Bell icon "What's New" changelog widget in sidebar
 - Heroicons integration for clean, minimal iconography
-- Automated changelog syncing from CHANGELOG.md to widget
 
 ### Changed
 - Invoice line items now display on single line when creating invoices
