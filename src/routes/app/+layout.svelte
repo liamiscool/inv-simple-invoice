@@ -76,8 +76,7 @@
     { href: '/app', label: 'Dashboard', exact: true },
     { href: '/app/invoices', label: 'Invoices' },
     { href: '/app/clients', label: 'Clients' },
-    { href: '/app/templates', label: 'Templates' },
-    { href: '/app/settings', label: 'Settings' }
+    { href: '/app/templates', label: 'Templates' }
   ];
 </script>
 
@@ -106,7 +105,7 @@
         </div>
 
         <!-- Nav -->
-        <div class="flex-1 overflow-y-auto">
+        <div class="flex-1 overflow-y-auto flex flex-col">
           <nav class="px-3 py-4 space-y-0.5">
             {#each navItems as item}
               <a
@@ -121,6 +120,21 @@
               </a>
             {/each}
           </nav>
+
+          <!-- Spacer -->
+          <div class="flex-1"></div>
+
+          <!-- Feedback Button -->
+          <div class="px-3 pb-4">
+            <a
+              href="mailto:feedback@inv.so"
+              onclick={closeMobileSidebar}
+              class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors rounded"
+            >
+              <Icon src={ChatBubbleLeftRight} class="w-[16px] h-[16px]" />
+              <span>Feedback</span>
+            </a>
+          </div>
         </div>
 
         <!-- Mobile Profile section -->
@@ -208,7 +222,7 @@
     </div>
 
     <!-- Nav -->
-    <div class="flex-1 overflow-y-auto">
+    <div class="flex-1 overflow-y-auto flex flex-col">
       <nav class="px-3 py-4 space-y-0.5">
         {#each navItems as item}
           <a
@@ -222,6 +236,20 @@
           </a>
         {/each}
       </nav>
+
+      <!-- Spacer -->
+      <div class="flex-1"></div>
+
+      <!-- Feedback Button -->
+      <div class="px-3 pb-4">
+        <a
+          href="mailto:feedback@inv.so"
+          class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors rounded"
+        >
+          <Icon src={ChatBubbleLeftRight} class="w-[16px] h-[16px]" />
+          <span>Feedback</span>
+        </a>
+      </div>
     </div>
 
     <!-- Profile section with popup -->
