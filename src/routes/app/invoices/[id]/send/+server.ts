@@ -1,8 +1,13 @@
-import type { RequestHandler } from './$types';
-import { getTemplate } from '$lib/templates';
+import {
+  isEmailServiceConfigured,
+  sendInvoiceEmail,
+} from '$lib/email/service';
 import { generateOptimizedInvoicePDF } from '$lib/pdf/generator';
-import { sendInvoiceEmail, isEmailServiceConfigured } from '$lib/email/service';
+import { getTemplate } from '$lib/templates';
+
 import { json } from '@sveltejs/kit';
+
+import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, params, locals: { supabase, safeGetSession } }) => {
   const { user } = await safeGetSession();
@@ -60,7 +65,7 @@ export const POST: RequestHandler = async ({ request, params, locals: { supabase
       `)
       .eq('id', params.id)
       .eq('org_id', profile.org_id)
-      .single();
+      .maybeSingle();
 
     if (!invoice) {
       return json({ error: 'Invoice not found' }, { status: 404 });

@@ -61,10 +61,10 @@
       }, 0);
 
       // Get client count
-      const { count: clientCount } = await data.supabase
-        .from('client')
-        .select('*', { count: 'exact', head: true })
-        .eq('org_id', orgId);
+    const { count: clientCount } = await data.supabase
+      .from('client')
+      .select('*', { count: 'exact', head: true })
+      .eq('org_id', orgId);
 
       // Get recent invoices
       const { data: invoices } = await data.supabase

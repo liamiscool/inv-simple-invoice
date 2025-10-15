@@ -1,5 +1,9 @@
 import { fail } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types';
+
+import type {
+  Actions,
+  PageServerLoad,
+} from './$types';
 
 export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession } }) => {
   const { user } = await safeGetSession();
@@ -24,7 +28,7 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
     .from('plan_subscription')
     .select('plan, status')
     .eq('org_id', profile?.org_id)
-    .single();
+    .maybeSingle();
 
   // Get custom fields for this org
   let customFields = [];

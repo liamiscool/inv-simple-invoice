@@ -1,6 +1,14 @@
-import { redirect, fail } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types';
 import type { TemplateSpec } from '$lib/templates';
+
+import {
+  fail,
+  redirect,
+} from '@sveltejs/kit';
+
+import type {
+  Actions,
+  PageServerLoad,
+} from './$types';
 
 export const load: PageServerLoad = async ({ url, locals: { supabase, safeGetSession } }) => {
   const { user } = await safeGetSession();
@@ -22,7 +30,7 @@ export const load: PageServerLoad = async ({ url, locals: { supabase, safeGetSes
     .from('template')
     .select('*')
     .eq('id', templateId)
-    .single();
+    .maybeSingle();
 
   if (error || !template) {
     console.error('Failed to load template:', error);

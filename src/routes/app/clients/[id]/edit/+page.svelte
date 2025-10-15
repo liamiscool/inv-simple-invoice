@@ -30,7 +30,19 @@
     error = '';
 
     try {
-      // Update client
+      // Get current user to verify org_id
+      const { data: user } = await data.supabase.auth.getUser();
+      if (!user.user) throw new Error('Not authenticated');
+
+      const { data: profile } = await data.supabase
+        .from('app_user')
+        .select('org_id')
+        .eq('id', user.user.id)
+        .single();
+
+      if (!profile) throw new Error('Profile not found');
+
+      // Update client with org_id check
       const { error: updateError } = await data.supabase
         .from('client')
         .update({
@@ -43,14 +55,19 @@
           tax_id: tax_id || null,
           notes: notes || null
         })
-        .eq('id', data.client.id);
+        .eq('id', data.client.id)
+        .eq('org_id', profile.org_id);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Update error:', updateError);
+        throw updateError;
+      }
 
-      // Redirect to client detail page
-      window.location.href = `/app/clients/${data.client.id}`;
+      // Redirect to clients list page
+      window.location.href = '/app/clients';
 
     } catch (err: any) {
+      console.error('Full error:', err);
       error = err.message || 'Something went wrong. Please try again.';
     } finally {
       isLoading = false;

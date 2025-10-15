@@ -4,15 +4,15 @@
   let { data }: { data: PageData } = $props();
 
   async function deleteClient() {
-    if (!confirm(`Are you sure you want to delete ${data.client.name}? You can add them back later if needed.`)) {
+    if (!confirm(`Are you sure you want to delete ${data.client.name}? This action cannot be undone.`)) {
       return;
     }
 
     try {
-      // Soft delete: set deleted_at timestamp
+      // Hard delete: permanently remove the client
       const { error } = await data.supabase
         .from('client')
-        .update({ deleted_at: new Date().toISOString() })
+        .delete()
         .eq('id', data.client.id);
 
       if (error) throw error;

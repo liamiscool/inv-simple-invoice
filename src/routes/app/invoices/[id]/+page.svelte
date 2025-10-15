@@ -309,12 +309,6 @@
           Duplicate
         </button>
 
-        <a
-          href="/app/invoices/{data.invoice.id}/edit"
-          class="px-3 py-1.5 text-xs text-gray-700 hover:text-black transition-colors"
-        >
-          Edit
-        </a>
       </div>
     </div>
 

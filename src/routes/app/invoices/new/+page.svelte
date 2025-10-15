@@ -5,7 +5,14 @@
   
   let isLoading = $state(false);
   let error = $state('');
-  
+  let showPreview = $state(false);
+
+  // Auto-save state
+  let autoSaveTimeout: ReturnType<typeof setTimeout> | null = null;
+  let isSaving = $state(false);
+  let saveStatus = $state<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  let draftInvoiceId = $state<string | null>(null);
+
   // Form data
   let selectedClientId = $state('');
   let selectedTemplateId = $state('');
@@ -85,47 +92,215 @@
       currency = selectedClient.currency;
     }
   });
-  
-  async function handleSubmit(e: Event) {
-    e.preventDefault();
-    
-    if (!selectedClientId) {
-      error = 'Please select a client';
+
+  // Auto-save when form data changes
+  $effect(() => {
+    // Track these dependencies (Svelte 5 tracks them automatically)
+    selectedClientId;
+    selectedTemplateId;
+    issueDate;
+    dueDate;
+    notes;
+    currency;
+    lineItems;
+
+    // Don't auto-save if no meaningful data yet
+    if (!selectedClientId || !selectedTemplateId || !lineItems[0]?.description) {
       return;
     }
-    
-    if (!selectedTemplateId) {
-      error = 'Please select a template';
-      return;
+
+    // Debounce auto-save (wait 2 seconds after last change)
+    if (autoSaveTimeout) {
+      clearTimeout(autoSaveTimeout);
     }
-    
-    if (lineItems.length === 0 || !lineItems[0].description) {
-      error = 'Please add at least one line item';
-      return;
-    }
-    
-    isLoading = true;
-    error = '';
-    
+
+    autoSaveTimeout = setTimeout(() => {
+      triggerAutoSave();
+    }, 2000);
+
+    // Cleanup function
+    return () => {
+      if (autoSaveTimeout) {
+        clearTimeout(autoSaveTimeout);
+      }
+    };
+  });
+
+  async function triggerAutoSave() {
+    if (isSaving || isLoading) return;
+
     try {
+      isSaving = true;
+      saveStatus = 'saving';
+
       const { data: user } = await data.supabase.auth.getUser();
       if (!user.user) throw new Error('No user found');
-      
+
       // Get user's org_id
       const { data: profile } = await data.supabase
         .from('app_user')
         .select('org_id')
         .eq('id', user.user.id)
         .single();
-        
+
       if (!profile) throw new Error('Profile not found');
-      
+
+      // Calculate totals
+      const currentTotals = totals();
+
+      if (draftInvoiceId) {
+        // Update existing draft
+        const { error: updateError } = await data.supabase
+          .from('invoice')
+          .update({
+            client_id: selectedClientId,
+            template_id: selectedTemplateId,
+            issue_date: issueDate,
+            due_date: dueDate || null,
+            currency: currency,
+            notes: notes || null,
+            subtotal: currentTotals.subtotal,
+            tax_total: currentTotals.taxTotal,
+            total: currentTotals.total,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', draftInvoiceId);
+
+        if (updateError) throw updateError;
+
+        // Delete old line items and insert new ones
+        await data.supabase
+          .from('invoice_item')
+          .delete()
+          .eq('invoice_id', draftInvoiceId);
+
+        const itemsToInsert = lineItems.map((item, index) => ({
+          invoice_id: draftInvoiceId,
+          position: index + 1,
+          description: item.description,
+          qty: item.qty,
+          unit_price: item.unitPrice,
+          tax_rate: item.taxRate / 100,
+          line_total: item.qty * item.unitPrice
+        }));
+
+        await data.supabase
+          .from('invoice_item')
+          .insert(itemsToInsert);
+
+      } else {
+        // Create new draft invoice
+        const { data: nextNumber, error: numberError } = await data.supabase
+          .rpc('next_invoice_number', { p_org_id: profile.org_id });
+
+        if (numberError) throw numberError;
+
+        const { data: invoice, error: invoiceError } = await data.supabase
+          .from('invoice')
+          .insert({
+            org_id: profile.org_id,
+            client_id: selectedClientId,
+            template_id: selectedTemplateId,
+            number: nextNumber,
+            issue_date: issueDate,
+            due_date: dueDate || null,
+            currency: currency,
+            status: 'draft',
+            notes: notes || null,
+            subtotal: currentTotals.subtotal,
+            tax_total: currentTotals.taxTotal,
+            total: currentTotals.total
+          })
+          .select()
+          .single();
+
+        if (invoiceError) throw invoiceError;
+
+        draftInvoiceId = invoice.id;
+
+        // Create line items
+        const itemsToInsert = lineItems.map((item, index) => ({
+          invoice_id: invoice.id,
+          position: index + 1,
+          description: item.description,
+          qty: item.qty,
+          unit_price: item.unitPrice,
+          tax_rate: item.taxRate / 100,
+          line_total: item.qty * item.unitPrice
+        }));
+
+        await data.supabase
+          .from('invoice_item')
+          .insert(itemsToInsert);
+      }
+
+      saveStatus = 'saved';
+      setTimeout(() => {
+        if (saveStatus === 'saved') saveStatus = 'idle';
+      }, 2000);
+
+    } catch (err: any) {
+      console.error('Auto-save failed:', err);
+      saveStatus = 'error';
+    } finally {
+      isSaving = false;
+    }
+  }
+  
+  async function handleSubmit(e: Event) {
+    e.preventDefault();
+
+    if (!selectedClientId) {
+      error = 'Please select a client';
+      return;
+    }
+
+    if (!selectedTemplateId) {
+      error = 'Please select a template';
+      return;
+    }
+
+    if (lineItems.length === 0 || !lineItems[0].description) {
+      error = 'Please add at least one line item';
+      return;
+    }
+
+    isLoading = true;
+    error = '';
+
+    try {
+      // If we have a draft, just trigger one final save and redirect
+      if (draftInvoiceId) {
+        // Ensure latest changes are saved
+        if (autoSaveTimeout) {
+          clearTimeout(autoSaveTimeout);
+          await triggerAutoSave();
+        }
+
+        // Redirect to invoice detail page
+        window.location.href = `/app/invoices/${draftInvoiceId}`;
+        return;
+      }
+
+      // Otherwise, create new invoice (fallback if auto-save didn't trigger)
+      const { data: user } = await data.supabase.auth.getUser();
+      if (!user.user) throw new Error('No user found');
+
+      // Get user's org_id
+      const { data: profile } = await data.supabase
+        .from('app_user')
+        .select('org_id')
+        .eq('id', user.user.id)
+        .single();
+
+      if (!profile) throw new Error('Profile not found');
+
       // Generate invoice number
       const { data: nextNumber, error: numberError } = await data.supabase
         .rpc('next_invoice_number', { p_org_id: profile.org_id });
-        
+
       if (numberError) throw numberError;
-      
+
       // Create invoice
       const { data: invoice, error: invoiceError } = await data.supabase
         .from('invoice')
@@ -145,9 +320,9 @@
         })
         .select()
         .single();
-        
+
       if (invoiceError) throw invoiceError;
-      
+
       // Create line items
       const itemsToInsert = lineItems.map((item, index) => ({
         invoice_id: invoice.id,
@@ -158,16 +333,16 @@
         tax_rate: item.taxRate / 100, // Convert percentage to decimal
         line_total: item.qty * item.unitPrice
       }));
-      
+
       const { error: itemsError } = await data.supabase
         .from('invoice_item')
         .insert(itemsToInsert);
-        
+
       if (itemsError) throw itemsError;
-      
+
       // Redirect to invoice detail page
       window.location.href = `/app/invoices/${invoice.id}`;
-      
+
     } catch (err: any) {
       error = err.message || 'Something went wrong. Please try again.';
     } finally {
@@ -182,11 +357,24 @@
 
 <div class="max-w-3xl space-y-8">
   <!-- Header -->
-  <div>
-    <h1 class="text-base font-medium mb-1">Create Invoice</h1>
-    <p class="text-xs text-gray-500">
-      Create a new invoice for your client
-    </p>
+  <div class="flex items-start justify-between">
+    <div>
+      <h1 class="text-base font-medium mb-1">Create Invoice</h1>
+      <p class="text-xs text-gray-500">
+        Create a new invoice for your client
+      </p>
+    </div>
+
+    <!-- Auto-save indicator -->
+    <div class="flex items-center gap-2">
+      {#if saveStatus === 'saving'}
+        <span class="text-xs text-gray-600">Saving...</span>
+      {:else if saveStatus === 'saved'}
+        <span class="text-xs text-green-600">✓ Saved</span>
+      {:else if saveStatus === 'error'}
+        <span class="text-xs text-red-600">Save failed</span>
+      {/if}
+    </div>
   </div>
 
   {#if data.clients?.length === 0}
@@ -427,13 +615,24 @@
           Cancel
         </a>
 
-        <button
-          type="submit"
-          disabled={isLoading || !selectedClientId || !selectedTemplateId || totals().total <= 0}
-          class="px-6 py-1.5 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isLoading ? 'Creating Invoice...' : 'Create Invoice'}
-        </button>
+        <div class="flex items-center gap-3">
+          <button
+            type="button"
+            onclick={() => showPreview = true}
+            disabled={!selectedClientId || !selectedTemplateId || totals().total <= 0}
+            class="px-4 py-1.5 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Preview
+          </button>
+
+          <button
+            type="submit"
+            disabled={isLoading || !selectedClientId || !selectedTemplateId || totals().total <= 0}
+            class="px-6 py-1.5 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? 'Creating Invoice...' : 'Create Invoice'}
+          </button>
+        </div>
       </div>
 
       {#if error}
@@ -444,3 +643,55 @@
     </form>
   {/if}
 </div>
+
+<!-- Preview Modal -->
+{#if showPreview && selectedClient && selectedTemplate}
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onclick={() => showPreview = false}>
+    <div class="bg-white w-full h-full md:w-[90vw] md:h-[90vh] md:max-w-5xl flex flex-col" onclick={(e) => e.stopPropagation()}>
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <div>
+          <h2 class="text-sm font-medium">Invoice Preview</h2>
+          <p class="text-xs text-gray-500 mt-0.5">
+            {selectedTemplate.title} • {selectedClient.company || selectedClient.name}
+          </p>
+        </div>
+        <button
+          onclick={() => showPreview = false}
+          class="px-3 py-1.5 text-xs text-gray-500 hover:text-black transition-colors"
+        >
+          Close
+        </button>
+      </div>
+
+      <!-- Preview Content -->
+      <div class="flex-1 overflow-auto bg-gray-100 p-6">
+        <div class="max-w-3xl mx-auto bg-white shadow-lg">
+          <iframe
+            src={`/app/invoices/preview?` + new URLSearchParams({
+              template_id: selectedTemplateId,
+              client_id: selectedClientId,
+              issue_date: issueDate,
+              due_date: dueDate || '',
+              currency: currency,
+              notes: notes || '',
+              items: JSON.stringify(lineItems.map((item, index) => ({
+                position: index + 1,
+                description: item.description,
+                qty: item.qty,
+                unit_price: item.unitPrice,
+                tax_rate: item.taxRate / 100,
+                line_total: item.qty * item.unitPrice
+              }))),
+              subtotal: totals().subtotal.toString(),
+              tax_total: totals().taxTotal.toString(),
+              total: totals().total.toString()
+            })}
+            class="w-full h-[800px] border-0"
+            title="Invoice Preview"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+{/if}

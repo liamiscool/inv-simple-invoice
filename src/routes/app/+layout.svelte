@@ -27,7 +27,7 @@
         .from('plan_subscription')
         .select('plan, status')
         .eq('org_id', profile.org_id)
-        .single();
+        .maybeSingle();
 
       if (sub && sub.plan === 'pro' && sub.status === 'active') {
         subscriptionPlan = 'pro';

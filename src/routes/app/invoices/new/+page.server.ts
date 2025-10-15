@@ -1,5 +1,9 @@
+import {
+  ensureCuratedTemplates,
+  getTemplatesForOrg,
+} from '$lib/templates';
+
 import type { PageServerLoad } from './$types';
-import { ensureCuratedTemplates, getTemplatesForOrg } from '$lib/templates';
 
 export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession } }) => {
   const { user } = await safeGetSession();

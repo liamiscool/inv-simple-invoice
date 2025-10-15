@@ -1,3 +1,5 @@
+import { error as svelteError } from '@sveltejs/kit';
+
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ params, parent }) => {
@@ -9,11 +11,13 @@ export const load: PageLoad = async ({ params, parent }) => {
     .eq('id', params.id)
     .single();
 
-  if (error) {
-    throw new Error('Client not found');
+  if (error || !client) {
+    console.error('Client load error:', error);
+    throw svelteError(404, 'Client not found');
   }
 
   return {
+    supabase,
     client
   };
 };

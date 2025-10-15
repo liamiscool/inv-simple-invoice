@@ -37,14 +37,13 @@ export async function getSubscriptionInfo(
       .from('plan_subscription')
       .select('plan, status')
       .eq('org_id', profile.org_id)
-      .single();
+      .maybeSingle();
 
-    // Count active clients (where deleted_at is null)
+    // Count all clients (hard delete means no soft deletion)
     const { count: clientCount } = await supabase
       .from('client')
       .select('*', { count: 'exact', head: true })
-      .eq('org_id', profile.org_id)
-      .is('deleted_at', null);
+      .eq('org_id', profile.org_id);
 
     const plan = subscription?.plan || 'free';
     const activeClientCount = clientCount || 0;

@@ -1,6 +1,14 @@
-import type { Actions, PageServerLoad } from './$types';
-import { ensureCuratedTemplates, getTemplatesForOrg } from '$lib/templates';
+import {
+  ensureCuratedTemplates,
+  getTemplatesForOrg,
+} from '$lib/templates';
+
 import { fail } from '@sveltejs/kit';
+
+import type {
+  Actions,
+  PageServerLoad,
+} from './$types';
 
 export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession } }) => {
   const { user } = await safeGetSession();
@@ -130,7 +138,7 @@ export const actions = {
       .from('template')
       .select('*')
       .eq('id', templateId)
-      .single();
+      .maybeSingle();
 
     if (!template) {
       return fail(404, { error: 'Template not found' });

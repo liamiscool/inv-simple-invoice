@@ -26,20 +26,21 @@
         .from('plan_subscription')
         .select('*')
         .eq('org_id', profile.org_id)
-        .single();
+        .maybeSingle();
 
       // Get client counter
       const { data: counter } = await data.supabase
         .from('client_counter')
         .select('*')
         .eq('org_id', profile.org_id)
-        .single();
+        .maybeSingle();
 
       // Get actual client count
       const { count } = await data.supabase
         .from('client')
         .select('*', { count: 'exact', head: true })
-        .eq('org_id', profile.org_id);
+        .eq('org_id', profile.org_id)
+        .is('deleted_at', null);
 
       subscriptionInfo = {
         org_id: profile.org_id,

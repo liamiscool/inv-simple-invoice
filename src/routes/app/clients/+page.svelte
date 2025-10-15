@@ -15,15 +15,15 @@
   );
   
   async function deleteClient(clientId: string, clientName: string) {
-    if (!confirm(`Are you sure you want to delete ${clientName}? You can add them back later if needed.`)) {
+    if (!confirm(`Are you sure you want to delete ${clientName}? This action cannot be undone.`)) {
       return;
     }
 
     try {
-      // Soft delete: set deleted_at timestamp
+      // Hard delete: permanently remove the client
       const { error } = await data.supabase
         .from('client')
-        .update({ deleted_at: new Date().toISOString() })
+        .delete()
         .eq('id', clientId);
 
       if (error) throw error;

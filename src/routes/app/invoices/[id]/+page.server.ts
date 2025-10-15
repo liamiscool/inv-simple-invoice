@@ -52,7 +52,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, safeGet
     `)
     .eq('id', params.id)
     .eq('org_id', profile.org_id)
-    .single();
+    .maybeSingle();
   
   if (!invoice) {
     return {

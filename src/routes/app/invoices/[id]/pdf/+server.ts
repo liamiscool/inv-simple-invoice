@@ -1,8 +1,12 @@
-import type { RequestHandler } from './$types';
-import { getTemplate } from '$lib/templates';
-import { renderInvoiceHTML } from '$lib/pdf/renderer';
-import { generateOptimizedInvoicePDF, testPDFGeneration } from '$lib/pdf/generator';
 import { dev } from '$app/environment';
+import {
+  generateOptimizedInvoicePDF,
+  testPDFGeneration,
+} from '$lib/pdf/generator';
+import { renderInvoiceHTML } from '$lib/pdf/renderer';
+import { getTemplate } from '$lib/templates';
+
+import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params, locals: { supabase, safeGetSession } }) => {
   const { user } = await safeGetSession();
@@ -45,7 +49,7 @@ export const GET: RequestHandler = async ({ params, locals: { supabase, safeGetS
     `)
     .eq('id', params.id)
     .eq('org_id', profile.org_id)
-    .single();
+    .maybeSingle();
   
   if (!invoice) {
     return new Response('Invoice not found', { status: 404 });

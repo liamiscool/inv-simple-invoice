@@ -66,7 +66,7 @@
           currency,
           legal_name: legal_name || null,
           tax_id: tax_id || null,
-          notes: notes || null
+          notes: notes || null,
         });
 
       if (insertError) throw insertError;

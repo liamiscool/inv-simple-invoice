@@ -1,9 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+
 import minimalTemplate from './minimal.json';
 import modernTemplate from './modern.json';
-import elegantTemplate from './elegant.json';
-import boldTemplate from './bold.json';
-import techTemplate from './tech.json';
 
 export interface AreaSpec {
   x: number;
@@ -118,24 +116,6 @@ export const CURATED_TEMPLATES: Array<Omit<Template, 'id' | 'created_at'>> = [
     title: 'Modern',
     kind: 'curated',
     spec: modernTemplate as TemplateSpec
-  },
-  {
-    org_id: undefined,
-    title: 'Elegant',
-    kind: 'curated',
-    spec: elegantTemplate as TemplateSpec
-  },
-  {
-    org_id: undefined,
-    title: 'Bold',
-    kind: 'curated',
-    spec: boldTemplate as TemplateSpec
-  },
-  {
-    org_id: undefined,
-    title: 'Tech',
-    kind: 'curated',
-    spec: techTemplate as TemplateSpec
   }
 ];
 
@@ -147,7 +127,7 @@ export async function ensureCuratedTemplates(supabase: SupabaseClient) {
     // Check which curated templates already exist
     const { data: existingTemplates, error: fetchError } = await supabase
       .from('template')
-      .select('title')
+      .select('id, title')
       .eq('kind', 'curated')
       .is('org_id', null);
 
@@ -157,6 +137,27 @@ export async function ensureCuratedTemplates(supabase: SupabaseClient) {
     }
 
     const existingTitles = new Set(existingTemplates?.map(t => t.title) || []);
+    const validTitles = new Set(CURATED_TEMPLATES.map(t => t.title));
+    
+    // Remove unwanted curated templates (Bold, Elegant, Tech)
+    const templatesToDelete = existingTemplates?.filter(t => !validTitles.has(t.title)) || [];
+    if (templatesToDelete.length > 0) {
+      console.log(`Attempting to delete ${templatesToDelete.length} unwanted templates: ${templatesToDelete.map(t => t.title).join(', ')}`);
+      
+      // Try to delete each template individually to see which ones fail
+      for (const template of templatesToDelete) {
+        const { error: deleteError } = await supabase
+          .from('template')
+          .delete()
+          .eq('id', template.id);
+
+        if (deleteError) {
+          console.error(`Error deleting template ${template.title}:`, deleteError);
+        } else {
+          console.log(`Successfully deleted template: ${template.title}`);
+        }
+      }
+    }
     
     // Insert missing curated templates
     const templatesToInsert = CURATED_TEMPLATES
@@ -215,7 +216,7 @@ export async function getTemplate(supabase: SupabaseClient, templateId: string):
     .from('template')
     .select('*')
     .eq('id', templateId)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error fetching template:', error);

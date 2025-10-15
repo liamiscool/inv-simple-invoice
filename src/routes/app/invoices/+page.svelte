@@ -216,12 +216,6 @@
               </td>
               <td class="px-4 py-3">
                 <div class="flex items-center gap-3">
-                  <a
-                    href="/app/invoices/{invoice.id}/edit"
-                    class="text-xs text-gray-500 hover:text-black transition-colors"
-                  >
-                    Edit
-                  </a>
                   <button
                     onclick={() => duplicateInvoice(invoice.id)}
                     class="text-xs text-gray-500 hover:text-black transition-colors"

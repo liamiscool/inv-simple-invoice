@@ -1,6 +1,14 @@
-import { redirect, fail } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types';
 import type { TemplateSpec } from '$lib/templates';
+
+import {
+  fail,
+  redirect,
+} from '@sveltejs/kit';
+
+import type {
+  Actions,
+  PageServerLoad,
+} from './$types';
 
 export const load: PageServerLoad = async ({ params, locals: { supabase, safeGetSession } }) => {
   // User is already authenticated by /app layout
@@ -14,7 +22,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, safeGet
     .from('template')
     .select('*')
     .eq('id', params.id)
-    .single();
+    .maybeSingle();
 
   if (error || !template) {
     redirect(303, '/app/templates');
