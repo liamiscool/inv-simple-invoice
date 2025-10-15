@@ -364,9 +364,12 @@
   <div class="flex items-start justify-between">
     <div>
       <h1 class="text-lg font-medium mb-1">Create Invoice</h1>
-      <p class="text-sm text-gray-500">
-        Create a new invoice for your client
-      </p>
+      <!-- Breadcrumbs -->
+      <div class="flex items-center gap-2 text-xs">
+        <a href="/app/invoices" class="text-gray-400 hover:text-black transition-colors">Invoices</a>
+        <span class="text-gray-400">/</span>
+        <span class="text-gray-600">New</span>
+      </div>
     </div>
 
     <!-- Auto-save indicator -->
@@ -506,10 +509,11 @@
           </button>
         </div>
 
-        <div class="space-y-3">
+        <div class="space-y-6">
           {#each lineItems as item, index}
-            <div class="grid grid-cols-12 gap-3 items-end">
-              <div class="col-span-12 md:col-span-5">
+            <div class="border border-gray-200 p-4 space-y-4 md:border-0 md:p-0 md:space-y-0">
+              <!-- Description - Full width always -->
+              <div class="md:mb-3">
                 <label class="block text-sm text-gray-500 mb-1.5">Description</label>
                 <input
                   type="text"
@@ -520,52 +524,106 @@
                 />
               </div>
 
-              <div class="col-span-3 md:col-span-2">
-                <label class="block text-sm text-gray-500 mb-1.5">Qty</label>
-                <input
-                  type="number"
-                  bind:value={item.qty}
-                  min="0"
-                  step="0.01"
-                  class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
-                  required
-                />
+              <!-- Desktop: Horizontal layout -->
+              <div class="hidden md:grid md:grid-cols-12 md:gap-3 md:items-end">
+                <div class="md:col-span-2">
+                  <label class="block text-sm text-gray-500 mb-1.5">Qty</label>
+                  <input
+                    type="number"
+                    bind:value={item.qty}
+                    min="0"
+                    step="0.01"
+                    class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                    required
+                  />
+                </div>
+
+                <div class="md:col-span-3">
+                  <label class="block text-sm text-gray-500 mb-1.5">Unit Price</label>
+                  <input
+                    type="number"
+                    bind:value={item.unitPrice}
+                    min="0"
+                    step="0.01"
+                    class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                    required
+                  />
+                </div>
+
+                <div class="md:col-span-2">
+                  <label class="block text-sm text-gray-500 mb-1.5">Tax %</label>
+                  <input
+                    type="number"
+                    bind:value={item.taxRate}
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                  />
+                </div>
+
+                <div class="md:col-span-2">
+                  {#if lineItems.length > 1}
+                    <button
+                      type="button"
+                      onclick={() => removeLineItem(index)}
+                      class="w-full px-2 py-2.5 text-sm text-gray-500 hover:text-red-600 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  {/if}
+                </div>
               </div>
 
-              <div class="col-span-4 md:col-span-2">
-                <label class="block text-sm text-gray-500 mb-1.5">Unit Price</label>
-                <input
-                  type="number"
-                  bind:value={item.unitPrice}
-                  min="0"
-                  step="0.01"
-                  class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
-                  required
-                />
-              </div>
+              <!-- Mobile: 2-column grid -->
+              <div class="grid grid-cols-2 gap-3 md:hidden">
+                <div>
+                  <label class="block text-sm text-gray-500 mb-1.5">Qty</label>
+                  <input
+                    type="number"
+                    bind:value={item.qty}
+                    min="0"
+                    step="0.01"
+                    class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                    required
+                  />
+                </div>
 
-              <div class="col-span-3 md:col-span-2">
-                <label class="block text-sm text-gray-500 mb-1.5">Tax %</label>
-                <input
-                  type="number"
-                  bind:value={item.taxRate}
-                  min="0"
-                  max="100"
-                  step="0.1"
-                  class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
-                />
-              </div>
+                <div>
+                  <label class="block text-sm text-gray-500 mb-1.5">Unit Price</label>
+                  <input
+                    type="number"
+                    bind:value={item.unitPrice}
+                    min="0"
+                    step="0.01"
+                    class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                    required
+                  />
+                </div>
 
-              <div class="col-span-2 md:col-span-1">
-                {#if lineItems.length > 1}
-                  <button
-                    type="button"
-                    onclick={() => removeLineItem(index)}
-                    class="w-full px-2 py-2.5 text-sm text-gray-500 hover:text-red-600 transition-colors"
-                  >
-                    Remove
-                  </button>
-                {/if}
+                <div>
+                  <label class="block text-sm text-gray-500 mb-1.5">Tax %</label>
+                  <input
+                    type="number"
+                    bind:value={item.taxRate}
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                  />
+                </div>
+
+                <div class="flex items-end">
+                  {#if lineItems.length > 1}
+                    <button
+                      type="button"
+                      onclick={() => removeLineItem(index)}
+                      class="w-full px-4 py-2.5 text-sm text-gray-600 hover:text-red-600 border border-gray-300 hover:border-red-300 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  {/if}
+                </div>
               </div>
             </div>
           {/each}

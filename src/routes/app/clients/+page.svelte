@@ -45,14 +45,14 @@
   <!-- Header -->
   <div class="flex items-center justify-between">
     <div>
-      <h1 class="text-base font-medium mb-1">Clients</h1>
-      <p class="text-xs text-gray-500">
+      <h1 class="text-lg font-medium mb-1">Clients</h1>
+      <p class="text-sm text-gray-500">
         {data.clients?.length || 0} total
       </p>
     </div>
     <a
       href="/app/clients/new"
-      class="px-4 py-1.5 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75"
+      class="px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75"
     >
       Add Client
     </a>
@@ -64,7 +64,7 @@
       type="text"
       bind:value={searchQuery}
       placeholder="Search clients..."
-      class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
+      class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
     />
   </div>
 
@@ -72,13 +72,13 @@
     <!-- Empty state -->
     <div class="py-16 text-center">
       <div class="space-y-4">
-        <h2 class="text-sm font-medium">No clients yet</h2>
-        <p class="text-xs text-gray-500 max-w-sm mx-auto">
+        <h2 class="text-base font-medium">No clients yet</h2>
+        <p class="text-sm text-gray-500 max-w-sm mx-auto">
           Add your first client to start creating and sending invoices
         </p>
         <a
           href="/app/clients/new"
-          class="inline-flex items-center px-4 py-1.5 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75"
+          class="inline-flex items-center px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75"
         >
           Add Your First Client
         </a>
@@ -87,66 +87,66 @@
   {:else if filteredClients.length === 0}
     <!-- No search results -->
     <div class="py-12 text-center">
-      <p class="text-xs text-gray-500">
+      <p class="text-sm text-gray-500">
         No clients match your search for "{searchQuery}"
       </p>
     </div>
   {:else}
-    <!-- Clients table -->
-    <div class="border-t border-b border-gray-200">
+    <!-- Desktop: Clients table -->
+    <div class="hidden md:block border-t border-b border-gray-200">
       <table class="w-full">
         <thead class="border-b border-gray-200">
           <tr>
-            <th class="text-left text-xs text-gray-500 px-4 py-3 font-medium">Name</th>
-            <th class="text-left text-xs text-gray-500 px-4 py-3 font-medium">Company</th>
-            <th class="text-left text-xs text-gray-500 px-4 py-3 font-medium">Email</th>
-            <th class="text-left text-xs text-gray-500 px-4 py-3 font-medium">Currency</th>
-            <th class="text-left text-xs text-gray-500 px-4 py-3 font-medium">Added</th>
+            <th class="text-left text-sm text-gray-500 px-4 py-4 font-medium">Name</th>
+            <th class="text-left text-sm text-gray-500 px-4 py-4 font-medium">Company</th>
+            <th class="text-left text-sm text-gray-500 px-4 py-4 font-medium">Email</th>
+            <th class="text-left text-sm text-gray-500 px-4 py-4 font-medium">Currency</th>
+            <th class="text-left text-sm text-gray-500 px-4 py-4 font-medium">Added</th>
             <th class="w-16"></th>
           </tr>
         </thead>
         <tbody>
           {#each filteredClients as client, i}
             <tr class="border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50">
-              <td class="px-4 py-3">
+              <td class="px-4 py-4">
                 <a
                   href="/app/clients/{client.id}"
-                  class="text-xs hover:text-black transition-colors font-medium"
+                  class="text-sm hover:text-black transition-colors font-medium"
                 >
                   {client.name}
                 </a>
               </td>
-              <td class="px-4 py-3">
-                <span class="text-xs text-gray-600">
+              <td class="px-4 py-4">
+                <span class="text-sm text-gray-600">
                   {client.company || '—'}
                 </span>
               </td>
-              <td class="px-4 py-3">
-                <span class="text-xs text-gray-600">
+              <td class="px-4 py-4">
+                <span class="text-sm text-gray-600">
                   {client.email || '—'}
                 </span>
               </td>
-              <td class="px-4 py-3">
-                <span class="text-xs text-gray-500">
+              <td class="px-4 py-4">
+                <span class="text-sm text-gray-500">
                   {client.currency || 'EUR'}
                 </span>
               </td>
-              <td class="px-4 py-3">
-                <span class="text-xs text-gray-500">
+              <td class="px-4 py-4">
+                <span class="text-sm text-gray-500">
                   {new Date(client.created_at || '').toLocaleDateString()}
                 </span>
               </td>
-              <td class="px-4 py-3">
+              <td class="px-4 py-4">
                 <div class="flex items-center gap-3">
                   <a
                     href="/app/clients/{client.id}/edit"
-                    class="text-xs text-gray-500 hover:text-black transition-colors"
+                    class="text-sm text-gray-500 hover:text-black transition-colors"
                   >
                     Edit
                   </a>
                   <button
                     onclick={() => deleteClient(client.id, client.name)}
-                    class="text-xs text-gray-500 hover:text-red-600 transition-colors"
+                    class="text-sm text-gray-500 hover:text-red-600 transition-colors"
                   >
                     Delete
                   </button>
@@ -158,9 +158,52 @@
       </table>
     </div>
 
+    <!-- Mobile: Clients cards -->
+    <div class="block md:hidden space-y-3">
+      {#each filteredClients as client}
+        <div class="border border-gray-200 p-4 hover:bg-gray-50/50 transition-colors">
+          <a href="/app/clients/{client.id}" class="block">
+            <!-- Name -->
+            <div class="text-sm font-medium hover:text-black transition-colors mb-2">
+              {client.name}
+            </div>
+
+            <!-- Details -->
+            <div class="space-y-1 text-sm mb-3">
+              {#if client.company}
+                <div class="text-gray-600">{client.company}</div>
+              {/if}
+              {#if client.email}
+                <div class="text-gray-600">{client.email}</div>
+              {/if}
+              <div class="text-gray-500">
+                {client.currency || 'EUR'} • Added {new Date(client.created_at || '').toLocaleDateString()}
+              </div>
+            </div>
+          </a>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-3 pt-3 border-t border-gray-100">
+            <a
+              href="/app/clients/{client.id}/edit"
+              class="text-sm text-gray-500 hover:text-black transition-colors"
+            >
+              Edit
+            </a>
+            <button
+              onclick={() => deleteClient(client.id, client.name)}
+              class="text-sm text-gray-500 hover:text-red-600 transition-colors"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      {/each}
+    </div>
+
     <!-- Summary -->
     <div class="text-center">
-      <p class="text-xs text-gray-500">
+      <p class="text-sm text-gray-500">
         Showing {filteredClients.length} of {data.clients?.length || 0} clients
       </p>
     </div>

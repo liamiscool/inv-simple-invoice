@@ -33,21 +33,24 @@
   <!-- Header -->
   <div class="flex items-center justify-between">
     <div>
-      <h1 class="text-base font-medium mb-1">{data.client.name}</h1>
-      <p class="text-xs text-gray-500">
-        Client Details
-      </p>
+      <h1 class="text-lg font-medium mb-1">{data.client.name}</h1>
+      <!-- Breadcrumbs -->
+      <div class="flex items-center gap-2 text-xs">
+        <a href="/app/clients" class="text-gray-400 hover:text-black transition-colors">Clients</a>
+        <span class="text-gray-400">/</span>
+        <span class="text-gray-600">{data.client.name}</span>
+      </div>
     </div>
     <div class="flex items-center gap-3">
       <a
         href="/app/clients/{data.client.id}/edit"
-        class="px-4 py-1.5 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75"
+        class="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm hover:bg-gray-50 transition-colors duration-75"
       >
         Edit
       </a>
       <button
         onclick={deleteClient}
-        class="px-4 py-1.5 border border-red-300 text-red-600 text-xs hover:bg-red-50 transition-colors duration-75"
+        class="px-5 py-2.5 border border-red-300 text-red-600 text-sm hover:bg-red-50 transition-colors duration-75"
       >
         Delete
       </button>
@@ -58,24 +61,24 @@
   <div class="border-t border-b border-gray-200 py-6">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
       <div class="space-y-5">
-        <h2 class="text-sm font-medium pb-2 border-b border-gray-200">Basic Information</h2>
+        <h2 class="text-base font-medium pb-2 border-b border-gray-200">Basic Information</h2>
 
         <div>
-          <dt class="text-xs text-gray-500 mb-1">Name</dt>
-          <dd class="text-sm">{data.client.name}</dd>
+          <dt class="text-sm text-gray-500 mb-1">Name</dt>
+          <dd class="text-base">{data.client.name}</dd>
         </div>
 
         {#if data.client.company}
           <div>
-            <dt class="text-xs text-gray-500 mb-1">Company</dt>
-            <dd class="text-sm">{data.client.company}</dd>
+            <dt class="text-sm text-gray-500 mb-1">Company</dt>
+            <dd class="text-base">{data.client.company}</dd>
           </div>
         {/if}
 
         {#if data.client.email}
           <div>
-            <dt class="text-xs text-gray-500 mb-1">Email</dt>
-            <dd class="text-sm">
+            <dt class="text-sm text-gray-500 mb-1">Email</dt>
+            <dd class="text-base">
               <a href="mailto:{data.client.email}" class="hover:text-black transition-colors">
                 {data.client.email}
               </a>
@@ -84,67 +87,58 @@
         {/if}
 
         <div>
-          <dt class="text-xs text-gray-500 mb-1">Currency</dt>
-          <dd class="text-sm">{data.client.currency || 'EUR'}</dd>
+          <dt class="text-sm text-gray-500 mb-1">Currency</dt>
+          <dd class="text-base">{data.client.currency || 'EUR'}</dd>
         </div>
       </div>
 
       <div class="space-y-5">
-        <h2 class="text-sm font-medium pb-2 border-b border-gray-200">Legal Information</h2>
+        <h2 class="text-base font-medium pb-2 border-b border-gray-200">Legal Information</h2>
 
         {#if data.client.legal_name}
           <div>
-            <dt class="text-xs text-gray-500 mb-1">Legal Name</dt>
-            <dd class="text-sm">{data.client.legal_name}</dd>
+            <dt class="text-sm text-gray-500 mb-1">Legal Name</dt>
+            <dd class="text-base">{data.client.legal_name}</dd>
           </div>
         {:else}
           <div>
-            <dt class="text-xs text-gray-500 mb-1">Legal Name</dt>
-            <dd class="text-xs text-gray-400">Not provided</dd>
+            <dt class="text-sm text-gray-500 mb-1">Legal Name</dt>
+            <dd class="text-sm text-gray-400">Not provided</dd>
           </div>
         {/if}
 
         {#if data.client.company_address}
           <div>
-            <dt class="text-xs text-gray-500 mb-1">Company Address</dt>
-            <dd class="text-sm whitespace-pre-wrap">{data.client.company_address}</dd>
+            <dt class="text-sm text-gray-500 mb-1">Company Address</dt>
+            <dd class="text-base whitespace-pre-wrap">{data.client.company_address}</dd>
           </div>
         {:else}
           <div>
-            <dt class="text-xs text-gray-500 mb-1">Company Address</dt>
-            <dd class="text-xs text-gray-400">Not provided</dd>
+            <dt class="text-sm text-gray-500 mb-1">Company Address</dt>
+            <dd class="text-sm text-gray-400">Not provided</dd>
           </div>
         {/if}
 
         {#if data.client.tax_id}
           <div>
-            <dt class="text-xs text-gray-500 mb-1">Tax ID</dt>
-            <dd class="text-sm">{data.client.tax_id}</dd>
+            <dt class="text-sm text-gray-500 mb-1">Tax ID</dt>
+            <dd class="text-base">{data.client.tax_id}</dd>
           </div>
         {:else}
           <div>
-            <dt class="text-xs text-gray-500 mb-1">Tax ID</dt>
-            <dd class="text-xs text-gray-400">Not provided</dd>
+            <dt class="text-sm text-gray-500 mb-1">Tax ID</dt>
+            <dd class="text-sm text-gray-400">Not provided</dd>
           </div>
         {/if}
 
         {#if data.client.notes}
           <div>
-            <dt class="text-xs text-gray-500 mb-1">Notes</dt>
-            <dd class="text-sm whitespace-pre-wrap">{data.client.notes}</dd>
+            <dt class="text-sm text-gray-500 mb-1">Notes</dt>
+            <dd class="text-base whitespace-pre-wrap">{data.client.notes}</dd>
           </div>
         {/if}
       </div>
     </div>
   </div>
 
-  <!-- Back Button -->
-  <div>
-    <a
-      href="/app/clients"
-      class="inline-flex items-center text-xs text-gray-500 hover:text-black transition-colors"
-    >
-      ← Back to Clients
-    </a>
-  </div>
 </div>

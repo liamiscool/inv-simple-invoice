@@ -287,9 +287,12 @@
             {statusLabels[data.invoice.status as keyof typeof statusLabels]}
           </span>
         </div>
-        <p class="text-sm text-gray-500">
-          Created {formatDate(data.invoice.created_at)}
-        </p>
+        <!-- Breadcrumbs -->
+        <div class="flex items-center gap-2 text-xs">
+          <a href="/app/invoices" class="text-gray-400 hover:text-black transition-colors">Invoices</a>
+          <span class="text-gray-400">/</span>
+          <span class="text-gray-600">{data.invoice.number}</span>
+        </div>
       </div>
 
       <div class="flex items-center gap-2">
@@ -388,10 +391,11 @@
     </div>
     
     <!-- Line Items -->
-    <div class="border border-thin rounded-sm p-6">
+    <div class="border border-thin rounded-sm p-4 md:p-6">
       <h2 class="text-base mb-4 font-medium">Items</h2>
 
-      <div class="overflow-x-auto">
+      <!-- Desktop: Table -->
+      <div class="hidden md:block overflow-x-auto">
         <table class="w-full">
           <thead class="border-b border-thin">
             <tr class="text-left">
@@ -415,10 +419,35 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Mobile: Stacked List -->
+      <div class="block md:hidden space-y-4">
+        {#each data.invoice.items as item}
+          <div class="border-b border-thin last:border-0 pb-4 last:pb-0">
+            <!-- Description -->
+            <div class="text-sm font-medium mb-2">{item.description}</div>
+
+            <!-- Details Grid -->
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <div class="text-gray-500">Quantity:</div>
+              <div class="text-right">{item.qty}</div>
+
+              <div class="text-gray-500">Unit Price:</div>
+              <div class="text-right">{formatCurrency(item.unit_price, data.invoice.currency)}</div>
+
+              <div class="text-gray-500">Tax:</div>
+              <div class="text-right">{(item.tax_rate * 100).toFixed(1)}%</div>
+
+              <div class="text-gray-500 font-medium">Total:</div>
+              <div class="text-right font-medium">{formatCurrency(item.line_total + (item.line_total * item.tax_rate), data.invoice.currency)}</div>
+            </div>
+          </div>
+        {/each}
+      </div>
     </div>
     
     <!-- Totals -->
-    <div class="border border-thin rounded-sm p-6">
+    <div class="border border-thin rounded-sm p-4 md:p-6">
       <h2 class="text-base mb-4 font-medium">Summary</h2>
 
       <div class="max-w-sm ml-auto space-y-2">
@@ -484,41 +513,32 @@
     {/if}
     
     <!-- Actions -->
-    <div class="flex items-center justify-between pt-4 border-t border-thin">
-      <a
-        href="/app/invoices"
-        class="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm hover:bg-gray-50 transition-colors duration-75"
+    <div class="flex items-center justify-end gap-3 pt-4 border-t border-thin">
+      <button
+        onclick={handleDownloadPDF}
+        disabled={pdfLoading}
+        class="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm hover:bg-gray-50 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
       >
-        ← Back to Invoices
-      </a>
-
-      <div class="flex items-center gap-3">
-        <button
-          onclick={handleDownloadPDF}
-          disabled={pdfLoading}
-          class="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm hover:bg-gray-50 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-        >
-          {#if pdfLoading}
-            <svg class="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Generating PDF...
-          {:else}
-            Download PDF
-          {/if}
-        </button>
-
-        {#if ['draft', 'sent'].includes(data.invoice.status)}
-          <button
-            onclick={openEmailModal}
-            disabled={isLoading}
-            class="px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75 font-medium disabled:opacity-50"
-          >
-            Send Invoice to Client
-          </button>
+        {#if pdfLoading}
+          <svg class="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Generating PDF...
+        {:else}
+          Download PDF
         {/if}
-      </div>
+      </button>
+
+      {#if ['draft', 'sent'].includes(data.invoice.status)}
+        <button
+          onclick={openEmailModal}
+          disabled={isLoading}
+          class="px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75 font-medium disabled:opacity-50"
+        >
+          Send Invoice to Client
+        </button>
+      {/if}
     </div>
     
     <!-- Messages -->

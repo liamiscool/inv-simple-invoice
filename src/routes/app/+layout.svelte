@@ -59,10 +59,10 @@
   <!-- Mobile header -->
   <div class="md:hidden border-b border-thin px-4 py-3">
     <div class="flex items-center justify-between">
-      <a href="/app" class="text-base tracking-tight">inv</a>
-      <button 
+      <a href="/app" class="text-lg tracking-tight font-medium">inv</a>
+      <button
         onclick={() => showMobileSidebar = !showMobileSidebar}
-        class="text-xs hover:text-black transition-colors"
+        class="text-sm hover:text-black transition-colors"
       >
         Menu
       </button>
@@ -73,17 +73,17 @@
   {#if showMobileSidebar}
     <div class="md:hidden fixed inset-0 z-50">
       <div class="fixed inset-0 bg-black/20" onclick={closeMobileSidebar}></div>
-      <div class="fixed left-0 top-0 h-full w-48 bg-white border-r border-thin">
+      <div class="fixed left-0 top-0 h-full w-56 bg-white border-r border-thin">
         <div class="py-6 px-4">
-          <a href="/app" class="text-base tracking-tight block mb-6">inv</a>
+          <a href="/app" class="text-lg tracking-tight font-medium block mb-6">inv</a>
           <nav class="space-y-3">
             {#each navItems as item}
               <a
                 href={item.href}
                 onclick={closeMobileSidebar}
-                class="block text-xs hover:text-black transition-colors {
+                class="block text-sm hover:text-black transition-colors {
                   (item.exact ? $page.url.pathname === item.href : $page.url.pathname.startsWith(item.href))
-                    ? 'text-black' : 'text-gray-600'
+                    ? 'text-black font-medium' : 'text-gray-600'
                 }"
               >
                 {item.label}
@@ -94,19 +94,19 @@
             {#if subscriptionPlan === 'free'}
               <button
                 onclick={() => { showUpgradeModal = true; closeMobileSidebar(); }}
-                class="block w-full px-3 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors font-medium mt-4"
+                class="block w-full px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors font-medium mt-4"
               >
                 Upgrade to Pro
               </button>
             {:else}
-              <div class="mt-4 px-3 py-2 bg-black text-white text-xs text-center">
+              <div class="mt-4 px-5 py-2.5 bg-black text-white text-sm text-center font-medium">
                 Pro Plan
               </div>
             {/if}
 
             <button
               onclick={handleLogout}
-              class="block text-xs text-gray-600 hover:text-black transition-colors mt-6 pt-3 border-t border-thin"
+              class="block text-sm text-gray-600 hover:text-black transition-colors mt-6 pt-3 border-t border-thin"
             >
               Sign out
             </button>
@@ -117,16 +117,16 @@
   {/if}
   
   <!-- Desktop sidebar -->
-  <div class="hidden md:fixed md:left-0 md:top-0 md:h-full md:w-48 md:border-r md:border-thin md:bg-white md:flex md:flex-col">
+  <div class="hidden md:fixed md:left-0 md:top-0 md:h-full md:w-56 md:border-r md:border-thin md:bg-white md:flex md:flex-col">
     <div class="py-8 px-6 flex-1 flex flex-col">
       <!-- Logo and Nav -->
       <div class="flex-shrink-0">
-        <a href="/app" class="text-base tracking-tight block mb-8 font-medium">inv</a>
+        <a href="/app" class="text-lg tracking-tight block mb-8 font-medium">inv</a>
         <nav class="space-y-1">
           {#each navItems as item}
             <a
               href={item.href}
-              class="block text-xs hover:text-black transition-colors py-1.5 {
+              class="block text-sm hover:text-black transition-colors py-2 {
                 (item.exact ? $page.url.pathname === item.href : $page.url.pathname.startsWith(item.href))
                   ? 'text-black font-medium' : 'text-gray-500'
               }"
@@ -144,20 +144,20 @@
       <div class="flex-shrink-0">
         {#if subscriptionPlan === 'free'}
           <div class="bg-gradient-to-br from-gray-900 to-black p-4 mb-4 text-white">
-            <div class="text-xs font-medium mb-2">Upgrade to Pro</div>
-            <div class="text-xs text-gray-300 mb-3 leading-relaxed">
+            <div class="text-sm font-medium mb-2">Upgrade to Pro</div>
+            <div class="text-sm text-gray-300 mb-3 leading-relaxed">
               Unlimited invoices, custom templates, and priority support
             </div>
             <button
               onclick={() => showUpgradeModal = true}
-              class="w-full px-3 py-1.5 bg-white text-black text-xs hover:bg-gray-100 transition-colors duration-75 font-medium"
+              class="w-full px-5 py-2.5 bg-white text-black text-sm hover:bg-gray-100 transition-colors duration-75 font-medium"
             >
               Upgrade Now
             </button>
           </div>
         {:else}
           <div class="pb-4 mb-4 border-b border-thin">
-            <div class="text-xs font-medium text-green-600">
+            <div class="text-sm font-medium text-green-600">
               ✓ Pro Plan Active
             </div>
           </div>
@@ -165,12 +165,12 @@
 
         <!-- User section -->
         <div class="pb-4">
-          <div class="text-xs text-gray-500 mb-2 truncate">
+          <div class="text-sm text-gray-500 mb-2 truncate">
             {data.session?.user?.email?.split('@')[0] || 'User'}
           </div>
           <button
             onclick={handleLogout}
-            class="text-xs text-gray-500 hover:text-black transition-colors"
+            class="text-sm text-gray-500 hover:text-black transition-colors"
           >
             Sign out
           </button>
@@ -180,8 +180,8 @@
   </div>
   
   <!-- Main content -->
-  <main class="md:ml-48">
-    <div class="p-6">
+  <main class="md:ml-56">
+    <div class="p-4 md:p-6">
       {@render children?.()}
     </div>
   </main>
