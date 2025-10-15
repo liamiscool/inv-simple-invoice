@@ -110,5 +110,7 @@ The "What's New" widget in the app reads from `src/lib/generated/changelog.json`
 
 ## Example Workflow
 
+**Remember**: Always focus on user-visible changes that improve their experience with inv.
+
 ```
 User: /changelog
