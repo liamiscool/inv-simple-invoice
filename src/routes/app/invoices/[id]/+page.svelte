@@ -6,6 +6,7 @@
   let isLoading = $state(false);
   let message = $state('');
   let error = $state('');
+  let pdfLoading = $state(false);
   
   // Email modal state
   let showEmailModal = $state(false);
@@ -188,16 +189,16 @@
   
   async function sendInvoiceEmail(e: Event) {
     e.preventDefault();
-    
+
     if (!emailForm.to) {
       emailError = 'Recipient email is required';
       return;
     }
-    
+
     emailLoading = true;
     emailError = '';
     emailSuccess = '';
-    
+
     try {
       const response = await fetch(`/app/invoices/${data.invoice.id}/send`, {
         method: 'POST',
@@ -211,26 +212,47 @@
           include_pdf: emailForm.includePdf
         })
       });
-      
+
       const result = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(result.error || 'Failed to send email');
       }
-      
+
       emailSuccess = 'Invoice sent successfully!';
-      
+
       // Close modal after a delay
       setTimeout(() => {
         closeEmailModal();
         // Refresh page to show updated status
         window.location.reload();
       }, 2000);
-      
+
     } catch (err: any) {
       emailError = err.message || 'Failed to send invoice';
     } finally {
       emailLoading = false;
+    }
+  }
+
+  async function handleDownloadPDF(e: Event) {
+    e.preventDefault();
+
+    pdfLoading = true;
+
+    try {
+      // Open PDF in new tab (will redirect to stored PDF or generate it)
+      const pdfUrl = `/app/invoices/${data.invoice.id}/pdf`;
+      const newWindow = window.open(pdfUrl, '_blank');
+
+      // Give it a moment to start loading, then reset the button
+      setTimeout(() => {
+        pdfLoading = false;
+      }, 1000);
+
+    } catch (err) {
+      pdfLoading = false;
+      error = 'Failed to open PDF';
     }
   }
 </script>
@@ -482,13 +504,21 @@
           Delete Invoice
         </button>
         
-        <a
-          href="/app/invoices/{data.invoice.id}/pdf"
-          target="_blank"
-          class="px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium"
+        <button
+          onclick={handleDownloadPDF}
+          disabled={pdfLoading}
+          class="px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
-          Download PDF
-        </a>
+          {#if pdfLoading}
+            <svg class="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Generating PDF...
+          {:else}
+            Download PDF
+          {/if}
+        </button>
       </div>
     </div>
     
