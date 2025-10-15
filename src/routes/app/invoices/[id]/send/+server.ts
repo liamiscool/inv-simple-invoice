@@ -9,6 +9,8 @@ import { json } from '@sveltejs/kit';
 
 import type { RequestHandler } from './$types';
 
+// Cache bust: Force Cloudflare rebuild - 2025-10-15
+
 export const POST: RequestHandler = async ({ request, params, locals: { supabase, safeGetSession } }) => {
   const { user } = await safeGetSession();
   
