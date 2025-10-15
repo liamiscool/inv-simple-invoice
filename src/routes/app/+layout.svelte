@@ -4,7 +4,7 @@
   import { onMount } from 'svelte';
   import { STRIPE_MONTHLY_LINK, STRIPE_YEARLY_LINK } from '$lib/config/stripe';
   import UpgradeModal from '$lib/components/UpgradeModal.svelte';
-  import Icon from '@steeze-ui/svelte-icon';
+  import { Icon } from '@steeze-ui/svelte-icon';
   import { Cog6Tooth, Star, ChatBubbleLeftRight, ArrowRightOnRectangle } from '@steeze-ui/heroicons';
 
   let { data, children }: { data: LayoutData; children: any } = $props();
