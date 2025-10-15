@@ -127,14 +127,15 @@
           <div class="flex-1"></div>
 
           <!-- What's New Button -->
-          <div class="px-3 pb-2 relative">
-            <button
-              onclick={() => showChangelogWidget = !showChangelogWidget}
-              class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors rounded w-full"
-            >
+          <div
+            class="px-3 pb-2 relative"
+            onmouseenter={() => showChangelogWidget = true}
+            onmouseleave={() => showChangelogWidget = false}
+          >
+            <div class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors rounded cursor-pointer">
               <Icon src={Bell} class="w-[16px] h-[16px]" />
               <span>What's New</span>
-            </button>
+            </div>
 
             {#if showChangelogWidget}
               <ChangelogWidget onClose={() => showChangelogWidget = false} />
@@ -258,14 +259,15 @@
       <div class="flex-1"></div>
 
       <!-- What's New Button -->
-      <div class="px-3 pb-2 relative">
-        <button
-          onclick={() => showChangelogWidget = !showChangelogWidget}
-          class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors rounded w-full"
-        >
+      <div
+        class="px-3 pb-2 relative"
+        onmouseenter={() => showChangelogWidget = true}
+        onmouseleave={() => showChangelogWidget = false}
+      >
+        <div class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors rounded cursor-pointer">
           <Icon src={Bell} class="w-[16px] h-[16px]" />
           <span>What's New</span>
-        </button>
+        </div>
 
         {#if showChangelogWidget}
           <ChangelogWidget onClose={() => showChangelogWidget = false} />

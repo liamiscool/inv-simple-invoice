@@ -33,11 +33,8 @@
   }
 </script>
 
-<!-- Backdrop -->
-<div class="fixed inset-0 bg-black/20 z-40" onclick={onClose}></div>
-
 <!-- Dropdown -->
-<div class="fixed left-[280px] bottom-[120px] w-[480px] bg-white border border-gray-200 shadow-xl max-h-[600px] overflow-y-auto z-50">
+<div class="absolute left-full ml-4 bottom-0 w-[480px] bg-white border border-gray-200 shadow-lg max-h-[600px] overflow-y-auto">
   <!-- Header -->
   <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
     <div class="text-base font-medium">What's New</div>
@@ -45,7 +42,7 @@
       onclick={onClose}
       class="text-gray-500 hover:text-black transition-colors text-sm"
     >
-      Close
+      ✕
     </button>
   </div>
 
@@ -64,46 +61,46 @@
         No updates yet
       </div>
     {:else}
-      <div class="space-y-8">
+      <div class="space-y-6">
         {#each changelogEntries as entry}
-          <div class="border-l-2 border-black pl-6">
+          <div class="pb-6 border-b border-gray-100 last:border-0">
             <!-- Version & Date -->
-            <div class="flex items-baseline gap-3 mb-3">
+            <div class="flex items-baseline gap-3 mb-4">
               {#if entry.version}
-                <div class="text-base font-medium">{entry.version}</div>
+                <div class="text-base font-medium text-black">v{entry.version}</div>
               {/if}
-              <div class="text-sm text-gray-500">{formatDate(entry.date)}</div>
+              <div class="text-sm text-gray-400">{formatDate(entry.date)}</div>
             </div>
 
             <!-- Changes -->
             {#if entry.added && entry.added.length > 0}
-              <div class="mb-3">
-                <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Added</div>
-                <ul class="text-sm space-y-1.5">
+              <div class="mb-4">
+                <div class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Added</div>
+                <ul class="space-y-2">
                   {#each entry.added as item}
-                    <li class="text-gray-700">• {item}</li>
+                    <li class="text-sm text-gray-900 leading-relaxed">• {item}</li>
                   {/each}
                 </ul>
               </div>
             {/if}
 
             {#if entry.changed && entry.changed.length > 0}
-              <div class="mb-3">
-                <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Changed</div>
-                <ul class="text-sm space-y-1.5">
+              <div class="mb-4">
+                <div class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Changed</div>
+                <ul class="space-y-2">
                   {#each entry.changed as item}
-                    <li class="text-gray-700">• {item}</li>
+                    <li class="text-sm text-gray-900 leading-relaxed">• {item}</li>
                   {/each}
                 </ul>
               </div>
             {/if}
 
             {#if entry.fixed && entry.fixed.length > 0}
-              <div class="mb-3">
-                <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Fixed</div>
-                <ul class="text-sm space-y-1.5">
+              <div class="mb-4">
+                <div class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Fixed</div>
+                <ul class="space-y-2">
                   {#each entry.fixed as item}
-                    <li class="text-gray-700">• {item}</li>
+                    <li class="text-sm text-gray-900 leading-relaxed">• {item}</li>
                   {/each}
                 </ul>
               </div>
