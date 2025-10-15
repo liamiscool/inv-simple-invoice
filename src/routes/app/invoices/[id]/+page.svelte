@@ -301,6 +301,15 @@
       </div>
 
       <div class="flex items-center gap-2">
+        {#if data.invoice.status === 'draft'}
+          <a
+            href="/app/invoices/{data.invoice.id}/edit"
+            class="px-4 py-2 text-sm border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            Edit
+          </a>
+        {/if}
+
         <button
           onclick={duplicateInvoice}
           disabled={isLoading}
