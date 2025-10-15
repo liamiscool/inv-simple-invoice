@@ -511,21 +511,20 @@
 
         <div class="space-y-6">
           {#each lineItems as item, index}
-            <div class="border border-gray-200 p-4 space-y-4 md:border-0 md:p-0 md:space-y-0">
-              <!-- Description - Full width always -->
-              <div class="md:mb-3">
-                <label class="block text-sm text-gray-500 mb-1.5">Description</label>
-                <input
-                  type="text"
-                  bind:value={item.description}
-                  placeholder="Description of work or product"
-                  class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
-                  required
-                />
-              </div>
-
-              <!-- Desktop: Horizontal layout -->
+            <div class="border border-gray-200 p-4 space-y-4 md:border-0 md:p-0">
+              <!-- Desktop: Single line with all fields -->
               <div class="hidden md:grid md:grid-cols-12 md:gap-3 md:items-end">
+                <div class="md:col-span-4">
+                  <label class="block text-sm text-gray-500 mb-1.5">Description</label>
+                  <input
+                    type="text"
+                    bind:value={item.description}
+                    placeholder="Description"
+                    class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                    required
+                  />
+                </div>
+
                 <div class="md:col-span-2">
                   <label class="block text-sm text-gray-500 mb-1.5">Qty</label>
                   <input
@@ -538,7 +537,7 @@
                   />
                 </div>
 
-                <div class="md:col-span-3">
+                <div class="md:col-span-2">
                   <label class="block text-sm text-gray-500 mb-1.5">Unit Price</label>
                   <input
                     type="number"
@@ -575,54 +574,68 @@
                 </div>
               </div>
 
-              <!-- Mobile: 2-column grid -->
-              <div class="grid grid-cols-2 gap-3 md:hidden">
+              <!-- Mobile: Stacked layout with description first -->
+              <div class="md:hidden space-y-3">
                 <div>
-                  <label class="block text-sm text-gray-500 mb-1.5">Qty</label>
+                  <label class="block text-sm text-gray-500 mb-1.5">Description</label>
                   <input
-                    type="number"
-                    bind:value={item.qty}
-                    min="0"
-                    step="0.01"
+                    type="text"
+                    bind:value={item.description}
+                    placeholder="Description of work or product"
                     class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
                     required
                   />
                 </div>
 
-                <div>
-                  <label class="block text-sm text-gray-500 mb-1.5">Unit Price</label>
-                  <input
-                    type="number"
-                    bind:value={item.unitPrice}
-                    min="0"
-                    step="0.01"
-                    class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
-                    required
-                  />
-                </div>
+                <!-- Mobile: 2-column grid for qty/price/tax -->
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-sm text-gray-500 mb-1.5">Qty</label>
+                    <input
+                      type="number"
+                      bind:value={item.qty}
+                      min="0"
+                      step="0.01"
+                      class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                      required
+                    />
+                  </div>
 
-                <div>
-                  <label class="block text-sm text-gray-500 mb-1.5">Tax %</label>
-                  <input
-                    type="number"
-                    bind:value={item.taxRate}
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
-                  />
-                </div>
+                  <div>
+                    <label class="block text-sm text-gray-500 mb-1.5">Unit Price</label>
+                    <input
+                      type="number"
+                      bind:value={item.unitPrice}
+                      min="0"
+                      step="0.01"
+                      class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                      required
+                    />
+                  </div>
 
-                <div class="flex items-end">
-                  {#if lineItems.length > 1}
-                    <button
-                      type="button"
-                      onclick={() => removeLineItem(index)}
-                      class="w-full px-4 py-2.5 text-sm text-gray-600 hover:text-red-600 border border-gray-300 hover:border-red-300 transition-colors"
-                    >
-                      Remove
-                    </button>
-                  {/if}
+                  <div>
+                    <label class="block text-sm text-gray-500 mb-1.5">Tax %</label>
+                    <input
+                      type="number"
+                      bind:value={item.taxRate}
+                      min="0"
+                      max="100"
+                      step="0.1"
+                      class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                    />
+                  </div>
+
+                  <div class="flex items-end">
+                    {#if lineItems.length > 1}
+                      <button
+                        type="button"
+                        onclick={() => removeLineItem(index)}
+                        class="w-full px-4 py-2.5 text-sm text-gray-600 hover:text-red-600 border border-gray-300 hover:border-red-300 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    {/if}
+                  </div>
                 </div>
               </div>
             </div>
