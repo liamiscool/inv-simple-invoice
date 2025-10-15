@@ -282,7 +282,7 @@
     </div>
   </div>
 {:else}
-  <div class="max-w-6xl space-y-8">
+  <div class="max-w-3xl space-y-12">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
@@ -396,39 +396,41 @@
     </div>
     
     <!-- Line Items -->
-    <div class="border border-thin rounded-sm p-4 md:p-6">
-      <h2 class="text-base mb-4 font-medium">Items</h2>
+    <div class="space-y-4">
+      <h2 class="text-base font-medium">Items</h2>
 
       <!-- Desktop: Table -->
-      <div class="hidden md:block overflow-x-auto">
-        <table class="w-full">
-          <thead class="border-b border-thin">
-            <tr class="text-left">
-              <th class="text-sm text-gray-600 pb-2 font-normal">Description</th>
-              <th class="text-sm text-gray-600 pb-2 font-normal text-right">Qty</th>
-              <th class="text-sm text-gray-600 pb-2 font-normal text-right">Unit Price</th>
-              <th class="text-sm text-gray-600 pb-2 font-normal text-right">Tax</th>
-              <th class="text-sm text-gray-600 pb-2 font-normal text-right">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each data.invoice.items as item}
-              <tr class="border-b border-thin last:border-0">
-                <td class="py-3 text-sm">{item.description}</td>
-                <td class="py-3 text-sm text-right">{item.qty}</td>
-                <td class="py-3 text-sm text-right">{formatCurrency(item.unit_price, data.invoice.currency)}</td>
-                <td class="py-3 text-sm text-right">{(item.tax_rate * 100).toFixed(1)}%</td>
-                <td class="py-3 text-sm text-right">{formatCurrency(item.line_total + (item.line_total * item.tax_rate), data.invoice.currency)}</td>
+      <div class="hidden md:block">
+        <div class="border-t border-b border-gray-200 py-4">
+          <table class="w-full">
+            <thead>
+              <tr class="text-left">
+                <th class="text-sm text-gray-500 pb-3 font-medium">Description</th>
+                <th class="text-sm text-gray-500 pb-3 font-medium text-right">Qty</th>
+                <th class="text-sm text-gray-500 pb-3 font-medium text-right">Unit Price</th>
+                <th class="text-sm text-gray-500 pb-3 font-medium text-right">Tax</th>
+                <th class="text-sm text-gray-500 pb-3 font-medium text-right">Total</th>
               </tr>
-            {/each}
-          </tbody>
-        </table>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              {#each data.invoice.items as item}
+                <tr>
+                  <td class="py-3 text-sm">{item.description}</td>
+                  <td class="py-3 text-sm text-right">{item.qty}</td>
+                  <td class="py-3 text-sm text-right">{formatCurrency(item.unit_price, data.invoice.currency)}</td>
+                  <td class="py-3 text-sm text-right">{(item.tax_rate * 100).toFixed(1)}%</td>
+                  <td class="py-3 text-sm text-right">{formatCurrency(item.line_total + (item.line_total * item.tax_rate), data.invoice.currency)}</td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- Mobile: Stacked List -->
-      <div class="block md:hidden space-y-4">
+      <div class="block md:hidden border-t border-b border-gray-200 divide-y divide-gray-100">
         {#each data.invoice.items as item}
-          <div class="border-b border-thin last:border-0 pb-4 last:pb-0">
+          <div class="py-4">
             <!-- Description -->
             <div class="text-sm font-medium mb-2">{item.description}</div>
 
@@ -452,10 +454,10 @@
     </div>
     
     <!-- Totals -->
-    <div class="border border-thin rounded-sm p-4 md:p-6">
-      <h2 class="text-base mb-4 font-medium">Summary</h2>
+    <div class="bg-gray-50 border border-gray-200 p-6">
+      <h2 class="text-base mb-6 font-medium">Summary</h2>
 
-      <div class="max-w-sm ml-auto space-y-2">
+      <div class="max-w-sm ml-auto space-y-3">
         <div class="flex justify-between text-sm">
           <span class="text-gray-600">Subtotal:</span>
           <span>{formatCurrency(data.invoice.subtotal, data.invoice.currency)}</span>
@@ -464,7 +466,7 @@
           <span class="text-gray-600">Tax:</span>
           <span>{formatCurrency(data.invoice.tax_total, data.invoice.currency)}</span>
         </div>
-        <div class="border-t border-thin pt-2">
+        <div class="border-t border-gray-300 pt-3 mt-3">
           <div class="flex justify-between text-base font-medium">
             <span>Total:</span>
             <span>{formatCurrency(data.invoice.total, data.invoice.currency)}</span>
@@ -472,12 +474,12 @@
         </div>
 
         {#if data.invoice.amount_paid > 0}
-          <div class="border-t border-thin pt-2">
+          <div class="border-t border-gray-300 pt-3 mt-3">
             <div class="flex justify-between text-sm">
               <span class="text-gray-600">Amount Paid:</span>
               <span>{formatCurrency(data.invoice.amount_paid, data.invoice.currency)}</span>
             </div>
-            <div class="flex justify-between text-sm font-medium">
+            <div class="flex justify-between text-sm font-medium mt-2">
               <span>Amount Due:</span>
               <span>{formatCurrency(data.invoice.total - data.invoice.amount_paid, data.invoice.currency)}</span>
             </div>
@@ -488,24 +490,24 @@
     
     <!-- Notes -->
     {#if data.invoice.notes}
-      <div class="border border-thin rounded-sm p-6">
-        <h2 class="text-base mb-2 font-medium">Notes</h2>
-        <p class="text-sm text-gray-600 whitespace-pre-wrap">{data.invoice.notes}</p>
+      <div class="space-y-3">
+        <h2 class="text-base font-medium">Notes</h2>
+        <p class="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">{data.invoice.notes}</p>
       </div>
     {/if}
 
     <!-- Payments (if any) -->
     {#if data.invoice.payments && data.invoice.payments.length > 0}
-      <div class="border border-thin rounded-sm p-6">
-        <h2 class="text-base mb-4 font-medium">Payment History</h2>
+      <div class="space-y-4">
+        <h2 class="text-base font-medium">Payment History</h2>
 
-        <div class="space-y-2">
+        <div class="border-t border-b border-gray-200 divide-y divide-gray-100">
           {#each data.invoice.payments as payment}
-            <div class="flex justify-between items-center py-2 border-b border-thin last:border-0">
+            <div class="flex justify-between items-center py-4">
               <div>
-                <div class="text-sm">{formatDate(payment.date)}</div>
+                <div class="text-sm font-medium">{formatDate(payment.date)}</div>
                 {#if payment.notes}
-                  <div class="text-sm text-gray-600">{payment.notes}</div>
+                  <div class="text-sm text-gray-500 mt-1">{payment.notes}</div>
                 {/if}
               </div>
               <div class="text-sm font-medium">
@@ -516,9 +518,9 @@
         </div>
       </div>
     {/if}
-    
+
     <!-- Actions -->
-    <div class="flex items-center justify-end gap-3 pt-4 border-t border-thin">
+    <div class="flex items-center justify-end gap-3 pt-8">
       <button
         onclick={handleDownloadPDF}
         disabled={pdfLoading}

@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Sidebar width increased from 192px to 224px for better readability
 - Invoice PDFs can now be viewed by anyone with the link (no account required)
 - "What's New" widget now displays properly when hovering
+- Cleaner invoice detail page with more whitespace and fewer boxes
 
 ### Fixed
 - Mobile sidebar closing div tag error
