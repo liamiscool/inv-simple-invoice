@@ -43,21 +43,54 @@ You are helping update the CHANGELOG.md file for **inv** (simple invoicing softw
 ## Your Task
 
 1. **Read current CHANGELOG.md** and show the `[Unreleased]` section
-2. **Review recent commits** using `git log --oneline -10`
+2. **Review recent commits** using `git log --oneline -6`
 3. **Identify user-facing changes** (skip internal refactors)
 4. **Write plain English descriptions** (1 sentence each)
 5. **Update CHANGELOG.md** under the `## [Unreleased]` section
 6. **Keep entries brief and relevant** to end users
+7. **Maintain list size**: Keep only the 6 most recent user-facing entries per section (Added/Changed/Fixed)
+8. **Remove oldest entries** when adding new ones to keep changelog focused
 
 ## Process
 
 When I run this command, you should:
 
 1. Show me the current [Unreleased] section from CHANGELOG.md
-2. Show me the last 10 commits
+2. Show me the last 6 commits
 3. Ask me which changes should be added to the changelog
 4. Suggest user-friendly wording for each change
-5. Update CHANGELOG.md with my approval
+5. When adding new entries, remove the oldest ones to maintain ~6 entries per section
+6. Update CHANGELOG.md with my approval
+
+## Managing Changelog Size
+
+**Goal**: Keep [Unreleased] section focused on recent changes only (~6 entries per section)
+
+**When adding new entries:**
+- If a section (Added/Changed/Fixed) has more than 6 entries, remove the oldest ones
+- Prioritize recent, high-impact changes
+- Older changes get archived when you create a new release version
+
+**Example:**
+```markdown
+### Added (currently 6 entries)
+- New feature from today
+- Feature from yesterday
+- Feature from 3 days ago
+- Feature from 4 days ago
+- Feature from 5 days ago
+- Feature from 1 week ago
+
+# After adding new feature:
+### Added (still 6 entries)
+- **NEW: Latest feature** ← added
+- New feature from today
+- Feature from yesterday
+- Feature from 3 days ago
+- Feature from 4 days ago
+- Feature from 5 days ago
+- ~~Feature from 1 week ago~~ ← removed (oldest)
+```
 
 ## Example Workflow
 
