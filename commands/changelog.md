@@ -61,6 +61,8 @@ When I run this command, you should:
 4. Suggest user-friendly wording for each change
 5. When adding new entries, remove the oldest ones to maintain ~6 entries per section
 6. Update CHANGELOG.md with my approval
+7. **IMPORTANT**: Regenerate changelog.json by running `npx tsx scripts/parse-changelog.ts`
+8. Commit both CHANGELOG.md and the regenerated changelog.json
 
 ## Managing Changelog Size
 
@@ -91,6 +93,20 @@ When I run this command, you should:
 - Feature from 5 days ago
 - ~~Feature from 1 week ago~~ ← removed (oldest)
 ```
+
+## Why Regenerate changelog.json?
+
+The "What's New" widget in the app reads from `src/lib/generated/changelog.json`, NOT directly from CHANGELOG.md.
+
+**The flow is:**
+1. CHANGELOG.md (source of truth) ← we edit this
+2. `scripts/parse-changelog.ts` parses CHANGELOG.md
+3. Generates `src/lib/generated/changelog.json` ← widget reads this
+4. Widget displays the changes to users
+
+**Without regenerating:** Users will see old changelog entries in the widget, even though CHANGELOG.md is updated.
+
+**After regenerating:** Users see the latest changes immediately.
 
 ## Example Workflow
 
