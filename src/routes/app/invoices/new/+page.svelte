@@ -127,6 +127,7 @@
   });
 
   async function triggerAutoSave() {
+    // Skip if already saving, loading, or about to submit
     if (isSaving || isLoading) return;
 
     try {
@@ -250,6 +251,9 @@
   async function handleSubmit(e: Event) {
     e.preventDefault();
 
+    // Prevent double submission
+    if (isLoading) return;
+
     if (!selectedClientId) {
       error = 'Please select a client';
       return;
@@ -269,20 +273,20 @@
     error = '';
 
     try {
-      // If we have a draft, just trigger one final save and redirect
+      // If we have a draft, just redirect (auto-save has been keeping it updated)
       if (draftInvoiceId) {
-        // Ensure latest changes are saved
+        // Clear any pending auto-save timeout
         if (autoSaveTimeout) {
           clearTimeout(autoSaveTimeout);
-          await triggerAutoSave();
         }
 
-        // Redirect to invoice detail page
+        // Redirect to invoice detail page immediately
+        // Auto-save has already kept the draft up-to-date
         window.location.href = `/app/invoices/${draftInvoiceId}`;
-        return;
+        return; // IMPORTANT: Exit here to prevent creating duplicate
       }
 
-      // Otherwise, create new invoice (fallback if auto-save didn't trigger)
+      // Otherwise, create new invoice (only if no draft exists)
       const { data: user } = await data.supabase.auth.getUser();
       if (!user.user) throw new Error('No user found');
 
@@ -359,8 +363,8 @@
   <!-- Header -->
   <div class="flex items-start justify-between">
     <div>
-      <h1 class="text-base font-medium mb-1">Create Invoice</h1>
-      <p class="text-xs text-gray-500">
+      <h1 class="text-lg font-medium mb-1">Create Invoice</h1>
+      <p class="text-sm text-gray-500">
         Create a new invoice for your client
       </p>
     </div>
@@ -368,11 +372,11 @@
     <!-- Auto-save indicator -->
     <div class="flex items-center gap-2">
       {#if saveStatus === 'saving'}
-        <span class="text-xs text-gray-600">Saving...</span>
+        <span class="text-sm text-gray-600">Saving...</span>
       {:else if saveStatus === 'saved'}
-        <span class="text-xs text-green-600">✓ Saved</span>
+        <span class="text-sm text-green-600">✓ Saved</span>
       {:else if saveStatus === 'error'}
-        <span class="text-xs text-red-600">Save failed</span>
+        <span class="text-sm text-red-600">Save failed</span>
       {/if}
     </div>
   </div>
@@ -381,13 +385,13 @@
     <!-- No clients state -->
     <div class="py-16 text-center">
       <div class="space-y-4">
-        <h2 class="text-sm font-medium">No clients available</h2>
-        <p class="text-xs text-gray-500 max-w-sm mx-auto">
+        <h2 class="text-base font-medium">No clients available</h2>
+        <p class="text-sm text-gray-500 max-w-sm mx-auto">
           You need to add at least one client before creating an invoice
         </p>
         <a
           href="/app/clients/new"
-          class="inline-flex items-center px-4 py-1.5 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75"
+          class="inline-flex items-center px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75"
         >
           Add Your First Client
         </a>
@@ -397,17 +401,17 @@
     <form onsubmit={handleSubmit} class="space-y-8">
       <!-- Client and Basic Info -->
       <div class="space-y-5">
-        <h2 class="text-sm font-medium pb-2 border-b border-gray-200">Basic Information</h2>
-        
+        <h2 class="text-base font-medium pb-2 border-b border-gray-200">Basic Information</h2>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <label for="client" class="block text-xs text-gray-500 mb-1.5">
+            <label for="client" class="block text-sm text-gray-500 mb-1.5">
               Client <span class="text-red-600">*</span>
             </label>
             <select
               id="client"
               bind:value={selectedClientId}
-              class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
+              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
               required
             >
               <option value="">Select a client</option>
@@ -420,13 +424,13 @@
           </div>
 
           <div>
-            <label for="template" class="block text-xs text-gray-500 mb-1.5">
+            <label for="template" class="block text-sm text-gray-500 mb-1.5">
               Template <span class="text-red-600">*</span>
             </label>
             <select
               id="template"
               bind:value={selectedTemplateId}
-              class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
+              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
               required
             >
               <option value="">Select a template</option>
@@ -441,11 +445,11 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <label for="currency" class="block text-xs text-gray-500 mb-1.5">Currency</label>
+            <label for="currency" class="block text-sm text-gray-500 mb-1.5">Currency</label>
             <select
               id="currency"
               bind:value={currency}
-              class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
+              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
             >
               {#each currencies as curr}
                 <option value={curr.code}>{curr.name}</option>
@@ -455,8 +459,8 @@
 
           {#if selectedTemplate}
             <div>
-              <label class="block text-xs text-gray-500 mb-1.5">Template Preview</label>
-              <div class="px-3 py-1.5 text-xs border border-gray-300 bg-gray-50 text-gray-500">
+              <label class="block text-sm text-gray-500 mb-1.5">Template Preview</label>
+              <div class="px-4 py-2.5 text-sm border border-gray-300 bg-gray-50 text-gray-500">
                 {selectedTemplate.title}
               </div>
             </div>
@@ -465,25 +469,25 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <label for="issueDate" class="block text-xs text-gray-500 mb-1.5">
+            <label for="issueDate" class="block text-sm text-gray-500 mb-1.5">
               Issue Date <span class="text-red-600">*</span>
             </label>
             <input
               id="issueDate"
               type="date"
               bind:value={issueDate}
-              class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
+              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
               required
             />
           </div>
 
           <div>
-            <label for="dueDate" class="block text-xs text-gray-500 mb-1.5">Due Date</label>
+            <label for="dueDate" class="block text-sm text-gray-500 mb-1.5">Due Date</label>
             <input
               id="dueDate"
               type="date"
               bind:value={dueDate}
-              class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
+              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
             />
           </div>
         </div>
@@ -492,63 +496,63 @@
       <!-- Line Items -->
       <div class="space-y-5">
         <div class="flex items-center justify-between pb-2 border-b border-gray-200">
-          <h2 class="text-sm font-medium">Line Items</h2>
+          <h2 class="text-base font-medium">Line Items</h2>
           <button
             type="button"
             onclick={addLineItem}
-            class="px-3 py-1 text-xs text-gray-500 hover:text-black transition-colors"
+            class="px-5 py-2.5 text-sm text-gray-500 hover:text-black transition-colors"
           >
             Add Item
           </button>
         </div>
-        
+
         <div class="space-y-3">
           {#each lineItems as item, index}
             <div class="grid grid-cols-12 gap-3 items-end">
               <div class="col-span-12 md:col-span-5">
-                <label class="block text-xs text-gray-500 mb-1.5">Description</label>
+                <label class="block text-sm text-gray-500 mb-1.5">Description</label>
                 <input
                   type="text"
                   bind:value={item.description}
                   placeholder="Description of work or product"
-                  class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                  class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
                   required
                 />
               </div>
 
               <div class="col-span-3 md:col-span-2">
-                <label class="block text-xs text-gray-500 mb-1.5">Qty</label>
+                <label class="block text-sm text-gray-500 mb-1.5">Qty</label>
                 <input
                   type="number"
                   bind:value={item.qty}
                   min="0"
                   step="0.01"
-                  class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                  class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
                   required
                 />
               </div>
 
               <div class="col-span-4 md:col-span-2">
-                <label class="block text-xs text-gray-500 mb-1.5">Unit Price</label>
+                <label class="block text-sm text-gray-500 mb-1.5">Unit Price</label>
                 <input
                   type="number"
                   bind:value={item.unitPrice}
                   min="0"
                   step="0.01"
-                  class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                  class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
                   required
                 />
               </div>
 
               <div class="col-span-3 md:col-span-2">
-                <label class="block text-xs text-gray-500 mb-1.5">Tax %</label>
+                <label class="block text-sm text-gray-500 mb-1.5">Tax %</label>
                 <input
                   type="number"
                   bind:value={item.taxRate}
                   min="0"
                   max="100"
                   step="0.1"
-                  class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors"
+                  class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors"
                 />
               </div>
 
@@ -557,7 +561,7 @@
                   <button
                     type="button"
                     onclick={() => removeLineItem(index)}
-                    class="w-full px-2 py-1.5 text-xs text-gray-500 hover:text-red-600 transition-colors"
+                    class="w-full px-2 py-2.5 text-sm text-gray-500 hover:text-red-600 transition-colors"
                   >
                     Remove
                   </button>
@@ -570,19 +574,19 @@
 
       <!-- Totals -->
       <div class="space-y-5">
-        <h2 class="text-sm font-medium pb-2 border-b border-gray-200">Summary</h2>
+        <h2 class="text-base font-medium pb-2 border-b border-gray-200">Summary</h2>
 
         <div class="max-w-sm ml-auto space-y-2">
-          <div class="flex justify-between text-xs">
+          <div class="flex justify-between text-sm">
             <span class="text-gray-500">Subtotal:</span>
             <span class="font-medium">{formatCurrency(totals().subtotal)}</span>
           </div>
-          <div class="flex justify-between text-xs">
+          <div class="flex justify-between text-sm">
             <span class="text-gray-500">Tax:</span>
             <span class="font-medium">{formatCurrency(totals().taxTotal)}</span>
           </div>
           <div class="border-t border-gray-200 pt-2">
-            <div class="flex justify-between text-sm font-medium">
+            <div class="flex justify-between text-base font-medium">
               <span>Total:</span>
               <span>{formatCurrency(totals().total)}</span>
             </div>
@@ -592,16 +596,16 @@
 
       <!-- Notes -->
       <div class="space-y-5">
-        <h2 class="text-sm font-medium pb-2 border-b border-gray-200">Additional Information</h2>
+        <h2 class="text-base font-medium pb-2 border-b border-gray-200">Additional Information</h2>
 
         <div>
-          <label for="notes" class="block text-xs text-gray-500 mb-1.5">Notes</label>
+          <label for="notes" class="block text-sm text-gray-500 mb-1.5">Notes</label>
           <textarea
             id="notes"
             bind:value={notes}
             placeholder="Additional notes or payment terms..."
             rows="3"
-            class="w-full px-3 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-black transition-colors resize-none"
+            class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors resize-none"
           ></textarea>
         </div>
       </div>
@@ -610,7 +614,7 @@
       <div class="flex items-center justify-between pt-4">
         <a
           href="/app/invoices"
-          class="px-4 py-1.5 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75"
+          class="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm hover:bg-gray-50 transition-colors duration-75"
         >
           Cancel
         </a>
@@ -620,7 +624,7 @@
             type="button"
             onclick={() => showPreview = true}
             disabled={!selectedClientId || !selectedTemplateId || totals().total <= 0}
-            class="px-4 py-1.5 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm hover:bg-gray-50 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Preview
           </button>
@@ -628,7 +632,7 @@
           <button
             type="submit"
             disabled={isLoading || !selectedClientId || !selectedTemplateId || totals().total <= 0}
-            class="px-6 py-1.5 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Creating Invoice...' : 'Create Invoice'}
           </button>
@@ -637,7 +641,7 @@
 
       {#if error}
         <div class="text-center">
-          <p class="text-xs text-red-600">{error}</p>
+          <p class="text-sm text-red-600">{error}</p>
         </div>
       {/if}
     </form>
