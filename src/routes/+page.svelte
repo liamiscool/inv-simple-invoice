@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   export let data;
 
   let invoicesSent = 2847;
@@ -13,18 +13,43 @@
   }
 
   onMount(() => {
+    console.log('Homepage mounted - initializing P5JS');
     // Load P5JS and our custom scripts
     loadScripts();
+
+    return () => {
+      // Cleanup on unmount
+      console.log('Homepage unmounting - cleaning up P5JS');
+      if (window.p5Instance) {
+        window.p5Instance.remove();
+        window.p5Instance = null;
+        console.log('P5JS instance removed');
+      }
+    };
   });
 
   function loadScripts() {
-    // Check if P5JS is already loaded
+    // Check if P5JS is already loaded and scripts are ready
+    if (window.p5 && typeof setup === 'function') {
+      console.log('P5JS and scripts already loaded - reinitializing instance');
+      // Scripts are already loaded, just create a new instance
+      if (window.p5Instance) {
+        window.p5Instance.remove();
+      }
+      window.p5Instance = new p5();
+      console.log('New P5JS instance created');
+      return;
+    }
+
+    // Check if just P5JS library is loaded
     if (window.p5) {
+      console.log('P5JS loaded, loading custom scripts');
       loadCustomScripts();
       return;
     }
-    
+
     // Load P5JS first (using the same version as OpenProcessing)
+    console.log('Loading P5JS library from CDN');
     const p5Script = document.createElement('script');
     p5Script.src = 'https://cdn.jsdelivr.net/npm/p5@1.11.7/lib/p5.js';
     p5Script.onload = () => {
