@@ -206,8 +206,8 @@
 
         if (updateError) throw updateError;
 
-        // Upsert line items (only save items with descriptions)
-        const itemsToUpsert = lineItems
+        // Update line items (only save items with descriptions)
+        const itemsToSave = lineItems
           .filter(item => item.description && item.description.trim())
           .map((item: any, index: number) => ({
             invoice_id: draftInvoiceId,
@@ -219,29 +219,28 @@
             line_total: (item.qty || 0) * (item.unitPrice || 0)
           }));
 
-        // Upsert all current items
-        if (itemsToUpsert.length > 0) {
-          const { error: upsertError } = await data.supabase
-            .from('invoice_item')
-            .upsert(itemsToUpsert, {
-              onConflict: 'invoice_id,position'
-            });
-
-          if (upsertError) {
-            console.error('Upsert error:', upsertError);
-            throw upsertError;
-          }
-        }
-
-        // Delete items beyond current count (if user removed items)
+        // Delete all old items and insert new ones in a transaction-like manner
+        // Note: Supabase doesn't support transactions, but we do delete+insert quickly
         const { error: deleteError } = await data.supabase
           .from('invoice_item')
           .delete()
-          .eq('invoice_id', draftInvoiceId)
-          .gt('position', itemsToUpsert.length);
+          .eq('invoice_id', draftInvoiceId);
 
         if (deleteError) {
-          console.error('Delete old items error:', deleteError);
+          console.error('Delete error:', deleteError);
+          throw deleteError;
+        }
+
+        // Insert all current items
+        if (itemsToSave.length > 0) {
+          const { error: insertError } = await data.supabase
+            .from('invoice_item')
+            .insert(itemsToSave);
+
+          if (insertError) {
+            console.error('Insert error:', insertError);
+            throw insertError;
+          }
         }
 
       } else {
