@@ -22,7 +22,7 @@
   let currency = $state(data.invoice?.currency || 'EUR');
 
   // Line items - pre-populate from existing invoice items
-  let lineItems = $state(
+  let lineItems = $state<any[]>(
     data.invoice?.items && data.invoice.items.length > 0
       ? data.invoice.items.map((item: any) => ({
           description: item.description,
@@ -43,18 +43,18 @@
   
   // Computed values
   const selectedClient = $derived(
-    data.clients?.find(c => c.id === selectedClientId) || null
+    data.clients?.find((c: any) => c.id === selectedClientId) || null
   );
-  
+
   const selectedTemplate = $derived(
-    data.templates?.find(t => t.id === selectedTemplateId) || null
+    data.templates?.find((t: any) => t.id === selectedTemplateId) || null
   );
   
   const totals = $derived(() => {
     let subtotal = 0;
     let taxTotal = 0;
-    
-    lineItems.forEach(item => {
+
+    lineItems.forEach((item: any) => {
       const lineSubtotal = item.qty * item.unitPrice;
       const lineTax = lineSubtotal * (item.taxRate / 100);
       subtotal += lineSubtotal;
@@ -182,7 +182,7 @@
           .delete()
           .eq('invoice_id', draftInvoiceId);
 
-        const itemsToInsert = lineItems.map((item, index) => ({
+        const itemsToInsert = lineItems.map((item: any, index: number) => ({
           invoice_id: draftInvoiceId,
           position: index + 1,
           description: item.description,
@@ -227,7 +227,7 @@
         draftInvoiceId = invoice.id;
 
         // Create line items
-        const itemsToInsert = lineItems.map((item, index) => ({
+        const itemsToInsert = lineItems.map((item: any, index: number) => ({
           invoice_id: invoice.id,
           position: index + 1,
           description: item.description,
@@ -335,7 +335,7 @@
       if (invoiceError) throw invoiceError;
 
       // Create line items
-      const itemsToInsert = lineItems.map((item, index) => ({
+      const itemsToInsert = lineItems.map((item: any, index: number) => ({
         invoice_id: invoice.id,
         position: index + 1,
         description: item.description,
@@ -759,7 +759,7 @@
               due_date: dueDate || '',
               currency: currency,
               notes: notes || '',
-              items: JSON.stringify(lineItems.map((item, index) => ({
+              items: JSON.stringify(lineItems.map((item: any, index: number) => ({
                 position: index + 1,
                 description: item.description,
                 qty: item.qty,

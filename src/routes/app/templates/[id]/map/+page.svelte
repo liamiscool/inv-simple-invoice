@@ -104,7 +104,7 @@
     ctx.drawImage(bgImage, 0, 0);
 
     // Draw all area boxes
-    Object.entries(spec.areas).forEach(([key, area]) => {
+    Object.entries(spec.areas).forEach(([key, area]: [string, any]) => {
       if (!area || !('x' in area)) return;
 
       const isSelected = key === selectedArea;
@@ -137,7 +137,7 @@
 
     // Check if clicking on existing area
     let clickedArea: string | null = null;
-    Object.entries(spec.areas).forEach(([key, area]) => {
+    Object.entries(spec.areas).forEach(([key, area]: [string, any]) => {
       if (!area || !('x' in area)) return;
 
       const ax = mmToPx(area.x);
@@ -218,7 +218,7 @@
   function updateSelectedArea(updates: Partial<AreaSpec>) {
     if (!selectedArea || !spec.areas[selectedArea as keyof typeof spec.areas]) return;
 
-    const current = spec.areas[selectedArea as keyof typeof spec.areas];
+    const current: any = spec.areas[selectedArea as keyof typeof spec.areas];
     if (current && 'x' in current) {
       spec.areas[selectedArea as keyof typeof spec.areas] = {
         ...current,
@@ -473,7 +473,7 @@
   action="?/save"
   use:enhance={() => {
     saving = true;
-    return async ({ update }) => {
+    return async ({ update }: any) => {
       saving = false;
       await update();
     };

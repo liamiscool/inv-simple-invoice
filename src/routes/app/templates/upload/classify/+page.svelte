@@ -116,7 +116,7 @@
   const reusableFields = new Set(['payment_info', '__ignore__', 'client_name', 'client_company']);
 
   // Org-wide custom fields - using $state so we can update it
-  let customFieldsList = $state(data.customFields);
+  let customFieldsList = $state<any[]>(data.customFields);
 
   // Org-wide custom fields from database
   let orgCustomFields = $derived(
@@ -181,7 +181,7 @@
 
       // Convert Map to plain object for JSON serialization
       const classifiedItemsObj: Record<string, any> = {};
-      classifiedItems.forEach((value, key) => {
+      classifiedItems.forEach((value: any, key: any) => {
         classifiedItemsObj[key] = value;
       });
 
@@ -230,12 +230,12 @@
       // Initialize classifications - use saved state if available, otherwise suggest
       if (data.savedClassifiedItems) {
         // Restore from saved state
-        Object.entries(data.savedClassifiedItems).forEach(([key, value]: [string, any]) => {
+        Object.entries(data.savedClassifiedItems as any).forEach(([key, value]: [string, any]) => {
           classifiedItems.set(parseInt(key), value);
         });
       } else {
         // Auto-suggest classifications
-        extracted.items.forEach((item, index) => {
+        extracted.items.forEach((item: any, index: number) => {
           const classification = suggestClassification(item.text);
           const fieldMapping = classification === 'dynamic'
             ? suggestFieldMapping(item.text, item, extracted.items)
@@ -247,9 +247,9 @@
 
       // Restore custom areas if saved
       if (data.savedCustomAreas) {
-        customAreas = data.savedCustomAreas;
+        customAreas = data.savedCustomAreas as any;
         // Check for overlaps with restored areas
-        customAreas.forEach((_, index) => {
+        customAreas.forEach((_: any, index: number) => {
           markOverlappingTextAsIgnored(index);
         });
       }
@@ -315,7 +315,7 @@
 
       // Highlight text items that will be covered by this box
       const dragRect = { x: x1, y: y1, width: x2 - x1, height: y2 - y1 };
-      extractedText.items.forEach((item, index) => {
+      extractedText.items.forEach((item: any, index: number) => {
         const textRect = { x: item.x, y: item.y, width: item.width, height: item.height };
         if (rectanglesOverlap(textRect, dragRect)) {
           // Highlight overlapping text with orange
@@ -337,7 +337,7 @@
     }
 
     // Draw custom areas
-    customAreas.forEach((area, index) => {
+    customAreas.forEach((area: any, index: number) => {
       const isSelected = selectedAreaIndex === index;
       const isStatic = area.classification === 'static';
       const isMapped = area.fieldMapping && area.fieldMapping !== '' && area.fieldMapping !== '__ignore__';
@@ -375,7 +375,7 @@
         ctx.setLineDash([4, 4]);
 
         let currentX = area.x;
-        config.columns.forEach((column, colIndex) => {
+        config.columns.forEach((column: any, colIndex: number) => {
           // Skip first column divider (left edge)
           if (colIndex > 0) {
             ctx.beginPath();
@@ -413,7 +413,7 @@
           ctx.font = '10px monospace';
           let currentX = area.x;
 
-          config.columns.forEach((column, colIndex) => {
+          config.columns.forEach((column: any, colIndex: number) => {
             const colWidth = (column.widthPercent / 100) * area.width;
             const label = column.field === 'custom' && column.customLabel
               ? column.customLabel
@@ -479,7 +479,7 @@
     });
 
     // Draw text boxes
-    extractedText.items.forEach((item, index) => {
+    extractedText.items.forEach((item: any, index: number) => {
       const classification = classifiedItems.get(index);
       if (!classification) return;
 
@@ -561,7 +561,7 @@
     // Check if clicking on an existing custom area
     let clickedAreaIndex: number | null = null;
     for (let i = customAreas.length - 1; i >= 0; i--) {
-      const area = customAreas[i];
+      const area: any = customAreas[i];
       if (x >= area.x && x <= area.x + area.width &&
           y >= area.y && y <= area.y + area.height) {
         clickedAreaIndex = i;
@@ -734,7 +734,7 @@
     if (!extractedText) return null;
 
     // 1. Filter text items within the box
-    const itemsInBox = extractedText.items.filter(item =>
+    const itemsInBox = extractedText.items.filter((item: any) =>
       rectanglesOverlap(
         { x: item.x, y: item.y, width: item.width, height: item.height },
         box
@@ -749,8 +749,8 @@
     const tolerance = 5;
     const rows: typeof itemsInBox[] = [];
 
-    itemsInBox.forEach(item => {
-      const foundRow = rows.find(row =>
+    itemsInBox.forEach((item: any) => {
+      const foundRow = rows.find((row: any) =>
         Math.abs(row[0].y - item.y) < tolerance
       );
 
@@ -762,10 +762,10 @@
     });
 
     // Sort rows by Y position
-    rows.sort((a, b) => a[0].y - b[0].y);
+    rows.sort((a: any, b: any) => a[0].y - b[0].y);
 
     // Sort items within each row by X position
-    rows.forEach(row => row.sort((a, b) => a.x - b.x));
+    rows.forEach((row: any) => row.sort((a: any, b: any) => a.x - b.x));
 
     if (rows.length < 2) {
       // Need at least 2 rows for reliable detection
@@ -776,17 +776,17 @@
     // Find common X-positions (column starts) across all rows
     const columnStarts: number[] = [];
 
-    rows.forEach(row => {
-      row.forEach(item => {
+    rows.forEach((row: any) => {
+      row.forEach((item: any) => {
         // Check if this X position is similar to any existing column start
-        const existingCol = columnStarts.find(x => Math.abs(x - item.x) < 10);
+        const existingCol = columnStarts.find((x: number) => Math.abs(x - item.x) < 10);
         if (!existingCol) {
           columnStarts.push(item.x);
         }
       });
     });
 
-    columnStarts.sort((a, b) => a - b);
+    columnStarts.sort((a: number, b: number) => a - b);
 
     // 4. Calculate column widths and create column configs
     const columns: TableColumn[] = [];
@@ -802,13 +802,13 @@
       let align: TableColumn['align'] = 'left';
 
       // Sample text from this column across rows
-      const columnTexts = rows.map(row =>
-        row.find(item => Math.abs(item.x - colStart) < 10)?.text || ''
+      const columnTexts = rows.map((row: any) =>
+        row.find((item: any) => Math.abs(item.x - colStart) < 10)?.text || ''
       );
 
       // Detect if column contains numbers (quantity/rate/amount)
-      const hasNumbers = columnTexts.some(text => /^\$?\d+\.?\d*$/.test(text.trim()));
-      const hasDollar = columnTexts.some(text => text.includes('$'));
+      const hasNumbers = columnTexts.some((text: string) => /^\$?\d+\.?\d*$/.test(text.trim()));
+      const hasDollar = columnTexts.some((text: string) => text.includes('$'));
 
       if (i === 0) {
         field = 'description';
@@ -882,7 +882,7 @@
     const coveredIndices: number[] = [];
     let overlappingCount = 0;
 
-    extractedText.items.forEach((item, index) => {
+    extractedText.items.forEach((item: any, index: number) => {
       const textRect = {
         x: item.x,
         y: item.y,
@@ -943,9 +943,9 @@
 
     let restoredCount = 0;
 
-    area.coveredTextIndices.forEach(textIndex => {
+    area.coveredTextIndices.forEach((textIndex: number) => {
       // Check if this text is covered by any OTHER custom area
-      const coveredByOtherArea = customAreas.some((otherArea, otherIndex) => {
+      const coveredByOtherArea = customAreas.some((otherArea: any, otherIndex: number) => {
         if (otherIndex === areaIndex) return false; // Skip the area being deleted
         if (!otherArea.coveredTextIndices) return false;
         return otherArea.coveredTextIndices.includes(textIndex);
@@ -1252,7 +1252,7 @@
 
       // White out dynamic text areas and ignored items
       blankCtx.fillStyle = '#ffffff';
-      extractedText.items.forEach((item, index) => {
+      extractedText.items.forEach((item: any, index: number) => {
         const classification = classifiedItems.get(index);
         const isDynamic = classification?.classification === 'dynamic';
         const isIgnored = classification?.fieldMapping === '__ignore__';
@@ -1369,7 +1369,7 @@
     };
 
     // Add dynamic text items as areas (skip ignored items)
-    extractedText.items.forEach((item, index) => {
+    extractedText.items.forEach((item: any, index: number) => {
       const classification = classifiedItems.get(index);
       if (classification?.classification === 'dynamic' && classification.fieldMapping) {
         const fieldMapping = classification.fieldMapping;
@@ -1411,7 +1411,7 @@
     });
 
     // Add custom areas (boxes drawn by user)
-    customAreas.forEach((area) => {
+    customAreas.forEach((area: any) => {
       if (!area.fieldMapping || area.fieldMapping === '__ignore__') {
         return;
       }
@@ -1425,7 +1425,7 @@
           y: pxToMm(area.y),
           w: pxToMm(area.width),
           row_height: pxToMm(area.tableConfig.rowHeight),
-          columns: area.tableConfig.columns.map(col => ({
+          columns: area.tableConfig.columns.map((col: any) => ({
             key: col.field === 'custom' ? (col.customLabel || 'custom') : col.field,
             label: col.field === 'custom' ? (col.customLabel || 'Custom') : col.field.charAt(0).toUpperCase() + col.field.slice(1),
             w: (col.widthPercent / 100) * pxToMm(area.width),
@@ -1499,7 +1499,7 @@
     let ignoredCount = 0;
 
     // Count text items
-    classifiedItems.forEach((classification) => {
+    classifiedItems.forEach((classification: any) => {
       if (classification.fieldMapping === '__ignore__') {
         ignoredCount++;
       } else if (classification.classification === 'static') {
@@ -1515,7 +1515,7 @@
     });
 
     // Count custom areas (boxes)
-    customAreas.forEach((area) => {
+    customAreas.forEach((area: any) => {
       if (area.classification === 'static') {
         staticCount++;
       } else if (area.fieldMapping && area.fieldMapping !== '' && area.fieldMapping !== '__ignore__') {
@@ -1728,7 +1728,7 @@
                 <!-- Dropdown for custom area mapping -->
                 <select
                   value={area.isLineItemsTable ? '__line_items_table__' : (area.fieldMapping || '')}
-                  onchange={(e) => {
+                  onchange={(e: any) => {
                     const newMapping = e.currentTarget.value;
 
                     if (newMapping === '__line_items_table__') {
@@ -1997,7 +1997,7 @@
   action="?/save"
   use:enhance={() => {
     generating = true;
-    return async ({ result, update }) => {
+    return async ({ result, update }: any) => {
       if (result.type === 'redirect') {
         // Successfully saved - navigate to map page
         window.location.href = result.location;
@@ -2059,8 +2059,10 @@
                     <button
                       type="button"
                       onclick={() => {
-                        tableConfig.columns.splice(colIndex, 1);
-                        customAreas = [...customAreas];
+                        if (tableConfig && tableConfig.columns) {
+                          tableConfig.columns.splice(colIndex, 1);
+                          customAreas = [...customAreas];
+                        }
                       }}
                       class="text-xs text-red-600 hover:text-red-700"
                     >
@@ -2093,7 +2095,7 @@
                       <input
                         type="text"
                         value={column.customLabel || ''}
-                        oninput={(e) => {
+                        oninput={(e: any) => {
                           column.customLabel = e.currentTarget.value;
                           customAreas = [...customAreas];
                         }}
@@ -2108,7 +2110,7 @@
                     <label class="block text-xs text-gray-600 mb-1">Align</label>
                     <select
                       value={column.align}
-                      onchange={(e) => {
+                      onchange={(e: any) => {
                         column.align = e.currentTarget.value as any;
                         customAreas = [...customAreas];
                         redraw();
@@ -2133,16 +2135,16 @@
                     max="80"
                     step="0.5"
                     value={column.widthPercent}
-                    oninput={(e) => {
+                    oninput={(e: any) => {
                       column.widthPercent = parseFloat(e.currentTarget.value);
                       customAreas = [...customAreas];
                     }}
                     onchange={() => {
                       // Normalize widths to 100%
-                      const total = tableConfig.columns.reduce((sum, c) => sum + c.widthPercent, 0);
+                      const total = tableConfig.columns.reduce((sum: number, c: any) => sum + c.widthPercent, 0);
                       if (total !== 100) {
                         const factor = 100 / total;
-                        tableConfig.columns.forEach(c => {
+                        tableConfig.columns.forEach((c: any) => {
                           c.widthPercent = c.widthPercent * factor;
                         });
                       }
@@ -2165,9 +2167,9 @@
                 align: 'left'
               });
               // Re-normalize widths
-              const total = tableConfig.columns.reduce((sum, c) => sum + c.widthPercent, 0);
+              const total = tableConfig.columns.reduce((sum: number, c: any) => sum + c.widthPercent, 0);
               const factor = 100 / total;
-              tableConfig.columns.forEach(c => {
+              tableConfig.columns.forEach((c: any) => {
                 c.widthPercent = c.widthPercent * factor;
               });
               customAreas = [...customAreas];
@@ -2185,7 +2187,7 @@
             <input
               type="number"
               value={tableConfig.rowHeight}
-              oninput={(e) => {
+              oninput={(e: any) => {
                 tableConfig.rowHeight = parseInt(e.currentTarget.value) || 24;
                 customAreas = [...customAreas];
                 redraw();
@@ -2201,7 +2203,7 @@
               <input
                 type="checkbox"
                 checked={tableConfig.headerRow}
-                onchange={(e) => {
+                onchange={(e: any) => {
                   tableConfig.headerRow = e.currentTarget.checked;
                   customAreas = [...customAreas];
                   redraw();

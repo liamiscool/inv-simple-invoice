@@ -233,7 +233,7 @@
             action="?/createCustomField"
             use:enhance={() => {
               isCustomFieldCreating = true;
-              return async ({ update, result }) => {
+              return async ({ update, result }: any) => {
                 isCustomFieldCreating = false;
                 if (result.type === 'success') {
                   customFieldLabel = '';
@@ -294,11 +294,11 @@
               <form
                 method="POST"
                 action="?/deleteCustomField"
-                use:enhance={({ cancel }) => {
+                use:enhance={({ cancel }: any) => {
                   if (!confirm(`Delete "${field.field_label}"? This will remove it from all templates.`)) {
                     cancel();
                   }
-                  return async ({ update }) => {
+                  return async ({ update }: any) => {
                     await update();
                   };
                 }}

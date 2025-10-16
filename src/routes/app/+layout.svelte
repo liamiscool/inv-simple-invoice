@@ -44,7 +44,7 @@
 
     // Close profile menu when clicking outside
     const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
+      const target: any = e.target;
       if (!target.closest('.profile-menu-container')) {
         showProfileMenu = false;
       }
