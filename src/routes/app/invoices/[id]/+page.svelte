@@ -608,21 +608,21 @@
 <!-- Email Modal -->
 {#if showEmailModal}
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-sm border border-thin max-w-md w-full max-h-[90vh] overflow-y-auto dark:bg-dark-bg dark:border-gray-700">
+    <div class="bg-white border border-gray-300 max-w-md w-full max-h-[90vh] overflow-y-auto dark:bg-dark-bg dark:border-gray-700">
       <div class="p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-medium dark:text-white">Send Invoice via Email</h3>
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-base font-medium dark:text-white">Send Invoice via Email</h3>
           <button
             onclick={closeEmailModal}
-            class="text-gray-400 hover:text-gray-600 dark:hover:text-white"
+            class="text-gray-400 hover:text-black dark:hover:text-white transition-colors"
           >
             ✕
           </button>
         </div>
-        
-        <form onsubmit={sendInvoiceEmail} class="space-y-4">
+
+        <form onsubmit={sendInvoiceEmail} class="space-y-5">
           <div>
-            <label for="email-to" class="block text-xs text-gray-600 mb-1 dark:text-gray-400">
+            <label for="email-to" class="block text-sm text-gray-500 mb-1.5 dark:text-gray-400">
               To <span class="text-red-600 dark:text-red-400">*</span>
             </label>
             <input
@@ -630,30 +630,30 @@
               type="email"
               bind:value={emailForm.to}
               placeholder="client@example.com"
-              class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors dark:bg-dark-input dark:border-gray-700 dark:text-white dark:focus:border-white dark:placeholder-gray-500"
+              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors dark:bg-dark-input dark:border-gray-600 dark:text-white dark:focus:border-white dark:placeholder-gray-500"
               required
             />
           </div>
 
           <div>
-            <label for="email-subject" class="block text-xs text-gray-600 mb-1 dark:text-gray-400">Subject</label>
+            <label for="email-subject" class="block text-sm text-gray-500 mb-1.5 dark:text-gray-400">Subject</label>
             <input
               id="email-subject"
               type="text"
               bind:value={emailForm.subject}
               placeholder="Invoice {data.invoice.number}"
-              class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors dark:bg-dark-input dark:border-gray-700 dark:text-white dark:focus:border-white dark:placeholder-gray-500"
+              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors dark:bg-dark-input dark:border-gray-600 dark:text-white dark:focus:border-white dark:placeholder-gray-500"
             />
           </div>
 
           <div>
-            <label for="email-message" class="block text-xs text-gray-600 mb-1 dark:text-gray-400">Additional Message</label>
+            <label for="email-message" class="block text-sm text-gray-500 mb-1.5 dark:text-gray-400">Additional Message</label>
             <textarea
               id="email-message"
               bind:value={emailForm.message}
               placeholder="Optional message to include in the email..."
               rows="3"
-              class="w-full px-3 py-2 text-xs border border-thin rounded-sm focus:outline-none focus:border-black transition-colors resize-none dark:bg-dark-input dark:border-gray-700 dark:text-white dark:focus:border-white dark:placeholder-gray-500"
+              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors resize-none dark:bg-dark-input dark:border-gray-600 dark:text-white dark:focus:border-white dark:placeholder-gray-500"
             ></textarea>
           </div>
 
@@ -662,37 +662,37 @@
               id="include-pdf"
               type="checkbox"
               bind:checked={emailForm.includePdf}
-              class="rounded border-thin dark:bg-dark-input dark:border-gray-700"
+              class="w-4 h-4 text-black border-gray-300 rounded focus:ring-black dark:bg-dark-input dark:border-gray-600 dark:focus:ring-gray-500"
             />
-            <label for="include-pdf" class="text-xs text-gray-600 dark:text-gray-400">
+            <label for="include-pdf" class="text-sm text-gray-700 dark:text-gray-300">
               Attach PDF invoice
             </label>
           </div>
-          
+
           {#if emailError}
-            <div class="text-xs text-red-600 bg-red-50 border border-red-200 rounded-sm p-3 dark:text-red-400 dark:bg-red-900/30 dark:border-red-800">
+            <div class="text-sm text-red-600 bg-red-50 border border-red-200 p-3 dark:text-red-400 dark:bg-red-900/30 dark:border-red-800">
               {emailError}
             </div>
           {/if}
 
           {#if emailSuccess}
-            <div class="text-xs text-green-600 bg-green-50 border border-green-200 rounded-sm p-3 dark:text-green-400 dark:bg-green-900/30 dark:border-green-800">
+            <div class="text-sm text-green-600 bg-green-50 border border-green-200 p-3 dark:text-green-400 dark:bg-green-900/30 dark:border-green-800">
               {emailSuccess}
             </div>
           {/if}
 
-          <div class="flex items-center justify-end gap-3 pt-2">
+          <div class="flex items-center justify-between pt-4">
             <button
               type="button"
               onclick={closeEmailModal}
-              class="px-4 py-2 border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition-colors duration-75 dark:border-gray-600 dark:text-white dark:hover:bg-dark-hover"
+              class="px-5 py-2.5 border border-gray-300 text-sm hover:bg-gray-50 transition-colors duration-75 dark:border-gray-600 dark:text-white dark:hover:bg-dark-hover"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={emailLoading || !emailForm.to}
-              class="px-4 py-2 bg-black text-white text-xs hover:bg-gray-800 transition-colors duration-75 font-medium disabled:opacity-50 disabled:cursor-not-allowed dark:bg-dark-button dark:hover:bg-dark-button-hover"
+              class="px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-dark-button dark:hover:bg-dark-button-hover"
             >
               {emailLoading ? 'Sending...' : 'Send Email'}
             </button>
