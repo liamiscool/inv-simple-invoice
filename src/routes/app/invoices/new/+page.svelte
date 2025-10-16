@@ -195,8 +195,7 @@
             include_contact_name: includeContactName,
             subtotal: currentTotals.subtotal,
             tax_total: currentTotals.taxTotal,
-            total: currentTotals.total,
-            updated_at: new Date().toISOString()
+            total: currentTotals.total
           } as any)
           .eq('id', draftInvoiceId);
 
