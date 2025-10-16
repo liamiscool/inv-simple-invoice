@@ -31,7 +31,8 @@ export async function generateInvoicePDF(
   invoice: InvoiceData,
   company: CompanyData,
   template: TemplateSpec,
-  options: PDFGenerationOptions = {}
+  options: PDFGenerationOptions = {},
+  renderOptions: { includeContactName?: boolean; hideTaxColumn?: boolean } = {}
 ): Promise<Buffer> {
   // Dynamically import Puppeteer only when this function is called
   // Using string-based import to prevent bundler from analyzing it
@@ -65,8 +66,11 @@ export async function generateInvoicePDF(
 
     const page = await browser.newPage();
 
+    console.log('=== generateInvoicePDF - renderOptions ===');
+    console.log('renderOptions:', renderOptions);
+
     // Generate HTML content using our template renderer
-    const html = renderInvoiceHTML(invoice, company, template, options);
+    const html = renderInvoiceHTML(invoice, company, template, renderOptions);
 
     // Set content and wait for any fonts/images to load
     await page.setContent(html, {
@@ -113,21 +117,24 @@ export async function generateOptimizedInvoicePDF(
   options: { includeContactName?: boolean; hideTaxColumn?: boolean } = {}
 ): Promise<Buffer> {
   const { meta } = template;
-  
+
+  console.log('=== generateOptimizedInvoicePDF - options received ===');
+  console.log('options:', options);
+
   // Use template dimensions if available
   const customOptions: PDFGenerationOptions = {
     format: meta.width === 210 && meta.height === 297 ? 'A4' : 'A4', // Default to A4 for now
     margin: {
       top: `${meta.margins.top}mm`,
-      right: `${meta.margins.right}mm`, 
+      right: `${meta.margins.right}mm`,
       bottom: `${meta.margins.bottom}mm`,
       left: `${meta.margins.left}mm`
     },
     printBackground: true,
     preferCSSPageSize: true
   };
-  
-  return generateInvoicePDF(invoice, company, template, customOptions);
+
+  return generateInvoicePDF(invoice, company, template, customOptions, options);
 }
 
 /**
@@ -137,7 +144,7 @@ export async function generateInvoicePreview(
   invoice: InvoiceData,
   company: CompanyData,
   template: TemplateSpec,
-  options: { width?: number; height?: number; quality?: number } = {}
+  options: { width?: number; height?: number; quality?: number; includeContactName?: boolean; hideTaxColumn?: boolean } = {}
 ): Promise<Buffer> {
   // Dynamically import Puppeteer
   // Using string-based import to prevent bundler from analyzing it
@@ -166,7 +173,13 @@ export async function generateInvoicePreview(
       deviceScaleFactor: 2 // Higher DPI for better quality
     });
 
-    const html = renderInvoiceHTML(invoice, company, template, options);
+    // Extract render options (separate from image generation options)
+    const renderOptions = {
+      includeContactName: options.includeContactName,
+      hideTaxColumn: options.hideTaxColumn
+    };
+
+    const html = renderInvoiceHTML(invoice, company, template, renderOptions);
     await page.setContent(html, { waitUntil: 'networkidle0' });
 
     // Take screenshot

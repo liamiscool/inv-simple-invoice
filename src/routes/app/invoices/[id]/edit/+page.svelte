@@ -7,11 +7,9 @@
   let error = $state('');
   let showPreview = $state(false);
 
-  // Auto-save state
-  let autoSaveTimeout: ReturnType<typeof setTimeout> | null = null;
-  let isSaving = $state(false);
-  let saveStatus = $state<'idle' | 'saving' | 'saved' | 'error'>('idle');
-  let draftInvoiceId = $state<string | null>(data.invoice?.id || null);
+  // Draft saving state
+  let isDraftSaving = $state(false);
+  let draftSavedMessage = $state('');
 
   // Form data - pre-populate from existing invoice
   let selectedClientId = $state(data.invoice?.client_id || '');
@@ -101,53 +99,17 @@
     }
   });
 
-  // Auto-save when form data changes
-  $effect(() => {
-    // Track these dependencies (Svelte 5 tracks them automatically)
-    selectedClientId;
-    selectedTemplateId;
-    issueDate;
-    dueDate;
-    notes;
-    currency;
-    includeContactName;
-    lineItems;
-
-    // Don't auto-save if no meaningful data yet
+  async function saveDraft() {
     if (!selectedClientId || !selectedTemplateId) {
+      error = 'Please select client and template first';
       return;
     }
 
-    // Note: We allow auto-save even with no line items yet, because:
-    // - User might be setting due date, contact name checkbox, etc.
-    // - Line items will be filtered when saving (only items with descriptions are saved)
-    // - This ensures all form changes trigger auto-save
-
-    // Debounce auto-save (wait 2 seconds after last change)
-    if (autoSaveTimeout) {
-      clearTimeout(autoSaveTimeout);
-    }
-
-    autoSaveTimeout = setTimeout(() => {
-      triggerAutoSave();
-    }, 2000);
-
-    // Cleanup function
-    return () => {
-      if (autoSaveTimeout) {
-        clearTimeout(autoSaveTimeout);
-      }
-    };
-  });
-
-  async function triggerAutoSave() {
-    // Skip if already saving, loading, or about to submit
-    if (isSaving || isLoading) return;
+    isDraftSaving = true;
+    error = '';
+    draftSavedMessage = '';
 
     try {
-      isSaving = true;
-      saveStatus = 'saving';
-
       const { data: user } = await data.supabase.auth.getUser();
       if (!user.user) throw new Error('No user found');
 
@@ -163,140 +125,74 @@
       // Calculate totals
       const currentTotals = totals();
 
-      if (draftInvoiceId) {
-        // Update existing draft
-        const { error: updateError } = await data.supabase
-          .from('invoice')
-          .update({
-            client_id: selectedClientId,
-            template_id: selectedTemplateId,
-            issue_date: issueDate,
-            due_date: dueDate || null,
-            currency: currency,
-            notes: notes || null,
-            include_contact_name: includeContactName,
-            subtotal: currentTotals.subtotal,
-            tax_total: currentTotals.taxTotal,
-            total: currentTotals.total
-          } as any)
-          .eq('id', draftInvoiceId);
+      // Update existing invoice
+      const draftInvoiceData = {
+        client_id: selectedClientId,
+        template_id: selectedTemplateId,
+        issue_date: issueDate,
+        due_date: dueDate || null,
+        currency: currency,
+        notes: notes || null,
+        include_contact_name: includeContactName,
+        subtotal: currentTotals.subtotal,
+        tax_total: currentTotals.taxTotal,
+        total: currentTotals.total
+      };
 
-        if (updateError) throw updateError;
+      console.log('=== SAVE DRAFT (EDIT) - SAVING TO SUPABASE ===');
+      console.log('Draft invoice data:', draftInvoiceData);
+      console.log('Invoice ID:', data.invoice?.id);
 
-        // Update line items (only save items with descriptions)
-        const itemsToSave = lineItems
-          .filter(item => item.description && item.description.trim())
-          .map((item: any, index: number) => ({
-            invoice_id: draftInvoiceId,
-            position: index + 1,
-            description: item.description,
-            qty: item.qty || 0,
-            unit_price: item.unitPrice || 0,
-            tax_rate: (item.taxRate || 0) / 100,
-            line_total: (item.qty || 0) * (item.unitPrice || 0)
-          }));
+      const { error: updateError } = await data.supabase
+        .from('invoice')
+        .update(draftInvoiceData)
+        .eq('id', data.invoice?.id);
 
-        // Delete all old items and insert new ones in a transaction-like manner
-        // Note: Supabase doesn't support transactions, but we do delete+insert quickly
-        const { error: deleteError } = await data.supabase
-          .from('invoice_item')
-          .delete()
-          .eq('invoice_id', draftInvoiceId);
+      if (updateError) throw updateError;
 
-        if (deleteError) {
-          console.error('Delete error:', deleteError);
-          throw deleteError;
-        }
+      console.log('✅ Draft invoice updated');
 
-        // Insert all current items
-        if (itemsToSave.length > 0) {
-          const { error: insertError } = await data.supabase
-            .from('invoice_item')
-            .insert(itemsToSave);
-
-          if (insertError) {
-            console.error('Insert error:', insertError);
-            throw insertError;
-          }
-        }
-
-      } else {
-        // Create new draft invoice
-        const { data: nextNumber, error: numberError } = await data.supabase
-          .rpc('next_invoice_number', { p_org_id: profile.org_id } as any);
-
-        if (numberError) throw numberError;
-
-        const { data: invoice, error: invoiceError } = await data.supabase
-          .from('invoice')
-          .insert({
-            org_id: profile.org_id,
-            client_id: selectedClientId,
-            template_id: selectedTemplateId,
-            number: nextNumber,
-            issue_date: issueDate,
-            due_date: dueDate || null,
-            currency: currency,
-            status: 'draft',
-            notes: notes || null,
-            subtotal: currentTotals.subtotal,
-            tax_total: currentTotals.taxTotal,
-            total: currentTotals.total
-          })
-          .select()
-          .single();
-
-        if (invoiceError) throw invoiceError;
-
-        draftInvoiceId = invoice.id;
-
-        // Create line items
-        const itemsToInsert = lineItems.map((item: any, index: number) => ({
-          invoice_id: invoice.id,
+      // Update line items
+      const itemsToSave = lineItems
+        .filter(item => item.description && item.description.trim())
+        .map((item: any, index: number) => ({
+          invoice_id: data.invoice?.id,
           position: index + 1,
           description: item.description,
-          qty: item.qty,
-          unit_price: item.unitPrice,
-          tax_rate: item.taxRate / 100,
-          line_total: item.qty * item.unitPrice
+          qty: item.qty || 0,
+          unit_price: item.unitPrice || 0,
+          tax_rate: (item.taxRate || 0) / 100,
+          line_total: (item.qty || 0) * (item.unitPrice || 0)
         }));
 
+      console.log('Draft line items to save:', itemsToSave);
+
+      // Delete old items
+      await data.supabase
+        .from('invoice_item')
+        .delete()
+        .eq('invoice_id', data.invoice?.id);
+
+      console.log('✅ Old line items deleted');
+
+      // Insert new items
+      if (itemsToSave.length > 0) {
         await data.supabase
           .from('invoice_item')
-          .insert(itemsToInsert);
+          .insert(itemsToSave);
+
+        console.log('✅ Draft line items created: ' + itemsToSave.length + ' items');
       }
 
-      saveStatus = 'saved';
-      setTimeout(() => {
-        if (saveStatus === 'saved') saveStatus = 'idle';
-      }, 2000);
+      console.log('=== END SAVE DRAFT (EDIT) ===');
+
+      draftSavedMessage = 'Draft saved successfully!';
+      setTimeout(() => { draftSavedMessage = ''; }, 3000);
 
     } catch (err: any) {
-      console.error('=== AUTO-SAVE ERROR DEBUG (EDIT) ===');
-      console.error('Error object:', err);
-      console.error('Error message:', err?.message);
-      console.error('Error details:', err?.details);
-      console.error('Error hint:', err?.hint);
-      console.error('Error code:', err?.code);
-      console.error('Full error:', JSON.stringify(err, null, 2));
-      console.error('Current state:', {
-        draftInvoiceId,
-        selectedClientId,
-        selectedTemplateId,
-        lineItems: lineItems.map(item => ({
-          description: item.description,
-          qty: item.qty,
-          unitPrice: item.unitPrice,
-          taxRate: item.taxRate
-        })),
-        includeContactName,
-        dueDate,
-        issueDate
-      });
-      console.error('=== END DEBUG ===');
-      saveStatus = 'error';
+      error = err.message || 'Failed to save draft';
     } finally {
-      isSaving = false;
+      isDraftSaving = false;
     }
   }
   
@@ -325,20 +221,6 @@
     error = '';
 
     try {
-      // If we have a draft, just redirect (auto-save has been keeping it updated)
-      if (draftInvoiceId) {
-        // Clear any pending auto-save timeout
-        if (autoSaveTimeout) {
-          clearTimeout(autoSaveTimeout);
-        }
-
-        // Redirect to invoice detail page immediately
-        // Auto-save has already kept the draft up-to-date
-        window.location.href = `/app/invoices/${draftInvoiceId}`;
-        return; // IMPORTANT: Exit here to prevent creating duplicate
-      }
-
-      // Otherwise, create new invoice (only if no draft exists)
       const { data: user } = await data.supabase.auth.getUser();
       if (!user.user) throw new Error('No user found');
 
@@ -351,53 +233,72 @@
 
       if (!profile) throw new Error('Profile not found');
 
-      // Generate invoice number
-      const { data: nextNumber, error: numberError } = await data.supabase
-        .rpc('next_invoice_number', { p_org_id: profile.org_id } as any);
+      // Calculate totals
+      const currentTotals = totals();
 
-      if (numberError) throw numberError;
+      // Update existing invoice
+      const invoiceData = {
+        client_id: selectedClientId,
+        template_id: selectedTemplateId,
+        issue_date: issueDate,
+        due_date: dueDate || null,
+        currency: currency,
+        notes: notes || null,
+        include_contact_name: includeContactName,
+        subtotal: currentTotals.subtotal,
+        tax_total: currentTotals.taxTotal,
+        total: currentTotals.total
+      };
 
-      // Create invoice
-      const { data: invoice, error: invoiceError } = await data.supabase
+      console.log('=== UPDATE INVOICE (EDIT) - SAVING TO SUPABASE ===');
+      console.log('Invoice data:', invoiceData);
+      console.log('Invoice ID:', data.invoice?.id);
+
+      const { error: updateError } = await data.supabase
         .from('invoice')
-        .insert({
-          org_id: profile.org_id,
-          client_id: selectedClientId,
-          template_id: selectedTemplateId,
-          number: nextNumber,
-          issue_date: issueDate,
-          due_date: dueDate || null,
-          currency: currency,
-          status: 'draft',
-          notes: notes || null,
-          subtotal: totals().subtotal,
-          tax_total: totals().taxTotal,
-          total: totals().total
-        })
-        .select()
-        .single();
+        .update(invoiceData)
+        .eq('id', data.invoice?.id);
 
-      if (invoiceError) throw invoiceError;
+      if (updateError) throw updateError;
 
-      // Create line items
-      const itemsToInsert = lineItems.map((item: any, index: number) => ({
-        invoice_id: invoice.id,
-        position: index + 1,
-        description: item.description,
-        qty: item.qty,
-        unit_price: item.unitPrice,
-        tax_rate: item.taxRate / 100, // Convert percentage to decimal
-        line_total: item.qty * item.unitPrice
-      }));
+      console.log('✅ Invoice updated');
 
-      const { error: itemsError } = await data.supabase
+      // Update line items
+      const itemsToInsert = lineItems
+        .filter(item => item.description && item.description.trim())
+        .map((item: any, index: number) => ({
+          invoice_id: data.invoice?.id,
+          position: index + 1,
+          description: item.description,
+          qty: item.qty || 0,
+          unit_price: item.unitPrice || 0,
+          tax_rate: (item.taxRate || 0) / 100,
+          line_total: (item.qty || 0) * (item.unitPrice || 0)
+        }));
+
+      console.log('Line items to insert:', itemsToInsert);
+
+      // Delete old items
+      await data.supabase
         .from('invoice_item')
-        .insert(itemsToInsert);
+        .delete()
+        .eq('invoice_id', data.invoice?.id);
 
-      if (itemsError) throw itemsError;
+      console.log('✅ Old line items deleted');
+
+      // Insert new items
+      if (itemsToInsert.length > 0) {
+        await data.supabase
+          .from('invoice_item')
+          .insert(itemsToInsert);
+
+        console.log('✅ Line items created: ' + itemsToInsert.length + ' items');
+      }
+
+      console.log('=== END SAVE ===');
 
       // Redirect to invoice detail page
-      window.location.href = `/app/invoices/${invoice.id}`;
+      window.location.href = `/app/invoices/${data.invoice?.id}`;
 
     } catch (err: any) {
       error = err.message || 'Something went wrong. Please try again.';
@@ -426,14 +327,10 @@
       </div>
     </div>
 
-    <!-- Auto-save indicator -->
+    <!-- Draft saved message -->
     <div class="flex items-center gap-2">
-      {#if saveStatus === 'saving'}
-        <span class="text-sm text-gray-600 dark:text-gray-400">Saving...</span>
-      {:else if saveStatus === 'saved'}
-        <span class="text-sm text-green-600 dark:text-green-400">✓ Saved</span>
-      {:else if saveStatus === 'error'}
-        <span class="text-sm text-red-600 dark:text-red-400">Save failed</span>
+      {#if draftSavedMessage}
+        <span class="text-sm text-green-600 dark:text-green-400">✓ {draftSavedMessage}</span>
       {/if}
     </div>
   </div>
@@ -752,12 +649,14 @@
 
       <!-- Actions -->
       <div class="flex items-center justify-between pt-4">
-        <a
-          href="/app/invoices"
-          class="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm hover:bg-gray-50 dark:border-gray-600 dark:text-white dark:hover:bg-dark-hover transition-colors duration-75"
+        <button
+          type="button"
+          onclick={saveDraft}
+          disabled={isDraftSaving || !selectedClientId || !selectedTemplateId}
+          class="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm hover:bg-gray-50 dark:border-gray-600 dark:text-white dark:hover:bg-dark-hover transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Cancel
-        </a>
+          {isDraftSaving ? 'Saving Draft...' : 'Save Draft'}
+        </button>
 
         <div class="flex items-center gap-3">
           <button

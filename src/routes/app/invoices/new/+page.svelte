@@ -338,16 +338,10 @@
       </div>
     </div>
 
-    <!-- Auto-save indicator -->
-    <div class="flex items-center gap-2">
-      {#if saveStatus === 'saving'}
-        <span class="text-sm text-gray-600 dark:text-gray-400">Saving...</span>
-      {:else if saveStatus === 'saved'}
-        <span class="text-sm text-green-600 dark:text-green-400">✓ Saved</span>
-      {:else if saveStatus === 'error'}
-        <span class="text-sm text-red-600 dark:text-red-400">Save failed</span>
-      {/if}
-    </div>
+    <!-- Draft save indicator -->
+    {#if draftSavedMessage}
+      <span class="text-sm text-green-600 dark:text-green-400">{draftSavedMessage}</span>
+    {/if}
   </div>
 
   {#if data.clients?.length === 0}

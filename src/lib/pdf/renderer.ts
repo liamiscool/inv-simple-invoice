@@ -300,8 +300,16 @@ export function renderInvoiceHTML(
     content += renderArea('client_legal_name', adjustedAreas.client_legal_name, invoice.client.legal_name);
   }
 
+  console.log('=== CLIENT NAME DEBUG ===');
+  console.log('adjustedAreas.client_name:', adjustedAreas.client_name);
+  console.log('invoice.client.name:', invoice.client.name);
+  console.log('options.includeContactName:', options.includeContactName);
+
   if (adjustedAreas.client_name && invoice.client.name && options.includeContactName) {
+    console.log('✅ Rendering client_name:', invoice.client.name);
     content += renderArea('client_name', adjustedAreas.client_name, invoice.client.name);
+  } else {
+    console.log('❌ NOT rendering client_name - one of the conditions failed');
   }
 
   if (adjustedAreas.client_email && invoice.client.email) {
