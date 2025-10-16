@@ -196,20 +196,20 @@
   <!-- Header -->
   <div>
     <div class="flex items-center gap-3 mb-2">
-      <a href="/app/templates" class="text-xs text-gray-600 hover:text-black transition-colors">
+      <a href="/app/templates" class="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
         ← Back to Templates
       </a>
     </div>
-    <h1 class="text-sm mb-2">Upload Custom Template</h1>
-    <p class="text-xs text-gray-600">
+    <h1 class="text-lg font-medium mb-1 dark:text-white">Upload Custom Template</h1>
+    <p class="text-sm text-gray-600 dark:text-gray-400">
       Upload your invoice design (PDF, PNG, or JPEG). PDFs are automatically converted to PNG in your browser.
     </p>
   </div>
 
   <!-- Instructions -->
-  <div class="border border-thin rounded-sm p-6 bg-gray-50 space-y-3">
-    <h2 class="text-xs font-medium">How it works</h2>
-    <ol class="text-xs text-gray-600 space-y-2 list-decimal list-inside">
+  <div class="border border-gray-300 dark:border-gray-700 rounded-sm p-4 bg-gray-50 dark:bg-dark-input space-y-3">
+    <h2 class="text-sm font-medium dark:text-white">How it works</h2>
+    <ol class="text-sm text-gray-600 dark:text-gray-300 space-y-2 list-decimal list-inside">
       <li>Upload your invoice design file (designed in Figma, Illustrator, etc.)</li>
       <li>Map the dynamic areas (client name, invoice number, line items, totals)</li>
       <li>Configure fonts, colors, and positioning for each area</li>
@@ -243,11 +243,11 @@
         await update();
       };
     }}
-    class="border border-thin rounded-sm p-6 space-y-6"
+    class="border border-gray-300 dark:border-gray-700 rounded-sm p-4 md:p-6 space-y-6 bg-white dark:bg-dark-bg"
   >
     <!-- Template Name -->
     <div class="space-y-2">
-      <label for="name" class="block text-xs font-medium">
+      <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
         Template Name *
       </label>
       <input
@@ -257,13 +257,13 @@
         required
         bind:value={templateName}
         placeholder="e.g. My Agency Invoice"
-        class="w-full px-3 py-2 border border-thin rounded-sm text-xs focus:outline-none focus:ring-1 focus:ring-black"
+        class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-sm focus:outline-none focus:border-black dark:focus:border-white bg-white dark:bg-dark-input dark:text-white"
       />
     </div>
 
     <!-- File Upload -->
     <div class="space-y-2">
-      <label for="file" class="block text-xs font-medium">
+      <label for="file" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
         Design File *
       </label>
 
@@ -273,7 +273,7 @@
           ondragover={handleDragOver}
           ondragleave={handleDragLeave}
           ondrop={handleDrop}
-          class="border-2 border-dashed rounded-sm p-8 text-center transition-colors {isDragging ? 'border-black bg-gray-50' : 'border-gray-300'}"
+          class="border-2 border-dashed rounded-sm p-8 text-center transition-colors {isDragging ? 'border-black dark:border-white bg-gray-50 dark:bg-dark-input' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-bg'}"
         >
           <input
             id="file"
@@ -288,29 +288,29 @@
             for="file"
             class="cursor-pointer inline-flex flex-col items-center gap-3"
           >
-            <svg class="w-12 h-12 {isDragging ? 'text-black' : 'text-gray-400'} transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-12 h-12 {isDragging ? 'text-black dark:text-white' : 'text-gray-400 dark:text-gray-500'} transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
             <div class="space-y-1">
-              <div class="text-xs font-medium">{isDragging ? 'Drop file here' : 'Click to upload or drag & drop'}</div>
-              <div class="text-xs text-gray-500">PDF, PNG, JPEG, or SVG (max 10MB)</div>
+              <div class="text-sm font-medium dark:text-white">{isDragging ? 'Drop file here' : 'Click to upload or drag & drop'}</div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">PDF, PNG, JPEG, or SVG (max 10MB)</div>
             </div>
           </label>
         </div>
       {:else}
-        <div class="border border-thin rounded-sm p-4 space-y-4">
+        <div class="border border-gray-300 dark:border-gray-700 rounded-sm p-4 space-y-4 bg-white dark:bg-dark-input">
           <!-- File info -->
           <div class="flex items-start justify-between">
             <div class="space-y-1">
-              <div class="text-xs font-medium">{selectedFile.name}</div>
-              <div class="text-xs text-gray-500">
+              <div class="text-sm font-medium dark:text-white">{selectedFile.name}</div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">
                 {(selectedFile.size / 1024 / 1024).toFixed(2)} MB • {selectedFile.type}
               </div>
             </div>
             <button
               type="button"
               onclick={clearFile}
-              class="text-xs text-red-600 hover:text-red-700"
+              class="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
             >
               Remove
             </button>
@@ -318,7 +318,7 @@
 
           <!-- Preview -->
           {#if previewUrl}
-            <div class="border border-thin rounded-sm p-2 bg-gray-50 overflow-hidden">
+            <div class="border border-gray-300 dark:border-gray-700 rounded-sm p-2 bg-gray-50 dark:bg-dark-bg overflow-hidden">
               <img
                 src={previewUrl}
                 alt="Preview"
@@ -330,20 +330,20 @@
       {/if}
 
       {#if error}
-        <div class="text-xs text-red-600">{error}</div>
+        <div class="text-sm text-red-600 dark:text-red-400">{error}</div>
       {/if}
 
       {#if form?.error}
-        <div class="text-xs text-red-600 bg-red-50 border border-red-200 rounded-sm p-3">
+        <div class="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-sm p-3">
           <strong>Upload failed:</strong> {form.error}
         </div>
       {/if}
     </div>
 
     <!-- File Requirements -->
-    <div class="bg-blue-50 border border-blue-200 rounded-sm p-4 space-y-2">
-      <div class="text-xs font-medium text-blue-900">File Requirements</div>
-      <ul class="text-xs text-blue-700 space-y-1 list-disc list-inside">
+    <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-sm p-4 space-y-2">
+      <div class="text-sm font-medium text-blue-900 dark:text-blue-400">File Requirements</div>
+      <ul class="text-sm text-blue-700 dark:text-blue-300 space-y-1 list-disc list-inside">
         <li>Maximum file size: 10MB</li>
         <li>Supported formats: PDF, PNG, JPEG, SVG</li>
         <li>Recommended: High-resolution PNG or PDF for best quality</li>
@@ -352,10 +352,10 @@
     </div>
 
     <!-- Submit -->
-    <div class="flex items-center justify-between pt-4 border-t border-thin">
+    <div class="flex items-center justify-between pt-4 border-t border-gray-300 dark:border-gray-700">
       <a
         href="/app/templates"
-        class="text-xs text-gray-600 hover:text-black transition-colors"
+        class="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
       >
         Cancel
       </a>
@@ -363,7 +363,7 @@
       <button
         type="submit"
         disabled={converting || uploading || !selectedFile || !templateName}
-        class="px-6 py-2 bg-black text-white text-xs rounded-sm hover:bg-gray-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+        class="px-5 py-2.5 bg-black dark:bg-dark-button text-white text-sm rounded-sm hover:bg-gray-800 dark:hover:bg-dark-button-hover transition-colors disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed"
       >
         {converting ? 'Converting PDF...' : uploading ? 'Uploading...' : 'Continue to Mapping'}
       </button>

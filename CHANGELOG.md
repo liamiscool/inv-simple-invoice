@@ -9,20 +9,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- Bulk selection and actions for invoices (select multiple, mark as paid, duplicate, delete)
 - Dark mode support across entire application with system preference detection
 - Quick actions dropdown menu on invoice list (duplicate, change status, delete)
 - Edit button for draft invoices
 - Breadcrumb navigation across all sub-pages (invoices, clients)
 - Bell icon "What's New" changelog widget in sidebar
-- Heroicons integration for clean, minimal iconography
 
 ### Changed
+- Invoice PDFs now automatically adjust table height based on number of items
 - Invoice line items now display on single line when creating invoices
 - Invoice PDFs can now be viewed by anyone with the link (no account required)
 - "What's New" widget now displays properly when hovering
 - Cleaner invoice detail page with more whitespace and fewer boxes
 - Improved sidebar design with better spacing and visual hierarchy
-- Updated typography scale: body text 14px, interactive elements 16px, titles 18px
 
 ### Fixed
 - PDF generation with Supabase Storage integration

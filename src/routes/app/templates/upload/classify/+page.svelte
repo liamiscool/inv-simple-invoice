@@ -1550,29 +1550,29 @@
   <div class="flex items-center justify-between">
     <div>
       <div class="flex items-center gap-3 mb-2">
-        <a href="/app/templates/upload" class="text-xs text-gray-600 hover:text-black">
+        <a href="/app/templates/upload" class="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white">
           ← Back to Upload
         </a>
       </div>
-      <h1 class="text-sm mb-1">Classify Text: {data.template.title}</h1>
-      <p class="text-xs text-gray-600">
+      <h1 class="text-lg font-medium mb-1 dark:text-white">Classify Text: {data.template.title}</h1>
+      <p class="text-sm text-gray-600 dark:text-gray-400">
         Mark text as static (keep) or dynamic (remove & map to invoice fields)
       </p>
     </div>
 
     <div class="flex items-center gap-3">
       {#if saveStatus === 'saving'}
-        <span class="text-xs text-gray-600">Saving...</span>
+        <span class="text-sm text-gray-600 dark:text-gray-400">Saving...</span>
       {:else if saveStatus === 'saved'}
-        <span class="text-xs text-green-600">✓ Saved</span>
+        <span class="text-sm text-green-600 dark:text-green-400">✓ Saved</span>
       {:else if saveStatus === 'error'}
-        <span class="text-xs text-red-600">Save failed</span>
+        <span class="text-sm text-red-600 dark:text-red-400">Save failed</span>
       {/if}
 
       <button
         onclick={generateTemplate}
         disabled={generating || loading || stats.dynamic === 0}
-        class="px-6 py-2 bg-black text-white text-xs rounded-sm hover:bg-gray-800 disabled:bg-gray-300"
+        class="px-5 py-2.5 bg-black dark:bg-dark-button text-white text-sm rounded-sm hover:bg-gray-800 dark:hover:bg-dark-button-hover disabled:bg-gray-300 dark:disabled:bg-gray-700"
       >
         {generating ? (generatingProgress || 'Generating Template...') : 'Generate Template'}
       </button>
@@ -1580,12 +1580,12 @@
   </div>
 
   <!-- Instructions -->
-  <div class="border border-thin rounded-sm p-4 bg-blue-50">
-    <div class="text-xs space-y-2">
+  <div class="border border-gray-300 dark:border-gray-700 rounded-sm p-4 bg-blue-50 dark:bg-blue-900/30">
+    <div class="text-sm space-y-2 dark:text-white">
       <div class="font-medium">How to classify your template:</div>
-      <ul class="list-disc list-inside text-gray-700 space-y-1">
-        <li><span class="text-gray-600 font-medium">Gray boxes</span> = Static labels (kept in template)</li>
-        <li><span class="text-blue-600 font-medium">Blue boxes</span> = Dynamic data (will be replaced with invoice data)</li>
+      <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-1">
+        <li><span class="text-gray-600 dark:text-gray-400 font-medium">Gray boxes</span> = Static labels (kept in template)</li>
+        <li><span class="text-blue-600 dark:text-blue-400 font-medium">Blue boxes</span> = Dynamic data (will be replaced with invoice data)</li>
         <li>Use the toggle switch to change between static/dynamic</li>
         <li>For dynamic text, assign a field mapping in the sidebar</li>
         <li>Use "Ignore / Delete" for unwanted text</li>
@@ -1596,23 +1596,23 @@
   <!-- Stats -->
   {#if extractedText}
     <div class="grid grid-cols-3 gap-4">
-      <div class="border border-thin rounded-sm p-3 {stats.unmapped === 0 ? 'bg-green-50' : 'bg-red-50'}">
-        <div class="text-xs {stats.unmapped === 0 ? 'text-green-700' : 'text-red-700'}">Dynamic Fields</div>
-        <div class="text-lg font-medium {stats.unmapped === 0 ? 'text-green-900' : 'text-red-900'}">{stats.mapped + stats.ignored} of {stats.dynamic + stats.ignored}</div>
+      <div class="border border-gray-300 dark:border-gray-700 rounded-sm p-3 {stats.unmapped === 0 ? 'bg-green-50 dark:bg-green-900/30' : 'bg-red-50 dark:bg-red-900/30'}">
+        <div class="text-sm {stats.unmapped === 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}">Dynamic Fields</div>
+        <div class="text-lg font-medium {stats.unmapped === 0 ? 'text-green-900 dark:text-green-300' : 'text-red-900 dark:text-red-300'}">{stats.mapped + stats.ignored} of {stats.dynamic + stats.ignored}</div>
       </div>
-      <div class="border border-thin rounded-sm p-3 bg-gray-50">
-        <div class="text-xs text-gray-700">Static Labels</div>
-        <div class="text-lg font-medium text-gray-900">{stats.static}</div>
+      <div class="border border-gray-300 dark:border-gray-700 rounded-sm p-3 bg-gray-50 dark:bg-dark-input">
+        <div class="text-sm text-gray-700 dark:text-gray-300">Static Labels</div>
+        <div class="text-lg font-medium text-gray-900 dark:text-white">{stats.static}</div>
       </div>
-      <div class="border border-thin rounded-sm p-3 bg-gray-50">
-        <div class="text-xs text-gray-600">Ignored</div>
-        <div class="text-lg font-medium text-gray-700">{stats.ignored}</div>
+      <div class="border border-gray-300 dark:border-gray-700 rounded-sm p-3 bg-gray-50 dark:bg-dark-input">
+        <div class="text-sm text-gray-600 dark:text-gray-400">Ignored</div>
+        <div class="text-lg font-medium text-gray-700 dark:text-gray-300">{stats.ignored}</div>
       </div>
     </div>
   {/if}
 
   {#if error}
-    <div class="border border-red-300 rounded-sm p-4 bg-red-50 text-red-700 text-xs">
+    <div class="border border-red-300 dark:border-red-800 rounded-sm p-4 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-sm">
       {error}
     </div>
   {/if}
@@ -1620,7 +1620,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Canvas -->
     <div class="lg:col-span-2 space-y-4">
-      <div class="border border-thin rounded-sm p-4 bg-white flex items-start justify-center">
+      <div class="border border-gray-300 dark:border-gray-700 rounded-sm p-4 bg-white dark:bg-dark-bg flex items-start justify-center">
         <!-- Always render canvas so it can be bound -->
         <canvas
           bind:this={canvas}
@@ -1628,16 +1628,16 @@
           onmousemove={handleCanvasMouseMove}
           onmouseup={handleCanvasMouseUp}
           style="cursor: crosshair; width: 100%; height: auto; display: {pdfRendered ? 'block' : 'none'};"
-          class="border border-gray-200"
+          class="border border-gray-200 dark:border-gray-700"
         ></canvas>
 
         <!-- Loading/Error States -->
         {#if loading}
-          <div class="flex items-center justify-center h-96 text-gray-400 text-xs">
+          <div class="flex items-center justify-center h-96 text-gray-400 dark:text-gray-500 text-sm">
             Analyzing PDF and extracting text...
           </div>
         {:else if !extractedText && !error}
-          <div class="flex items-center justify-center h-96 text-gray-400 text-xs">
+          <div class="flex items-center justify-center h-96 text-gray-400 dark:text-gray-500 text-sm">
             Waiting for PDF...
           </div>
         {/if}
@@ -1645,24 +1645,24 @@
 
       <!-- Custom field input for area (shows when area selected for custom field) -->
       {#if customFieldAreaIndex !== null}
-        <div class="border border-thin rounded-sm p-4 bg-blue-50">
-          <div class="text-xs font-medium mb-3">Create Custom Field for Selected Area</div>
+        <div class="border border-gray-300 dark:border-gray-700 rounded-sm p-4 bg-blue-50 dark:bg-blue-900/30">
+          <div class="text-sm font-medium mb-3 dark:text-white">Create Custom Field for Selected Area</div>
           <div class="space-y-2">
             <input
               type="text"
               bind:value={customFieldName}
               oninput={handleCustomFieldInput}
               placeholder="Enter field name..."
-              class="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-sm"
+              class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-sm bg-white dark:bg-dark-input dark:text-white focus:outline-none focus:border-black dark:focus:border-white"
               autofocus
             />
 
             {#if customFieldSuggestion}
-              <div class="text-xs p-2 bg-white border border-blue-300 rounded-sm">
-                <div class="text-blue-700 mb-1">Did you mean:</div>
+              <div class="text-sm p-2 bg-white dark:bg-dark-input border border-blue-300 dark:border-blue-800 rounded-sm">
+                <div class="text-blue-700 dark:text-blue-400 mb-1">Did you mean:</div>
                 <button
                   onclick={() => saveCustomField(true)}
-                  class="text-blue-600 hover:underline font-medium"
+                  class="text-blue-600 dark:text-blue-400 hover:underline font-medium"
                 >
                   {fieldOptions.find(f => f.value === customFieldSuggestion)?.label}
                 </button>
@@ -1673,13 +1673,13 @@
               <button
                 onclick={() => saveCustomField(false)}
                 disabled={!customFieldName.trim()}
-                class="flex-1 px-3 py-1.5 text-xs bg-black text-white rounded-sm hover:bg-gray-800 disabled:bg-gray-300"
+                class="flex-1 px-5 py-2.5 text-sm bg-black dark:bg-dark-button text-white rounded-sm hover:bg-gray-800 dark:hover:bg-dark-button-hover disabled:bg-gray-300 dark:disabled:bg-gray-700"
               >
                 Save Custom Field
               </button>
               <button
                 onclick={cancelCustomField}
-                class="px-3 py-1.5 text-xs border border-gray-300 bg-white rounded-sm hover:bg-gray-50"
+                class="px-5 py-2.5 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-input rounded-sm hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white"
               >
                 Cancel
               </button>
@@ -1693,8 +1693,8 @@
     <div class="space-y-4">
       <!-- Text Items List -->
       {#if extractedText}
-        <div class="border border-thin rounded-sm p-4 space-y-3">
-          <div class="text-xs font-medium">Fields ({extractedText.items.length + customAreas.length})</div>
+        <div class="border border-gray-300 dark:border-gray-700 rounded-sm p-4 space-y-3 bg-white dark:bg-dark-bg">
+          <div class="text-sm font-medium dark:text-white">Fields ({extractedText.items.length + customAreas.length})</div>
           <div class="space-y-2">
             <!-- Custom Boxes (shown first) -->
             {#each customAreas as area, areaIndex}
