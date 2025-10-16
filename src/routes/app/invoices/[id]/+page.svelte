@@ -116,6 +116,7 @@
         currency: invoice.currency,
         status: 'draft',
         notes: invoice.notes,
+        include_contact_name: invoice.include_contact_name || false,
         subtotal: invoice.subtotal,
         tax_total: invoice.tax_total,
         total: invoice.total

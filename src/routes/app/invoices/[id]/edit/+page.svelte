@@ -114,8 +114,17 @@
     lineItems;
 
     // Don't auto-save if no meaningful data yet
-    if (!selectedClientId || !selectedTemplateId || !lineItems[0]?.description) {
+    if (!selectedClientId || !selectedTemplateId) {
       return;
+    }
+
+    // Only save items that have at least a description
+    const validItems = lineItems.filter(item =>
+      item.description && item.description.trim().length > 0
+    );
+
+    if (validItems.length === 0) {
+      return; // Don't auto-save if no valid items
     }
 
     // Debounce auto-save (wait 2 seconds after last change)
@@ -179,25 +188,43 @@
 
         if (updateError) throw updateError;
 
-        // Delete old line items and insert new ones
-        await data.supabase
+        // Upsert line items (only save items with descriptions)
+        const itemsToUpsert = lineItems
+          .filter(item => item.description && item.description.trim())
+          .map((item: any, index: number) => ({
+            invoice_id: draftInvoiceId,
+            position: index + 1,
+            description: item.description,
+            qty: item.qty || 0,
+            unit_price: item.unitPrice || 0,
+            tax_rate: (item.taxRate || 0) / 100,
+            line_total: (item.qty || 0) * (item.unitPrice || 0)
+          }));
+
+        // Upsert all current items
+        if (itemsToUpsert.length > 0) {
+          const { error: upsertError } = await data.supabase
+            .from('invoice_item')
+            .upsert(itemsToUpsert, {
+              onConflict: 'invoice_id,position'
+            });
+
+          if (upsertError) {
+            console.error('Upsert error:', upsertError);
+            throw upsertError;
+          }
+        }
+
+        // Delete items beyond current count (if user removed items)
+        const { error: deleteError } = await data.supabase
           .from('invoice_item')
           .delete()
-          .eq('invoice_id', draftInvoiceId);
+          .eq('invoice_id', draftInvoiceId)
+          .gt('position', itemsToUpsert.length);
 
-        const itemsToInsert = lineItems.map((item: any, index: number) => ({
-          invoice_id: draftInvoiceId,
-          position: index + 1,
-          description: item.description,
-          qty: item.qty,
-          unit_price: item.unitPrice,
-          tax_rate: item.taxRate / 100,
-          line_total: item.qty * item.unitPrice
-        }));
-
-        await data.supabase
-          .from('invoice_item')
-          .insert(itemsToInsert);
+        if (deleteError) {
+          console.error('Delete old items error:', deleteError);
+        }
 
       } else {
         // Create new draft invoice
