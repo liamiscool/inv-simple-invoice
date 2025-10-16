@@ -41,6 +41,25 @@ export interface CompanyData {
 }
 
 /**
+ * Calculate the actual height of the items table based on number of items
+ */
+function calculateTableHeight(table: TableSpec, itemCount: number): number {
+  const headerHeight = table.header_height || table.row_height;
+  const totalRowsHeight = itemCount * table.row_height;
+  return headerHeight + totalRowsHeight;
+}
+
+/**
+ * Calculate the expected/default table height from template
+ * (used to determine if we need to adjust positions)
+ */
+function calculateDefaultTableHeight(table: TableSpec): number {
+  // Assume template was designed for ~10 items as a baseline
+  const defaultItemCount = 10;
+  return calculateTableHeight(table, defaultItemCount);
+}
+
+/**
  * Render an invoice to HTML using a template specification
  */
 export function renderInvoiceHTML(
@@ -49,6 +68,42 @@ export function renderInvoiceHTML(
   template: TemplateSpec
 ): string {
   const { meta, styles, areas } = template;
+
+  // Calculate dynamic table height and position adjustments
+  const actualTableHeight = calculateTableHeight(areas.items_table, invoice.items.length);
+  const defaultTableHeight = calculateDefaultTableHeight(areas.items_table);
+  const heightDifference = actualTableHeight - defaultTableHeight;
+
+  // Create adjusted areas with dynamic positioning for elements below the table
+  const adjustedAreas = { ...areas };
+
+  if (heightDifference > 0) {
+    // Adjust positions of elements that come after the items table
+    if (adjustedAreas.subtotal) {
+      adjustedAreas.subtotal = { ...adjustedAreas.subtotal, y: adjustedAreas.subtotal.y + heightDifference };
+    }
+    if (adjustedAreas.tax_total) {
+      adjustedAreas.tax_total = { ...adjustedAreas.tax_total, y: adjustedAreas.tax_total.y + heightDifference };
+    }
+    if (adjustedAreas.grand_total) {
+      adjustedAreas.grand_total = { ...adjustedAreas.grand_total, y: adjustedAreas.grand_total.y + heightDifference };
+    }
+    if (adjustedAreas.notes) {
+      adjustedAreas.notes = { ...adjustedAreas.notes, y: adjustedAreas.notes.y + heightDifference };
+    }
+    if (adjustedAreas.payment_info) {
+      adjustedAreas.payment_info = { ...adjustedAreas.payment_info, y: adjustedAreas.payment_info.y + heightDifference };
+    }
+    if (adjustedAreas.footer) {
+      adjustedAreas.footer = { ...adjustedAreas.footer, y: adjustedAreas.footer.y + heightDifference };
+    }
+  }
+
+  // Create adjusted meta with dynamic page height
+  const adjustedMeta = { ...meta };
+  if (heightDifference > 0) {
+    adjustedMeta.height = meta.height + heightDifference;
+  }
   
   // Helper functions
   function formatCurrency(amount: number, currency: string): string {
@@ -164,11 +219,11 @@ export function renderInvoiceHTML(
     return html;
   }
 
-  // Build CSS
+  // Build CSS (use adjusted meta for dynamic page height)
   const css = `
     @page {
-      size: ${meta.width}mm ${meta.height}mm;
-      margin: ${meta.margins.top}mm ${meta.margins.right}mm ${meta.margins.bottom}mm ${meta.margins.left}mm;
+      size: ${adjustedMeta.width}mm ${adjustedMeta.height}mm;
+      margin: ${adjustedMeta.margins.top}mm ${adjustedMeta.margins.right}mm ${adjustedMeta.margins.bottom}mm ${adjustedMeta.margins.left}mm;
     }
 
     body {
@@ -179,9 +234,9 @@ export function renderInvoiceHTML(
       margin: 0;
       padding: 0;
       position: relative;
-      ${meta.background_pdf_url || meta.background_image_url ? `
-        background-image: url('${meta.background_pdf_url || meta.background_image_url}');
-        background-size: ${meta.width}mm ${meta.height}mm;
+      ${adjustedMeta.background_pdf_url || adjustedMeta.background_image_url ? `
+        background-image: url('${adjustedMeta.background_pdf_url || adjustedMeta.background_image_url}');
+        background-size: ${adjustedMeta.width}mm ${adjustedMeta.height}mm;
         background-repeat: no-repeat;
         background-position: 0 0;
       ` : ''}
@@ -196,77 +251,77 @@ export function renderInvoiceHTML(
     }
   `;
 
-  // Build HTML content
+  // Build HTML content (use adjusted areas for dynamic positioning)
   let content = '';
 
   // Render each area
-  if (areas.invoice_title) {
-    content += renderArea('invoice_title', areas.invoice_title, 'INVOICE');
+  if (adjustedAreas.invoice_title) {
+    content += renderArea('invoice_title', adjustedAreas.invoice_title, 'INVOICE');
   }
 
-  if (areas.invoice_number) {
-    content += renderArea('invoice_number', areas.invoice_number, invoice.number);
+  if (adjustedAreas.invoice_number) {
+    content += renderArea('invoice_number', adjustedAreas.invoice_number, invoice.number);
   }
 
-  if (areas.company_info) {
+  if (adjustedAreas.company_info) {
     const companyInfo = [
       company.company_name || company.full_name || 'Company Name',
       company.company_address,
       company.tax_id ? `Tax ID: ${company.tax_id}` : null
     ].filter(Boolean).join('\\n');
-    
-    content += renderArea('company_info', areas.company_info, companyInfo.replace(/\\n/g, '<br>'));
+
+    content += renderArea('company_info', adjustedAreas.company_info, companyInfo.replace(/\\n/g, '<br>'));
   }
 
-  if (areas.issue_date) {
-    content += renderArea('issue_date', areas.issue_date, `Issue Date: ${formatDate(invoice.issue_date)}`);
+  if (adjustedAreas.issue_date) {
+    content += renderArea('issue_date', adjustedAreas.issue_date, `Issue Date: ${formatDate(invoice.issue_date)}`);
   }
 
-  if (areas.due_date && invoice.due_date) {
-    content += renderArea('due_date', areas.due_date, `Due Date: ${formatDate(invoice.due_date)}`);
+  if (adjustedAreas.due_date && invoice.due_date) {
+    content += renderArea('due_date', adjustedAreas.due_date, `Due Date: ${formatDate(invoice.due_date)}`);
   }
 
-  if (areas.client_name) {
-    content += renderArea('client_name', areas.client_name, invoice.client.name);
+  if (adjustedAreas.client_name) {
+    content += renderArea('client_name', adjustedAreas.client_name, invoice.client.name);
   }
 
-  if (areas.client_company && invoice.client.company) {
-    content += renderArea('client_company', areas.client_company, invoice.client.company);
+  if (adjustedAreas.client_company && invoice.client.company) {
+    content += renderArea('client_company', adjustedAreas.client_company, invoice.client.company);
   }
 
-  if (areas.client_email && invoice.client.email) {
-    content += renderArea('client_email', areas.client_email, invoice.client.email);
+  if (adjustedAreas.client_email && invoice.client.email) {
+    content += renderArea('client_email', adjustedAreas.client_email, invoice.client.email);
   }
 
-  if (areas.client_address && invoice.client.company_address) {
-    content += renderArea('client_address', areas.client_address, invoice.client.company_address.replace(/\\n/g, '<br>'));
+  if (adjustedAreas.client_address && invoice.client.company_address) {
+    content += renderArea('client_address', adjustedAreas.client_address, invoice.client.company_address.replace(/\\n/g, '<br>'));
   }
 
-  if (areas.client_tax_id && invoice.client.tax_id) {
-    content += renderArea('client_tax_id', areas.client_tax_id, `Tax ID: ${invoice.client.tax_id}`);
+  if (adjustedAreas.client_tax_id && invoice.client.tax_id) {
+    content += renderArea('client_tax_id', adjustedAreas.client_tax_id, `Tax ID: ${invoice.client.tax_id}`);
   }
 
-  // Items table
-  content += renderTable(areas.items_table, invoice.items);
+  // Items table (uses original table spec, but positions are adjusted)
+  content += renderTable(adjustedAreas.items_table, invoice.items);
 
-  if (areas.subtotal) {
-    content += renderArea('subtotal', areas.subtotal, `Subtotal: ${formatCurrency(invoice.subtotal, invoice.currency)}`);
+  if (adjustedAreas.subtotal) {
+    content += renderArea('subtotal', adjustedAreas.subtotal, `Subtotal: ${formatCurrency(invoice.subtotal, invoice.currency)}`);
   }
 
-  if (areas.tax_total) {
-    content += renderArea('tax_total', areas.tax_total, `Tax: ${formatCurrency(invoice.tax_total, invoice.currency)}`);
+  if (adjustedAreas.tax_total) {
+    content += renderArea('tax_total', adjustedAreas.tax_total, `Tax: ${formatCurrency(invoice.tax_total, invoice.currency)}`);
   }
 
-  if (areas.grand_total) {
-    content += renderArea('grand_total', areas.grand_total, `Total: ${formatCurrency(invoice.total, invoice.currency)}`);
+  if (adjustedAreas.grand_total) {
+    content += renderArea('grand_total', adjustedAreas.grand_total, `Total: ${formatCurrency(invoice.total, invoice.currency)}`);
   }
 
-  if (areas.notes && invoice.notes) {
-    content += renderArea('notes', areas.notes, invoice.notes.replace(/\\n/g, '<br>'));
+  if (adjustedAreas.notes && invoice.notes) {
+    content += renderArea('notes', adjustedAreas.notes, invoice.notes.replace(/\\n/g, '<br>'));
   }
 
-  if (areas.payment_info && company.bank_details) {
-    content += renderArea('payment_info', areas.payment_info, company.bank_details.replace(/\\n/g, '<br>'));
+  if (adjustedAreas.payment_info && company.bank_details) {
+    content += renderArea('payment_info', adjustedAreas.payment_info, company.bank_details.replace(/\\n/g, '<br>'));
   }
 
   // Complete HTML document
