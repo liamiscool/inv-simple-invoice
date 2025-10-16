@@ -1,4 +1,5 @@
 import type { PageServerLoad } from './$types';
+import { getTemplate } from '$lib/templates';
 
 export const load: PageServerLoad = async ({ params, locals: { supabase, safeGetSession } }) => {
   const { user } = await safeGetSession();
@@ -71,8 +72,12 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, safeGet
     invoice.payments.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }
 
+  // Get template for rendering
+  const template = await getTemplate(supabase, invoice.template_id);
+
   return {
     invoice,
-    userProfile: profile
+    userProfile: profile,
+    template
   };
 };
