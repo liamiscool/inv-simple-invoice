@@ -273,7 +273,28 @@
       }, 2000);
 
     } catch (err: any) {
-      console.error('Auto-save failed:', err);
+      console.error('=== AUTO-SAVE ERROR DEBUG (EDIT) ===');
+      console.error('Error object:', err);
+      console.error('Error message:', err?.message);
+      console.error('Error details:', err?.details);
+      console.error('Error hint:', err?.hint);
+      console.error('Error code:', err?.code);
+      console.error('Full error:', JSON.stringify(err, null, 2));
+      console.error('Current state:', {
+        draftInvoiceId,
+        selectedClientId,
+        selectedTemplateId,
+        lineItems: lineItems.map(item => ({
+          description: item.description,
+          qty: item.qty,
+          unitPrice: item.unitPrice,
+          taxRate: item.taxRate
+        })),
+        includeContactName,
+        dueDate,
+        issueDate
+      });
+      console.error('=== END DEBUG ===');
       saveStatus = 'error';
     } finally {
       isSaving = false;
