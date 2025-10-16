@@ -7,14 +7,15 @@
   let error = $state('');
 
   // Form data - initialize with existing client data
-  let name = $state(data.client.name);
-  let company = $state(data.client.company || '');
-  let company_address = $state(data.client.company_address || '');
-  let email = $state(data.client.email || '');
-  let currency = $state(data.client.currency || 'EUR');
-  let legal_name = $state(data.client.legal_name || '');
-  let tax_id = $state(data.client.tax_id || '');
-  let notes = $state(data.client.notes || '');
+  const client: any = data.client;
+  let name = $state(client.name);
+  let company = $state(client.company || '');
+  let company_address = $state(client.company_address || '');
+  let email = $state(client.email || '');
+  let currency = $state(client.currency || 'EUR');
+  let legal_name = $state(client.legal_name || '');
+  let tax_id = $state(client.tax_id || '');
+  let notes = $state(client.notes || '');
 
   const currencies = [
     { code: 'EUR', name: 'Euro (€)' },
@@ -38,24 +39,25 @@
         .from('app_user')
         .select('org_id')
         .eq('id', user.user.id)
-        .single();
+        .single() as { data: any };
 
       if (!profile) throw new Error('Profile not found');
 
       // Update client with org_id check
+      const updateData: any = {
+        name,
+        company: company || null,
+        company_address: company_address || null,
+        email: email || null,
+        currency,
+        legal_name: legal_name || null,
+        tax_id: tax_id || null,
+        notes: notes || null
+      };
       const { error: updateError } = await data.supabase
         .from('client')
-        .update({
-          name,
-          company: company || null,
-          company_address: company_address || null,
-          email: email || null,
-          currency,
-          legal_name: legal_name || null,
-          tax_id: tax_id || null,
-          notes: notes || null
-        } as any)
-        .eq('id', data.client.id)
+        .update(updateData)
+        .eq('id', client.id)
         .eq('org_id', profile.org_id);
 
       if (updateError) {
@@ -76,7 +78,7 @@
 </script>
 
 <svelte:head>
-  <title>Edit {data.client.name} - inv</title>
+  <title>Edit {client.name} - inv</title>
 </svelte:head>
 
 <div class="max-w-3xl space-y-8">
@@ -87,7 +89,7 @@
     <div class="flex items-center gap-2 text-xs">
       <a href="/app/clients" class="text-gray-400 hover:text-black dark:hover:text-white transition-colors">Clients</a>
       <span class="text-gray-400">/</span>
-      <a href="/app/clients/{data.client.id}" class="text-gray-400 hover:text-black dark:hover:text-white transition-colors">{data.client.name}</a>
+      <a href="/app/clients/{client.id}" class="text-gray-400 hover:text-black dark:hover:text-white transition-colors">{client.name}</a>
       <span class="text-gray-400">/</span>
       <span class="text-gray-600 dark:text-gray-400">Edit</span>
     </div>
@@ -218,7 +220,7 @@
     <!-- Actions -->
     <div class="flex items-center justify-between pt-4">
       <a
-        href="/app/clients/{data.client.id}"
+        href="/app/clients/{client.id}"
         class="px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white text-sm hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors duration-75"
       >
         Cancel
