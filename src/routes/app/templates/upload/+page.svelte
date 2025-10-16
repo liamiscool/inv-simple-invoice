@@ -195,11 +195,6 @@
 <div class="max-w-3xl space-y-6">
   <!-- Header -->
   <div>
-    <div class="flex items-center gap-3 mb-2">
-      <a href="/app/templates" class="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
-        ← Back to Templates
-      </a>
-    </div>
     <h1 class="text-lg font-medium mb-1 dark:text-white">Upload Custom Template</h1>
     <p class="text-sm text-gray-600 dark:text-gray-400">
       Upload your invoice design (PDF, PNG, or JPEG). PDFs are automatically converted to PNG in your browser.

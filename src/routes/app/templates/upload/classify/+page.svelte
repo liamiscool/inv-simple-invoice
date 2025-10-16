@@ -2049,7 +2049,7 @@
             {#each tableConfig.columns as column, colIndex}
               <div class="border border-gray-200 rounded-sm p-3">
                 <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs font-medium">Column {colIndex + 1}</span>
+                  <span class="text-sm font-medium dark:text-white">Column {colIndex + 1}</span>
                   {#if tableConfig.columns.length > 1}
                     <button
                       type="button"
@@ -2059,7 +2059,7 @@
                           customAreas = [...customAreas];
                         }
                       }}
-                      class="text-xs text-red-600 hover:text-red-700"
+                      class="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
                     >
                       Remove
                     </button>
@@ -2069,7 +2069,7 @@
                 <div class="grid grid-cols-2 gap-2">
                   <!-- Field Type -->
                   <div>
-                    <label class="block text-xs text-gray-600 mb-1">Field</label>
+                    <label class="block text-sm text-gray-600 dark:text-gray-400 mb-1">Field</label>
                     <select
                       value={column.field}
                       onchange={(e) => {
@@ -2077,7 +2077,7 @@
                         customAreas = [...customAreas];
                         redraw();
                       }}
-                      class="w-full px-2 py-1 text-xs border border-gray-300 rounded-sm"
+                      class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-sm bg-white dark:bg-dark-input dark:text-white"
                     >
                       <option value="description">Description</option>
                       <option value="quantity">Quantity</option>
@@ -2095,14 +2095,14 @@
                           customAreas = [...customAreas];
                         }}
                         placeholder="Custom label..."
-                        class="w-full px-2 py-1 text-xs border border-gray-300 rounded-sm mt-1"
+                        class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-sm bg-white dark:bg-dark-input dark:text-white mt-1"
                       />
                     {/if}
                   </div>
 
                   <!-- Alignment -->
                   <div>
-                    <label class="block text-xs text-gray-600 mb-1">Align</label>
+                    <label class="block text-sm text-gray-600 dark:text-gray-400 mb-1">Align</label>
                     <select
                       value={column.align}
                       onchange={(e: any) => {
@@ -2110,7 +2110,7 @@
                         customAreas = [...customAreas];
                         redraw();
                       }}
-                      class="w-full px-2 py-1 text-xs border border-gray-300 rounded-sm"
+                      class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-sm bg-white dark:bg-dark-input dark:text-white"
                     >
                       <option value="left">Left</option>
                       <option value="center">Center</option>
@@ -2121,7 +2121,7 @@
 
                 <!-- Width Slider -->
                 <div class="mt-2">
-                  <label class="block text-xs text-gray-600 mb-1">
+                  <label class="block text-sm text-gray-600 dark:text-gray-400 mb-1">
                     Width: {column.widthPercent.toFixed(1)}%
                   </label>
                   <input
@@ -2169,7 +2169,7 @@
               });
               customAreas = [...customAreas];
             }}
-            class="mt-2 px-3 py-1.5 text-xs border border-gray-300 rounded-sm hover:bg-gray-50"
+            class="mt-2 px-5 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-sm hover:bg-gray-50 dark:hover:bg-dark-hover dark:bg-dark-input dark:text-white"
           >
             + Add Column
           </button>
@@ -2178,7 +2178,7 @@
         <!-- Row Settings -->
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">Row Height (px)</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Row Height (px)</label>
             <input
               type="number"
               value={tableConfig.rowHeight}
@@ -2189,7 +2189,7 @@
               }}
               min="10"
               max="100"
-              class="w-full px-2 py-1 text-xs border border-gray-300 rounded-sm"
+              class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-sm bg-white dark:bg-dark-input dark:text-white"
             />
           </div>
 
@@ -2205,14 +2205,14 @@
                 }}
                 class="w-4 h-4"
               />
-              <span class="text-xs text-gray-700">First row is headers</span>
+              <span class="text-sm text-gray-700 dark:text-gray-300">First row is headers</span>
             </label>
           </div>
         </div>
 
         <!-- Table Preview -->
         <div class="border border-gray-200 rounded-sm p-3 bg-gray-50">
-          <div class="text-xs font-medium text-gray-700 mb-2">Preview</div>
+          <div class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Preview</div>
           <div class="text-[10px] font-mono">
             <div class="flex border-b border-gray-300">
               {#each tableConfig.columns as column}
@@ -2249,7 +2249,7 @@
             editingTableIndex = null;
             redraw();
           }}
-          class="px-3 py-1.5 text-xs border border-gray-300 rounded-sm hover:bg-gray-50"
+          class="px-5 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-sm hover:bg-gray-50 dark:hover:bg-dark-hover dark:bg-dark-input dark:text-white"
         >
           Cancel
         </button>
@@ -2260,7 +2260,7 @@
             editingTableIndex = null;
             redraw();
           }}
-          class="px-3 py-1.5 text-xs bg-black text-white rounded-sm hover:bg-gray-800"
+          class="px-5 py-2.5 text-sm bg-black dark:bg-dark-button text-white rounded-sm hover:bg-gray-800 dark:hover:bg-dark-button-hover"
         >
           Save Configuration
         </button>
