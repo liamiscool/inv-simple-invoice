@@ -88,13 +88,15 @@
 
 <div class="max-w-3xl space-y-8">
   <!-- Header -->
-  <div>
-    <h1 class="text-lg font-medium mb-1 dark:text-white">Add Client</h1>
-    <!-- Breadcrumbs -->
-    <div class="flex items-center gap-2 text-xs">
-      <a href="/app/clients" class="text-gray-400 hover:text-black dark:hover:text-white transition-colors">Clients</a>
-      <span class="text-gray-400">/</span>
-      <span class="text-gray-600 dark:text-gray-400">New</span>
+  <div class="flex items-start justify-between">
+    <div>
+      <h1 class="text-lg font-medium mb-1 dark:text-white">Add Client</h1>
+      <!-- Breadcrumbs -->
+      <div class="flex items-center gap-2 text-xs">
+        <a href="/app/clients" class="text-gray-400 hover:text-black dark:hover:text-white transition-colors">Clients</a>
+        <span class="text-gray-400">/</span>
+        <span class="text-gray-600 dark:text-gray-400">New</span>
+      </div>
     </div>
   </div>
 

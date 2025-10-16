@@ -1,0 +1,124 @@
+# .cursorrules
+# Cursor Rules for "inv – Beautiful Invoices for Designers"
+# Project guidance and behavioral context for Cursor when reading, editing, or generating code.
+
+---
+
+## 🧠 PROJECT OVERVIEW
+
+A minimal, Yeezy-inspired invoice tool with stark minimalism and terminal vibes.  
+Core innovation: designers can upload their own invoice designs (PDF/PNG) and convert them into reusable templates.
+
+Stack:
+- SvelteKit + TailwindCSS
+- Supabase (Postgres, Auth, Storage)
+- Resend (emails), Stripe (billing)
+- anime.js for micro-animations
+- Cloudflare Pages for deployment
+
+Goals:
+- Maintain minimalism in both UX and code.
+- Optimize for simplicity, portability, and clear architecture.
+- Always prefer small, isolated modules over large utilities.
+
+---
+
+## ⚙️ PDF CONVERSION ARCHITECTURE
+
+**Current approach:** client-side conversion using `pdf.js`.
+
+Cursor should preserve and respect this setup.
+
+Key points:
+1. Conversion occurs entirely in the browser (no server dependencies).
+2. Files: `src/routes/app/templates/upload/+page.svelte` (lines ~6–16, 30–56)
+3. Flow: upload → render PDF at 300 DPI → convert to PNG blob → upload to Supabase.
+4. Server handles only PNG uploads.
+
+When working on this area:
+- Avoid introducing native or server-side dependencies (Cairo, Pango, canvas, etc.).
+- Client-side keeps Cloudflare deployment simple.
+- Future refactors can use a Web Worker or external API (e.g., CloudConvert).
+
+---
+
+## 🧩 DATABASE & MCP CONTEXT
+
+The project uses Supabase with an org-scoped schema.  
+Claude used MCP for remote querying; Cursor should instead rely on:
+- `.env.local` variables
+- `src/lib/types/database.types.ts`
+- Supabase CLI or API directly for migrations and schema updates
+
+Cursor should:
+- Keep schema-driven types accurate (`npx supabase gen types typescript --local > src/lib/types/supabase.ts`)
+- Respect RLS policies (org_id scoping)
+
+---
+
+## 🧱 CORE MODELS
+
+- `app_org`: Organizations  
+- `app_user`: User profiles  
+- `client`: Customer records  
+- `template`: Invoice templates  
+- `invoice`: Invoice records  
+- `invoice_item`: Line items  
+- `invoice_payment`: Partial payments  
+- `plan_subscription`: Stripe subscription tracking  
+- `send_counter`: Free plan limiter  
+
+Invoice status flow:
+`draft → sent → partially_paid / paid / overdue / void`
+
+Free tier: 3 lifetime sends → upgrade required.
+
+---
+
+## 💄 DESIGN & UI SYSTEM
+
+- Stark minimalism, light UI chrome, dense info layout  
+- Typography: JetBrains Mono / IBM Plex Mono  
+- Palette: white-dominant with #EAEAEA borders  
+- Dark mode via `class` strategy (`darkMode: 'class'` in Tailwind)
+
+Dark Mode Reference:
+- Backgrounds: `#0A0A0A`, inputs `#171717`, buttons `#1A1A1A`
+- Text hierarchy: primary white → gray-300 → gray-400
+- Hover/focus: consistent with theme tokens
+
+Cursor should:
+- Preserve visual hierarchy
+- Keep Tailwind class usage consistent
+- Avoid hard-coded colors; extend via theme tokens
+
+---
+
+## 🔒 RLS + AUTH + SECURITY
+
+- Enforce `org_id` scoping on all tables
+- Never expose `service_role` key client-side
+- All database interactions go through Supabase JS client with anon key unless server route
+
+---
+
+## 🧪 TESTING TARGETS
+
+Cursor should aim to maintain:
+- Unit tests for totals, status transitions, numbering
+- E2E tests for create→send→payment flow
+- Visual regression for PDF rendering (snapshot comparison)
+- Email preview in Resend sandbox
+
+---
+
+## 🌐 DEPLOYMENT
+
+- Environment: Cloudflare Pages
+- Commands:
+  ```bash
+  pnpm install
+  pnpm dev
+  pnpm build
+  pnpm preview
+  pnpm check

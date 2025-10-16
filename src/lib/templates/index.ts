@@ -160,9 +160,19 @@ export async function ensureCuratedTemplates(supabase: SupabaseClient) {
       }
     }
     
-    // Insert missing curated templates
+    // Insert missing curated templates OR update existing ones
     const templatesToInsert = CURATED_TEMPLATES
       .filter(template => !existingTitles.has(template.title))
+      .map(template => ({
+        org_id: template.org_id,
+        title: template.title,
+        kind: template.kind,
+        spec: template.spec
+      }));
+
+    // Also update existing templates to ensure they have the latest spec
+    const templatesToUpdate = CURATED_TEMPLATES
+      .filter(template => existingTitles.has(template.title))
       .map(template => ({
         org_id: template.org_id,
         title: template.title,
@@ -183,6 +193,24 @@ export async function ensureCuratedTemplates(supabase: SupabaseClient) {
         console.log('Note: This is expected until RLS policies are updated to allow curated templates');
       } else {
         console.log(`Inserted ${templatesToInsert.length} curated templates`);
+      }
+    }
+
+    // Update existing templates to ensure they have the latest spec
+    if (templatesToUpdate.length > 0) {
+      console.log(`Updating ${templatesToUpdate.length} existing templates with latest spec`);
+      for (const template of templatesToUpdate) {
+        const { error: updateError } = await supabase
+          .from('template')
+          .update({ spec: template.spec })
+          .eq('title', template.title)
+          .eq('kind', 'curated');
+
+        if (updateError) {
+          console.error(`Error updating template ${template.title}:`, updateError);
+        } else {
+          console.log(`Successfully updated template: ${template.title}`);
+        }
       }
     }
   } catch (error) {

@@ -683,7 +683,7 @@
           <textarea
             id="notes"
             bind:value={notes}
-            placeholder="Additional notes or payment terms..."
+            placeholder="Additional notes or message to include on this invoice..."
             rows="3"
             class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors resize-none"
           ></textarea>

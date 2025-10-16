@@ -32,6 +32,7 @@ export const GET: RequestHandler = async ({ url, locals: { supabase, safeGetSess
   const subtotal = parseFloat(url.searchParams.get('subtotal') || '0');
   const taxTotal = parseFloat(url.searchParams.get('tax_total') || '0');
   const total = parseFloat(url.searchParams.get('total') || '0');
+  const includeContactName = url.searchParams.get('include_contact_name') === 'true';
 
   if (!templateId || !clientId) {
     return new Response('Missing required parameters', { status: 400 });
@@ -40,7 +41,7 @@ export const GET: RequestHandler = async ({ url, locals: { supabase, safeGetSess
   // Get client data
   const { data: client } = await supabase
     .from('client')
-    .select('id, name, company, email')
+    .select('id, name, company, email, company_address, tax_id, legal_name')
     .eq('id', clientId)
     .eq('org_id', (userProfile as any).org_id)
     .single();
@@ -55,6 +56,7 @@ export const GET: RequestHandler = async ({ url, locals: { supabase, safeGetSess
   if (!template) {
     return new Response('Template not found', { status: 404 });
   }
+
 
   // Parse items
   let items;
@@ -82,7 +84,7 @@ export const GET: RequestHandler = async ({ url, locals: { supabase, safeGetSess
   };
 
   // Render HTML
-  const html = renderInvoiceHTML(mockInvoice, userProfile, template.spec);
+  const html = renderInvoiceHTML(mockInvoice, userProfile, template.spec, { includeContactName });
 
   return new Response(html, {
     headers: {

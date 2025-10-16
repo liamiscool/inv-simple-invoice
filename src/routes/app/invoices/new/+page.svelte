@@ -21,6 +21,7 @@
   let dueDate = $state('');
   let notes = $state('');
   let currency = $state('EUR');
+  let includeContactName = $state(false);
   
   // Line items
   let lineItems = $state<any[]>([
@@ -122,6 +123,7 @@
     dueDate;
     notes;
     currency;
+    includeContactName;
     lineItems;
 
     // Don't auto-save if no meaningful data yet
@@ -466,6 +468,21 @@
           </div>
         </div>
 
+        <!-- Include Contact Name Option -->
+        {#if selectedClient}
+          <div class="flex items-center gap-3">
+            <input
+              id="includeContactName"
+              type="checkbox"
+              bind:checked={includeContactName}
+              class="w-4 h-4 text-black border-gray-300 rounded focus:ring-black dark:bg-dark-input dark:border-gray-600 dark:focus:ring-gray-500"
+            />
+            <label for="includeContactName" class="text-sm text-gray-700 dark:text-gray-300">
+              Include contact name on invoice
+            </label>
+          </div>
+        {/if}
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
             <label for="currency" class="block text-sm text-gray-500 dark:text-gray-400 mb-1.5">Currency</label>
@@ -704,6 +721,51 @@
         </div>
       </div>
 
+      <!-- Your Payment Details -->
+      <div class="space-y-5">
+        <div class="flex items-center justify-between pb-2 border-b border-gray-200 dark:text-white dark:border-gray-700">
+          <h2 class="text-base font-medium">Your Payment Details</h2>
+          <a
+            href="/app/settings"
+            class="px-3 py-1.5 text-xs border border-gray-300 text-gray-600 hover:text-black hover:bg-gray-50 dark:border-gray-600 dark:text-gray-400 dark:hover:text-white dark:hover:bg-dark-hover transition-colors duration-75"
+          >
+            Edit
+          </a>
+        </div>
+
+        <div class="bg-gray-50 dark:bg-dark-input p-4 space-y-3">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Your Company Name</label>
+              <div class="text-sm text-gray-600 dark:text-gray-300">
+                {data.userProfile?.company_name || data.userProfile?.full_name || 'Not set'}
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Your Tax ID</label>
+              <div class="text-sm text-gray-600 dark:text-gray-300">
+                {data.userProfile?.tax_id || 'Not set'}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Your Company Address</label>
+            <div class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">
+              {data.userProfile?.company_address || 'Not set'}
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Your Bank Details</label>
+            <div class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">
+              {data.userProfile?.bank_details || 'Not set'}
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Notes -->
       <div class="space-y-5">
         <h2 class="text-base font-medium pb-2 border-b border-gray-200 dark:text-white dark:border-gray-700">Additional Information</h2>
@@ -713,7 +775,7 @@
           <textarea
             id="notes"
             bind:value={notes}
-            placeholder="Additional notes or payment terms..."
+            placeholder="Additional notes or message to include on this invoice..."
             rows="3"
             class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors resize-none"
           ></textarea>
@@ -789,6 +851,7 @@
               due_date: dueDate || '',
               currency: currency,
               notes: notes || '',
+              include_contact_name: includeContactName.toString(),
               items: JSON.stringify(lineItems.map((item: any, index: number) => ({
                 position: index + 1,
                 description: item.description,

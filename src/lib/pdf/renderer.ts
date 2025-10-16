@@ -1,4 +1,8 @@
-import type { TemplateSpec, AreaSpec, TableSpec } from '$lib/templates';
+import type {
+  AreaSpec,
+  TableSpec,
+  TemplateSpec,
+} from '$lib/templates';
 
 export interface InvoiceData {
   id: string;
@@ -65,7 +69,8 @@ function calculateDefaultTableHeight(table: TableSpec): number {
 export function renderInvoiceHTML(
   invoice: InvoiceData,
   company: CompanyData,
-  template: TemplateSpec
+  template: TemplateSpec,
+  options: { includeContactName?: boolean } = {}
 ): string {
   const { meta, styles, areas } = template;
 
@@ -254,6 +259,7 @@ export function renderInvoiceHTML(
   // Build HTML content (use adjusted areas for dynamic positioning)
   let content = '';
 
+
   // Render each area
   if (adjustedAreas.invoice_title) {
     content += renderArea('invoice_title', adjustedAreas.invoice_title, 'INVOICE');
@@ -281,12 +287,16 @@ export function renderInvoiceHTML(
     content += renderArea('due_date', adjustedAreas.due_date, `Due Date: ${formatDate(invoice.due_date)}`);
   }
 
-  if (adjustedAreas.client_name) {
-    content += renderArea('client_name', adjustedAreas.client_name, invoice.client.name);
-  }
-
   if (adjustedAreas.client_company && invoice.client.company) {
     content += renderArea('client_company', adjustedAreas.client_company, invoice.client.company);
+  }
+
+  if (adjustedAreas.client_legal_name && invoice.client.legal_name) {
+    content += renderArea('client_legal_name', adjustedAreas.client_legal_name, invoice.client.legal_name);
+  }
+
+  if (adjustedAreas.client_name && invoice.client.name && options.includeContactName) {
+    content += renderArea('client_name', adjustedAreas.client_name, invoice.client.name);
   }
 
   if (adjustedAreas.client_email && invoice.client.email) {
@@ -294,7 +304,7 @@ export function renderInvoiceHTML(
   }
 
   if (adjustedAreas.client_address && invoice.client.company_address) {
-    content += renderArea('client_address', adjustedAreas.client_address, invoice.client.company_address.replace(/\\n/g, '<br>'));
+    content += renderArea('client_address', adjustedAreas.client_address, invoice.client.company_address.replace(/\n/g, '<br>'));
   }
 
   if (adjustedAreas.client_tax_id && invoice.client.tax_id) {

@@ -15,12 +15,12 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
     };
   }
   
-  // Get user's org_id first
+  // Get user's org_id and payment details
   const { data: profile } = await supabase
     .from('app_user')
-    .select('org_id')
+    .select('org_id, full_name, company_name, company_address, tax_id, bank_details')
     .eq('id', user.id)
-    .single() as { data: { org_id: string } | null };
+    .single() as { data: { org_id: string, full_name: string | null, company_name: string | null, company_address: string | null, tax_id: string | null, bank_details: string | null } | null };
 
   if (!profile) {
     return {
@@ -44,6 +44,7 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
   
   return {
     clients: clients || [],
-    templates
+    templates,
+    userProfile: profile
   };
 };

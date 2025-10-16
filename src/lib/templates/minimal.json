@@ -58,40 +58,46 @@
       "y": 49,
       "font_size": 9
     },
-    "client_name": {
+    "client_company": {
       "x": 20,
       "y": 80,
       "font_weight": "bold",
       "font_size": 11
     },
-    "client_company": {
+    "client_legal_name": {
       "x": 20,
       "y": 87,
       "font_size": 9,
       "color": "#666666"
     },
-    "client_email": {
+    "client_name": {
       "x": 20,
       "y": 93,
       "font_size": 9,
       "color": "#666666"
     },
-    "client_address": {
+    "client_email": {
       "x": 20,
       "y": 99,
+      "font_size": 9,
+      "color": "#666666"
+    },
+    "client_address": {
+      "x": 20,
+      "y": 105,
       "w": 80,
       "font_size": 9,
       "color": "#666666"
     },
     "client_tax_id": {
       "x": 20,
-      "y": 109,
+      "y": 115,
       "font_size": 9,
       "color": "#666666"
     },
     "items_table": {
       "x": 20,
-      "y": 118,
+      "y": 125,
       "w": 170,
       "row_height": 8,
       "header_height": 10,
