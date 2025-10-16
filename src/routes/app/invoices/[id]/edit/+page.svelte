@@ -118,14 +118,10 @@
       return;
     }
 
-    // Only save items that have at least a description
-    const validItems = lineItems.filter(item =>
-      item.description && item.description.trim().length > 0
-    );
-
-    if (validItems.length === 0) {
-      return; // Don't auto-save if no valid items
-    }
+    // Note: We allow auto-save even with no line items yet, because:
+    // - User might be setting due date, contact name checkbox, etc.
+    // - Line items will be filtered when saving (only items with descriptions are saved)
+    // - This ensures all form changes trigger auto-save
 
     // Debounce auto-save (wait 2 seconds after last change)
     if (autoSaveTimeout) {
