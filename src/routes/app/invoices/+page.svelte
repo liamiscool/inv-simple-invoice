@@ -8,6 +8,10 @@
   let searchQuery = $state('');
   let statusFilter = $state('all');
   let openDropdownId = $state<string | null>(null);
+
+  // Bulk selection state
+  let selectedInvoiceIds = $state(new Set<string>());
+  let isBulkActionLoading = $state(false);
   
   const statusColors = {
     draft: 'text-gray-600 bg-gray-100 dark:text-gray-300 dark:bg-gray-700',
@@ -30,14 +34,29 @@
   // Filter invoices based on search and status
   const filteredInvoices = $derived(
     data.invoices?.filter(invoice => {
-      const matchesSearch = 
+      const matchesSearch =
         invoice.number.toLowerCase().includes(searchQuery.toLowerCase()) ||
         invoice.client_name?.toLowerCase().includes(searchQuery.toLowerCase());
-        
+
       const matchesStatus = statusFilter === 'all' || invoice.status === statusFilter;
-      
+
       return matchesSearch && matchesStatus;
     }) || []
+  );
+
+  // Derived state for bulk selection
+  const selectedInvoices = $derived(
+    filteredInvoices.filter(inv => selectedInvoiceIds.has(inv.id))
+  );
+
+  const canMarkAsPaid = $derived(
+    selectedInvoices.length > 0 &&
+    selectedInvoices.every(inv => ['sent', 'partially_paid'].includes(inv.status))
+  );
+
+  const allVisibleSelected = $derived(
+    filteredInvoices.length > 0 &&
+    filteredInvoices.every(inv => selectedInvoiceIds.has(inv.id))
   );
   
   function formatCurrency(amount: number, currency: string) {
@@ -102,6 +121,163 @@
       alert('Failed to delete invoice. Please try again.');
     }
   }
+
+  // Bulk selection functions
+  function toggleSelection(invoiceId: string) {
+    const newSet = new Set(selectedInvoiceIds);
+    if (newSet.has(invoiceId)) {
+      newSet.delete(invoiceId);
+    } else {
+      newSet.add(invoiceId);
+    }
+    selectedInvoiceIds = newSet;
+  }
+
+  function toggleSelectAll() {
+    if (allVisibleSelected) {
+      selectedInvoiceIds = new Set();
+    } else {
+      selectedInvoiceIds = new Set(filteredInvoices.map(inv => inv.id));
+    }
+  }
+
+  function clearSelection() {
+    selectedInvoiceIds = new Set();
+  }
+
+  // Bulk operations
+  async function bulkMarkAsPaid() {
+    if (!canMarkAsPaid) return;
+
+    isBulkActionLoading = true;
+
+    try {
+      const { error } = await data.supabase
+        .from('invoice')
+        .update({ status: 'paid' as any })
+        .in('id', Array.from(selectedInvoiceIds));
+
+      if (error) throw error;
+
+      alert(`${selectedInvoiceIds.size} invoice(s) marked as paid`);
+      window.location.reload();
+
+    } catch (err) {
+      alert('Failed to update invoices. Please try again.');
+    } finally {
+      isBulkActionLoading = false;
+    }
+  }
+
+  async function bulkDuplicate() {
+    isBulkActionLoading = true;
+
+    try {
+      const { data: user } = await data.supabase.auth.getUser();
+      if (!user.user) throw new Error('Not authenticated');
+
+      const { data: profile } = await data.supabase
+        .from('app_user')
+        .select('org_id')
+        .eq('id', user.user.id)
+        .single();
+
+      if (!profile) throw new Error('Profile not found');
+
+      // Fetch selected invoices with items
+      const { data: invoicesToDuplicate, error: fetchError } = await data.supabase
+        .from('invoice')
+        .select(`
+          *,
+          items:invoice_item(*)
+        `)
+        .in('id', Array.from(selectedInvoiceIds));
+
+      if (fetchError) throw fetchError;
+      if (!invoicesToDuplicate) throw new Error('No invoices found');
+
+      // Create duplicates for each selected invoice
+      for (const invoice of invoicesToDuplicate) {
+        // Get next invoice number
+        const { data: nextNumber } = await data.supabase
+          .rpc('next_invoice_number', { p_org_id: profile.org_id });
+
+        // Insert new invoice
+        const { data: newInvoice, error: invoiceError } = await data.supabase
+          .from('invoice')
+          .insert({
+            org_id: invoice.org_id,
+            client_id: invoice.client_id,
+            template_id: invoice.template_id,
+            number: nextNumber,
+            issue_date: new Date().toISOString().split('T')[0],
+            due_date: invoice.due_date,
+            currency: invoice.currency,
+            status: 'draft',
+            notes: invoice.notes,
+            subtotal: invoice.subtotal,
+            tax_total: invoice.tax_total,
+            total: invoice.total
+          })
+          .select()
+          .single();
+
+        if (invoiceError) throw invoiceError;
+        if (!newInvoice) throw new Error('Failed to create invoice');
+
+        // Insert line items
+        if (invoice.items && invoice.items.length > 0) {
+          const itemsToInsert = invoice.items.map((item: any) => ({
+            invoice_id: newInvoice.id,
+            position: item.position,
+            description: item.description,
+            qty: item.qty,
+            unit_price: item.unit_price,
+            tax_rate: item.tax_rate,
+            line_total: item.line_total
+          }));
+
+          await data.supabase.from('invoice_item').insert(itemsToInsert);
+        }
+      }
+
+      alert(`${invoicesToDuplicate.length} invoice(s) duplicated`);
+      window.location.reload();
+
+    } catch (err) {
+      console.error('Bulk duplicate error:', err);
+      alert('Failed to duplicate invoices. Please try again.');
+    } finally {
+      isBulkActionLoading = false;
+    }
+  }
+
+  async function bulkDelete() {
+    const count = selectedInvoiceIds.size;
+
+    if (!confirm(`Delete ${count} invoice(s)? This action cannot be undone.`)) {
+      return;
+    }
+
+    isBulkActionLoading = true;
+
+    try {
+      const { error } = await data.supabase
+        .from('invoice')
+        .delete()
+        .in('id', Array.from(selectedInvoiceIds));
+
+      if (error) throw error;
+
+      alert(`${count} invoice(s) deleted`);
+      window.location.reload();
+
+    } catch (err) {
+      alert('Failed to delete invoices. Please try again.');
+    } finally {
+      isBulkActionLoading = false;
+    }
+  }
 </script>
 
 <svelte:head>
@@ -151,6 +327,51 @@
       </select>
     </div>
   </div>
+
+  <!-- Bulk Action Bar (Desktop) -->
+  {#if selectedInvoiceIds.size > 0}
+    <div class="hidden md:flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-dark-input border-t border-b border-gray-200 dark:border-gray-700">
+      <!-- Left: Selection count -->
+      <div class="text-sm text-gray-600 dark:text-gray-300">
+        <span class="font-medium">{selectedInvoiceIds.size}</span> invoice{selectedInvoiceIds.size !== 1 ? 's' : ''} selected
+      </div>
+
+      <!-- Center: Action buttons -->
+      <div class="flex items-center gap-2">
+        <button
+          onclick={bulkMarkAsPaid}
+          disabled={!canMarkAsPaid || isBulkActionLoading}
+          class="px-5 py-2.5 bg-black dark:bg-dark-button text-white text-sm hover:bg-gray-800 dark:hover:bg-dark-button-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Mark as Paid
+        </button>
+
+        <button
+          onclick={bulkDuplicate}
+          disabled={isBulkActionLoading}
+          class="px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white text-sm hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Duplicate
+        </button>
+
+        <button
+          onclick={bulkDelete}
+          disabled={isBulkActionLoading}
+          class="px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-red-600 dark:text-red-400 text-sm hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Delete
+        </button>
+      </div>
+
+      <!-- Right: Clear button -->
+      <button
+        onclick={clearSelection}
+        class="text-sm text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+      >
+        Clear
+      </button>
+    </div>
+  {/if}
   
   {#if !data.invoices || data.invoices.length === 0}
     <!-- Empty state -->
@@ -195,6 +416,14 @@
       <table class="w-full">
         <thead class="border-b border-gray-200 dark:border-gray-700">
           <tr>
+            <th class="w-12 px-4 py-4">
+              <input
+                type="checkbox"
+                checked={allVisibleSelected}
+                onchange={toggleSelectAll}
+                class="w-4 h-4 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-black dark:focus:border-white cursor-pointer accent-black dark:accent-white"
+              />
+            </th>
             <th class="text-left text-sm text-gray-500 dark:text-gray-400 px-4 py-4 font-medium">Number</th>
             <th class="text-left text-sm text-gray-500 dark:text-gray-400 px-4 py-4 font-medium">Client</th>
             <th class="text-left text-sm text-gray-500 dark:text-gray-400 px-4 py-4 font-medium">Amount</th>
@@ -206,7 +435,15 @@
         </thead>
         <tbody>
           {#each filteredInvoices as invoice}
-            <tr class="border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50/50 dark:hover:bg-dark-hover">
+            <tr class="border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50/50 dark:hover:bg-dark-hover {selectedInvoiceIds.has(invoice.id) ? 'bg-blue-50 dark:bg-blue-900/10' : ''}">
+              <td class="px-4 py-4">
+                <input
+                  type="checkbox"
+                  checked={selectedInvoiceIds.has(invoice.id)}
+                  onchange={() => toggleSelection(invoice.id)}
+                  class="w-4 h-4 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-black dark:focus:border-white cursor-pointer accent-black dark:accent-white"
+                />
+              </td>
               <td class="px-4 py-4">
                 <a
                   href="/app/invoices/{invoice.id}"
@@ -311,17 +548,26 @@
     <!-- Mobile: Invoices cards -->
     <div class="block md:hidden space-y-3">
       {#each filteredInvoices as invoice}
-        <div class="border border-gray-200 dark:border-gray-700 p-4 hover:bg-gray-50/50 dark:hover:bg-dark-hover transition-colors">
-          <a href="/app/invoices/{invoice.id}" class="block">
-            <!-- Header: Number + Status -->
-            <div class="flex items-center justify-between mb-3">
-              <div class="text-sm font-medium hover:text-black dark:hover:text-white transition-colors dark:text-white">
+        <div class="border border-gray-200 dark:border-gray-700 p-4 {selectedInvoiceIds.has(invoice.id) ? 'bg-blue-50 dark:bg-blue-900/10' : ''}">
+          <!-- Header: Checkbox + Number + Status -->
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex items-start gap-3">
+              <input
+                type="checkbox"
+                checked={selectedInvoiceIds.has(invoice.id)}
+                onchange={() => toggleSelection(invoice.id)}
+                class="w-4 h-4 mt-1 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-black dark:focus:border-white cursor-pointer accent-black dark:accent-white"
+              />
+              <a href="/app/invoices/{invoice.id}" class="text-sm font-medium hover:text-black dark:hover:text-white transition-colors dark:text-white">
                 {invoice.number}
-              </div>
-              <span class="inline-flex px-2.5 py-1 text-sm {statusColors[invoice.status as keyof typeof statusColors]}">
-                {statusLabels[invoice.status as keyof typeof statusLabels]}
-              </span>
+              </a>
             </div>
+            <span class="inline-flex px-2.5 py-1 text-sm {statusColors[invoice.status as keyof typeof statusColors]}">
+              {statusLabels[invoice.status as keyof typeof statusLabels]}
+            </span>
+          </div>
+
+          <a href="/app/invoices/{invoice.id}" class="block">
 
             <!-- Client + Amount -->
             <div class="mb-3">
@@ -373,6 +619,46 @@
           <div>Paid: <span class="font-medium text-black dark:text-white">{formatCurrency(data.stats.total_paid, 'EUR')}</span></div>
         </div>
       {/if}
+    </div>
+  {/if}
+
+  <!-- Mobile: Sticky bottom action bar -->
+  {#if selectedInvoiceIds.size > 0}
+    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-dark-bg border-t border-gray-200 dark:border-gray-700 p-4 shadow-lg z-50">
+      <div class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+        {selectedInvoiceIds.size} selected
+      </div>
+      <div class="flex flex-col gap-2">
+        <button
+          onclick={bulkMarkAsPaid}
+          disabled={!canMarkAsPaid || isBulkActionLoading}
+          class="w-full px-5 py-2.5 bg-black dark:bg-dark-button text-white text-sm hover:bg-gray-800 dark:hover:bg-dark-button-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Mark as Paid
+        </button>
+        <div class="flex gap-2">
+          <button
+            onclick={bulkDuplicate}
+            disabled={isBulkActionLoading}
+            class="flex-1 px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white text-sm hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Duplicate
+          </button>
+          <button
+            onclick={bulkDelete}
+            disabled={isBulkActionLoading}
+            class="flex-1 px-5 py-2.5 border border-red-300 dark:border-red-600 text-red-600 dark:text-red-400 text-sm hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Delete
+          </button>
+        </div>
+        <button
+          onclick={clearSelection}
+          class="text-sm text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+        >
+          Clear Selection
+        </button>
+      </div>
     </div>
   {/if}
 </div>
