@@ -88,6 +88,50 @@
   <meta name="description" content="Create beautiful, minimal invoices in 2 minutes. Custom PDF templates for freelance designers, content creators, and creative professionals." />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+  {@html `<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "inv.so",
+    "applicationCategory": "BusinessApplication",
+    "applicationSubCategory": "Invoicing Software",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD",
+      "description": "Free tier with 3 invoice sends, Pro plan for unlimited"
+    },
+    "operatingSystem": "Web Browser",
+    "description": "Simple invoice generator for designers, creatives, and freelancers. Create beautiful, minimal invoices with custom PDF templates in under 2 minutes.",
+    "featureList": [
+      "Custom template upload",
+      "PDF generation in 2 minutes",
+      "Client management CRM",
+      "Email integration",
+      "Payment status tracking",
+      "Minimal Yeezy-inspired design",
+      "Pixel-perfect PDF rendering",
+      "No accounting complexity"
+    ],
+    "audience": {
+      "@type": "Audience",
+      "audienceType": [
+        "Freelance Designers",
+        "Content Creators",
+        "Creative Professionals",
+        "Photographers",
+        "Videographers",
+        "Illustrators",
+        "Small Creative Studios"
+      ]
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "inv.so"
+    }
+  }
+  </script>`}
 </svelte:head>
 
 <div class="h-screen w-screen flex flex-col relative overflow-hidden font-mono dark:bg-dark-bg">
