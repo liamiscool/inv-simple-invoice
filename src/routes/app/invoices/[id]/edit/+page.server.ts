@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, safeGet
     .from('app_user')
     .select('org_id')
     .eq('id', user.id)
-    .single();
+    .single() as { data: { org_id: string } | null };
 
   if (!profile) {
     throw error(404, 'Profile not found');
@@ -41,7 +41,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, safeGet
     `)
     .eq('id', params.id)
     .eq('org_id', profile.org_id)
-    .single();
+    .single() as { data: any | null; error: any };
 
   if (invoiceError || !invoice) {
     throw error(404, 'Invoice not found');
@@ -65,7 +65,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, safeGet
     .from('client')
     .select('*')
     .eq('org_id', profile.org_id)
-    .order('name');
+    .order('name') as { data: any[] | null };
 
   // Get all available templates (curated + custom for this org)
   const templates = await getTemplatesForOrg(supabase, profile.org_id);

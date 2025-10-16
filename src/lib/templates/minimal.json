@@ -76,6 +76,19 @@
       "font_size": 9,
       "color": "#666666"
     },
+    "client_address": {
+      "x": 20,
+      "y": 99,
+      "w": 80,
+      "font_size": 9,
+      "color": "#666666"
+    },
+    "client_tax_id": {
+      "x": 20,
+      "y": 109,
+      "font_size": 9,
+      "color": "#666666"
+    },
     "items_table": {
       "x": 20,
       "y": 118,

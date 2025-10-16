@@ -30,7 +30,7 @@ export const load: PageServerLoad = async ({ url, locals: { supabase, safeGetSes
     .from('template')
     .select('*')
     .eq('id', templateId)
-    .maybeSingle();
+    .maybeSingle() as { data: any | null; error: any };
 
   if (error || !template) {
     console.error('Failed to load template:', error);
@@ -42,16 +42,16 @@ export const load: PageServerLoad = async ({ url, locals: { supabase, safeGetSes
     .from('app_user')
     .select('org_id, operates_as_company')
     .eq('id', user.id)
-    .single();
+    .single() as { data: { org_id: string; operates_as_company: boolean } | null };
 
   // Get org-wide custom fields
-  let customFields = [];
+  let customFields: any[] = [];
   if (userProfile?.org_id) {
     const { data } = await supabase
       .from('custom_field')
       .select('*')
       .eq('org_id', userProfile.org_id)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false }) as { data: any[] | null };
 
     customFields = data || [];
   }

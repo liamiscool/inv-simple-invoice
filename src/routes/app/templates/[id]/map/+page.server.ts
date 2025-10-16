@@ -22,7 +22,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, safeGet
     .from('template')
     .select('*')
     .eq('id', params.id)
-    .maybeSingle();
+    .maybeSingle() as { data: any | null; error: any };
 
   if (error || !template) {
     redirect(303, '/app/templates');
@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, safeGet
     .from('app_user')
     .select('org_id')
     .eq('id', user.id)
-    .single();
+    .single() as { data: { org_id: string } | null };
 
   if (template.kind === 'custom' && template.org_id !== userProfile?.org_id) {
     redirect(303, '/app/templates');

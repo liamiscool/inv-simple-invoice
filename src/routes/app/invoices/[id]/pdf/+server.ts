@@ -29,7 +29,7 @@ export const GET: RequestHandler = async ({ params, locals: { supabase, safeGetS
       .from('invoice')
       .select('org_id')
       .eq('id', params.id)
-      .single();
+      .single() as { data: { org_id: string } | null; error: any };
 
     if (invoiceError || !invoice) {
       return new Response('Invoice not found', { status: 404 });
@@ -43,7 +43,7 @@ export const GET: RequestHandler = async ({ params, locals: { supabase, safeGetS
       .from('app_user')
       .select('org_id')
       .eq('id', user.id)
-      .single();
+      .single() as { data: { org_id: string } | null; error: any };
 
     if (profileError || !profile) {
       return new Response('Profile not found', { status: 404 });
@@ -70,7 +70,10 @@ export const GET: RequestHandler = async ({ params, locals: { supabase, safeGetS
         id,
         name,
         company,
-        email
+        email,
+        company_address,
+        tax_id,
+        legal_name
       ),
       items:invoice_item (
         id,
@@ -84,7 +87,7 @@ export const GET: RequestHandler = async ({ params, locals: { supabase, safeGetS
     `)
     .eq('id', params.id)
     .eq('org_id', orgId)
-    .maybeSingle();
+    .maybeSingle() as { data: any | null; error: any };
 
   if (invoiceError || !invoice) {
     return new Response('Invoice not found', { status: 404 });
@@ -95,7 +98,7 @@ export const GET: RequestHandler = async ({ params, locals: { supabase, safeGetS
     .from('app_user')
     .select('*')
     .eq('org_id', orgId)
-    .single();
+    .single() as { data: any | null; error: any };
 
   if (userProfileError || !userProfile) {
     return new Response('Organization profile not found', { status: 404 });

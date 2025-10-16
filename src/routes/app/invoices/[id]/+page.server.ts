@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, safeGet
     .from('app_user')
     .select('*')
     .eq('id', user.id)
-    .single();
+    .single() as { data: any | null };
 
   if (!profile) {
     return {
@@ -22,7 +22,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, safeGet
       userProfile: null
     };
   }
-  
+
   // Get invoice with all related data
   const { data: invoice } = await supabase
     .from('invoice')
@@ -53,7 +53,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, safeGet
     `)
     .eq('id', params.id)
     .eq('org_id', profile.org_id)
-    .maybeSingle();
+    .maybeSingle() as { data: any | null };
   
   if (!invoice) {
     return {

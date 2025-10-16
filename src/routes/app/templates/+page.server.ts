@@ -24,7 +24,7 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
     .from('app_user')
     .select('org_id')
     .eq('id', user.id)
-    .single();
+    .single() as { data: { org_id: string } | null };
     
   if (!profile) {
     return {
@@ -41,7 +41,7 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
     .from('template')
     .select('id')
     .or(`org_id.is.null,org_id.eq.${profile.org_id}`)
-    .limit(1);
+    .limit(1) as { data: any[] | null };
     
   if (!existingTemplates || existingTemplates.length === 0) {
     // Create minimal template as user template if none exist
@@ -127,7 +127,7 @@ export const actions = {
       .from('app_user')
       .select('org_id')
       .eq('id', user.id)
-      .single();
+      .single() as { data: { org_id: string } | null };
 
     if (!userProfile?.org_id) {
       return fail(400, { error: 'No organization found' });
@@ -138,7 +138,7 @@ export const actions = {
       .from('template')
       .select('*')
       .eq('id', templateId)
-      .maybeSingle();
+      .maybeSingle() as { data: any | null };
 
     if (!template) {
       return fail(404, { error: 'Template not found' });

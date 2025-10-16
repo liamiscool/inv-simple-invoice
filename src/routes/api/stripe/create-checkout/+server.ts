@@ -36,7 +36,7 @@ export const POST: RequestHandler = async ({ request, locals: { supabase, safeGe
       .from('app_user')
       .select('org_id')
       .eq('id', user.id)
-      .maybeSingle();
+      .maybeSingle() as { data: { org_id: string } | null; error: any };
 
     if (profileError || !profile?.org_id) {
       return json({ error: 'Profile not found' }, { status: 404 });

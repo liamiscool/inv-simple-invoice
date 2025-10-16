@@ -17,6 +17,9 @@ export interface InvoiceData {
     name: string;
     company?: string;
     email?: string;
+    company_address?: string;
+    tax_id?: string;
+    legal_name?: string;
   };
   items: Array<{
     id: string;
@@ -233,6 +236,14 @@ export function renderInvoiceHTML(
 
   if (areas.client_email && invoice.client.email) {
     content += renderArea('client_email', areas.client_email, invoice.client.email);
+  }
+
+  if (areas.client_address && invoice.client.company_address) {
+    content += renderArea('client_address', areas.client_address, invoice.client.company_address.replace(/\\n/g, '<br>'));
+  }
+
+  if (areas.client_tax_id && invoice.client.tax_id) {
+    content += renderArea('client_tax_id', areas.client_tax_id, `Tax ID: ${invoice.client.tax_id}`);
   }
 
   // Items table

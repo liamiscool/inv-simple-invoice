@@ -13,7 +13,7 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
     .from('app_user')
     .select('org_id')
     .eq('id', user.id)
-    .single();
+    .single() as { data: { org_id: string } | null };
 
   if (!userProfile?.org_id) {
     return { customFields: [] };
@@ -24,7 +24,7 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
     .from('custom_field')
     .select('*')
     .eq('org_id', userProfile.org_id)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false }) as { data: any[] | null; error: any };
 
   if (error) {
     console.error('Error loading custom fields:', error);
@@ -56,7 +56,7 @@ export const actions = {
       .from('app_user')
       .select('org_id')
       .eq('id', user.id)
-      .single();
+      .single() as { data: { org_id: string } | null };
 
     if (!userProfile?.org_id) {
       return fail(400, { error: 'Organization not found' });
@@ -102,7 +102,7 @@ export const actions = {
       .from('app_user')
       .select('org_id')
       .eq('id', user.id)
-      .single();
+      .single() as { data: { org_id: string } | null };
 
     if (!userProfile?.org_id) {
       return fail(400, { error: 'Organization not found' });

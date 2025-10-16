@@ -38,7 +38,7 @@ export const POST: RequestHandler = async ({ request, params, locals: { supabase
       .from('app_user')
       .select('org_id')
       .eq('id', user.id)
-      .single();
+      .single() as { data: { org_id: string } | null; error: any };
 
     if (profileError || !profile) {
       return json({ error: 'Profile not found' }, { status: 404 });
@@ -67,7 +67,7 @@ export const POST: RequestHandler = async ({ request, params, locals: { supabase
       `)
       .eq('id', params.id)
       .eq('org_id', profile.org_id)
-      .maybeSingle();
+      .maybeSingle() as { data: any | null; error: any };
 
     if (invoiceError || !invoice) {
       return json({ error: 'Invoice not found' }, { status: 404 });
@@ -78,7 +78,7 @@ export const POST: RequestHandler = async ({ request, params, locals: { supabase
       .from('app_user')
       .select('*')
       .eq('id', user.id)
-      .single();
+      .single() as { data: any | null; error: any };
 
     if (userProfileError || !userProfile) {
       return json({ error: 'User profile not found' }, { status: 404 });

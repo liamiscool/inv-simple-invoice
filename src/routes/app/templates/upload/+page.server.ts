@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
     .from('app_user')
     .select('org_id')
     .eq('id', user.id)
-    .single();
+    .single() as { data: { org_id: string } | null };
 
   if (!userProfile?.org_id) {
     redirect(303, '/app/settings');
@@ -24,7 +24,7 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
   const { count } = await supabase
     .from('template')
     .select('*', { count: 'exact', head: true })
-    .eq('org_id', userProfile.org_id);
+    .eq('org_id', userProfile.org_id) as { count: number | null };
 
   return {
     orgId: userProfile.org_id,
@@ -84,7 +84,7 @@ export const actions = {
       .from('app_user')
       .select('org_id')
       .eq('id', user.id)
-      .single();
+      .single() as { data: { org_id: string } | null };
 
     if (!userProfile?.org_id) {
       return fail(400, { error: 'No organization found' });
@@ -154,7 +154,7 @@ export const actions = {
           }
         })
         .select()
-        .single();
+        .single() as { data: any | null; error: any };
 
       if (templateError) {
         console.error('Template creation error:', templateError);

@@ -21,14 +21,14 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
     .from('app_user')
     .select('*')
     .eq('id', user.id)
-    .single();
+    .single() as { data: any | null };
 
   // Get subscription info
   const { data: subscription } = await supabase
     .from('plan_subscription')
     .select('plan, status')
     .eq('org_id', profile?.org_id)
-    .maybeSingle();
+    .maybeSingle() as { data: any | null };
 
   // Get custom fields for this org
   let customFields = [];
@@ -37,7 +37,7 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
       .from('custom_field')
       .select('*')
       .eq('org_id', profile.org_id)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false }) as { data: any[] | null };
 
     customFields = data || [];
   }
@@ -69,7 +69,7 @@ export const actions = {
       .from('app_user')
       .select('org_id')
       .eq('id', user.id)
-      .single();
+      .single() as { data: { org_id: string } | null };
 
     if (!userProfile?.org_id) {
       return fail(400, { error: 'Organization not found' });
@@ -115,7 +115,7 @@ export const actions = {
       .from('app_user')
       .select('org_id')
       .eq('id', user.id)
-      .single();
+      .single() as { data: { org_id: string } | null };
 
     if (!userProfile?.org_id) {
       return fail(400, { error: 'Organization not found' });
