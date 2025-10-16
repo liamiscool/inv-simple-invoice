@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { PageData } from './$types';
-  
+  import { calculateMaxItems } from '$lib/templates';
+
   let { data }: { data: PageData } = $props();
 
   const invoice: any = data.invoice;
@@ -36,10 +37,17 @@
     sent: 'Sent',
     partially_paid: 'Partially Paid',
     paid: 'Paid',
-    overdue: 'Overdue', 
+    overdue: 'Overdue',
     void: 'Void'
   };
-  
+
+  // Check if invoice exceeds template capacity
+  const hasItemOverflow = $derived(() => {
+    if (!data.invoice || !data.template) return false;
+    const maxItems = calculateMaxItems(data.template.spec);
+    return data.invoice.items.length > maxItems;
+  });
+
   function formatCurrency(amount: number, currency: string) {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -295,6 +303,11 @@
           <span class="inline-flex px-2.5 py-1 text-sm {statusColors[data.invoice.status as keyof typeof statusColors]}">
             {statusLabels[data.invoice.status as keyof typeof statusLabels]}
           </span>
+          {#if hasItemOverflow()}
+            <span class="inline-flex px-2.5 py-1 text-sm bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+              ⚠️ Template Limit
+            </span>
+          {/if}
         </div>
         <!-- Breadcrumbs -->
         <div class="flex items-center gap-2 text-xs">
@@ -350,6 +363,21 @@
         </button>
       </div>
     </div>
+
+    {#if hasItemOverflow()}
+      <div class="px-4 py-3 text-sm bg-orange-50 border border-orange-200 text-orange-800 dark:bg-orange-900/30 dark:border-orange-800 dark:text-orange-400">
+        <div class="flex items-start gap-2">
+          <span class="mt-0.5">⚠️</span>
+          <div>
+            <p class="font-medium mb-1">PDF May Have Display Issues</p>
+            <p class="text-xs opacity-90">
+              This invoice has {data.invoice.items.length} items, but the template ({data.template?.title}) can only display {calculateMaxItems(data.template.spec)} items properly.
+              Items may overflow into the totals section. Consider splitting into multiple invoices.
+            </p>
+          </div>
+        </div>
+      </div>
+    {/if}
 
     <!-- Invoice Details -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">

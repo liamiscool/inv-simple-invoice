@@ -289,3 +289,116 @@ Required secrets (store in `.env.local`):
 - Invoice list: <500ms load time
 - PDF generation: <2s for single page
 - Email send: <1s response time
+
+---
+
+## 🔄 Claude Code Workflow (Two-Session System)
+
+**Last Updated:** 2025-10-16
+
+This project uses a two-session Claude Code workflow to prevent file locking conflicts and maintain clear separation between planning and implementation.
+
+### Session Types
+
+#### 1. Planner Session (Read-Only) 📋
+**Command:** `/issue <description>`
+**Purpose:** Research, analyze, create GitHub issues
+
+**What it can do:**
+- ✅ Read all files in the repository
+- ✅ Search and analyze codebase
+- ✅ Run read-only bash commands (`ls`, `cat`, `grep`, `git log`, `gh issue list`)
+- ✅ Draft comprehensive GitHub issues
+- ✅ Multiple planner sessions can run simultaneously
+
+**What it CANNOT do:**
+- ❌ Write or edit files
+- ❌ Run bash commands that modify state
+- ❌ Create GitHub issues via CLI
+- ❌ Use `/work` command
+
+**File:** `commands/issue.md`
+
+#### 2. Developer Session (Read/Write) 💻
+**Command:** `/work #N`
+**Purpose:** Implement GitHub issues, commit code, push changes
+
+**What it can do:**
+- ✅ Read and write any file
+- ✅ Run all bash commands
+- ✅ Create commits and push
+- ✅ Create GitHub issues via CLI
+- ✅ Update project board
+
+**What it CANNOT do:**
+- ❌ Run when another developer session is active (enforced by lock file)
+
+**File:** `commands/work.md`
+
+### Lock File Mechanism
+
+**Purpose:** Prevents two developer sessions from conflicting
+
+**How it works:**
+1. Developer session creates `.claude-lock` on startup
+2. Second developer session is blocked if lock exists
+3. Lock file auto-deletes when session closes normally
+4. Lock file is git-ignored (won't be committed)
+
+**Manual cleanup (if session crashes):**
+```bash
+rm .claude-lock
+```
+
+### Typical Workflow
+
+**1. Planning Phase (Planner Session):**
+```bash
+/issue Add dark mode to invoice templates
+# Analyzes codebase, creates comprehensive issue
+# Copy issue content to GitHub manually
+```
+
+**2. Development Phase (Developer Session):**
+```bash
+/work #11
+# Checks for lock file
+# Implements issue #11
+# Commits and pushes
+# Lock file auto-deleted on close
+```
+
+**3. Concurrent Planning (Optional):**
+- Keep planner session open while developing
+- Research next feature while current one is being implemented
+- No conflicts since planner is read-only
+
+### Best Practices
+
+1. **One developer session at a time** - Always close previous developer session before starting new one
+2. **Multiple planners OK** - Can have several planner sessions for research
+3. **Check lock file** - If developer session won't start, check for stale `.claude-lock`
+4. **Session crashes** - Manually remove `.claude-lock` if session terminated unexpectedly
+5. **Clear separation** - Don't try to write files in planner session
+
+### Troubleshooting
+
+**"Another session is active" error:**
+```bash
+# Check for lock file
+ls -la .claude-lock
+
+# Remove if stale (previous session crashed)
+rm .claude-lock
+```
+
+**File conflicts despite lock file:**
+- Verify you're not writing from planner session
+- Check only one developer session is open
+- Consider switching to single-session workflow (see WORKFLOW_OPTIONS.md)
+
+### Alternative: Single Session Workflow
+
+See `WORKFLOW_OPTIONS.md` for other workflow configurations including single-session mode if two-session system becomes cumbersome.
+
+---

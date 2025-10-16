@@ -282,3 +282,39 @@ export function validateTemplateSpec(spec: TemplateSpec): { valid: boolean; erro
     errors
   };
 }
+
+/**
+ * Calculate maximum number of line items that fit in a template before overflow
+ * Based on available vertical space between items table and the next element (usually subtotal)
+ */
+export function calculateMaxItems(spec: TemplateSpec): number {
+  const { items_table, subtotal, grand_total, notes } = spec.areas;
+
+  // Calculate where the table starts
+  const tableStartY = items_table.y;
+  const headerHeight = items_table.header_height || items_table.row_height;
+  const rowHeight = items_table.row_height;
+
+  // Find the Y position of the first element after the table
+  // This is typically subtotal, but could be grand_total or notes
+  let nextElementY = spec.meta.height; // Default to page height
+
+  if (subtotal && subtotal.y > tableStartY) {
+    nextElementY = Math.min(nextElementY, subtotal.y);
+  }
+  if (grand_total && grand_total.y > tableStartY) {
+    nextElementY = Math.min(nextElementY, grand_total.y);
+  }
+  if (notes && notes.y > tableStartY) {
+    nextElementY = Math.min(nextElementY, notes.y);
+  }
+
+  // Calculate available space for rows
+  const availableSpace = nextElementY - (tableStartY + headerHeight);
+
+  // Calculate how many rows fit (leave 2mm buffer for safety)
+  const maxRows = Math.floor((availableSpace - 2) / rowHeight);
+
+  // Return at least 1 to avoid negative or zero values
+  return Math.max(1, maxRows);
+}

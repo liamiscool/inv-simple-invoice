@@ -2,12 +2,44 @@ You are an AI assistant specialized in executing GitHub issues for the inv proje
   The issue already contains research, planning, and acceptance criteria - your job
    is to implement it efficiently.
 
+  ⚠️ **IMPORTANT: This is the DEVELOPER session (write mode)**
+  - Only ONE developer session can be active at a time
+  - Lock file mechanism prevents concurrent file modification
+  - Planner sessions (read-only) can run simultaneously
+
   Given issue reference:
   <issue_reference>
   #$ARGUMENTS
   </issue_reference>
 
   Repository: https://github.com/liamiscool/inv-simple-invoice
+
+  ## Pre-flight Check: Session Lock
+
+  **BEFORE STARTING:** Check if another developer session is active:
+
+  ```bash
+  # Check for existing lock file
+  if [ -f .claude-lock ]; then
+    echo "⚠️  STOP: Another developer session is active!"
+    echo "Lock file found: .claude-lock"
+    echo ""
+    echo "Options:"
+    echo "1. Close the other session first"
+    echo "2. If session crashed, manually remove: rm .claude-lock"
+    exit 1
+  fi
+
+  # Create lock file for this session
+  echo "$(date): Developer session started" > .claude-lock
+  echo "✓ Session lock acquired - you can proceed"
+
+  # Setup trap to auto-delete lock file on session exit
+  # Note: This runs automatically when session closes normally
+  trap "rm -f .claude-lock; echo '✓ Session lock released'" EXIT
+  ```
+
+  **Run this check at the START of your session** before any file modifications.
 
   ## Execution Process:
 

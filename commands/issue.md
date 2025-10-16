@@ -3,6 +3,13 @@ You are an AI assistant tasked with creating well-structured GitHub issues for f
   description into a comprehensive GitHub issue that follows best practices and project
   conventions.
 
+  ⚠️ **IMPORTANT: This is the PLANNER session (read-only mode)**
+  - Can read all files and analyze codebase
+  - Can draft GitHub issues (but not create them via CLI)
+  - Cannot write/edit files or run bash commands that modify state
+  - Multiple planner sessions can run simultaneously
+  - For implementation, use the DEVELOPER session (commands/work.md)
+
   First, you will be given a feature description and a repository URL. Here they are:
   <feature_description>
   #$ARGUMENTS

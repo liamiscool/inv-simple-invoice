@@ -1,8 +1,9 @@
 <script lang="ts">
   import type { PageData } from './$types';
-  
+  import { calculateMaxItems } from '$lib/templates';
+
   let { data }: { data: PageData } = $props();
-  
+
   let isLoading = $state(false);
   let error = $state('');
   let showPreview = $state(false);
@@ -42,7 +43,26 @@
   const selectedTemplate = $derived(
     data.templates?.find((t: any) => t.id === selectedTemplateId) || null
   );
-  
+
+  // Calculate max items for selected template
+  const maxItems = $derived(() => {
+    if (!selectedTemplate) return Infinity;
+    return calculateMaxItems(selectedTemplate.spec);
+  });
+
+  // Check if we're approaching or exceeding the limit
+  const itemLimitStatus = $derived(() => {
+    const max = maxItems();
+    const count = lineItems.length;
+
+    if (count >= max) {
+      return { level: 'error', message: `This invoice has ${count} items, but the template can only display ${max} items properly. Consider splitting into multiple invoices.` };
+    } else if (count >= max - 2) {
+      return { level: 'warning', message: `Approaching item limit (${count} of ${max} items). Template may not display correctly with more items.` };
+    }
+    return null;
+  });
+
   const totals = $derived(() => {
     let subtotal = 0;
     let taxTotal = 0;
@@ -499,7 +519,14 @@
       <!-- Line Items -->
       <div class="space-y-5">
         <div class="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-700">
-          <h2 class="text-base font-medium dark:text-white">Line Items</h2>
+          <div>
+            <h2 class="text-base font-medium dark:text-white">Line Items</h2>
+            {#if selectedTemplate}
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                {lineItems.length} of {maxItems()} items
+              </p>
+            {/if}
+          </div>
           <button
             type="button"
             onclick={addLineItem}
@@ -508,6 +535,18 @@
             Add Item
           </button>
         </div>
+
+        {#if itemLimitStatus()}
+          <div class="px-4 py-3 text-sm border {itemLimitStatus().level === 'error' ? 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/30 dark:border-red-800 dark:text-red-400' : 'bg-orange-50 border-orange-200 text-orange-800 dark:bg-orange-900/30 dark:border-orange-800 dark:text-orange-400'}">
+            <div class="flex items-start gap-2">
+              <span class="mt-0.5">{itemLimitStatus().level === 'error' ? '⚠️' : '⚡'}</span>
+              <div>
+                <p class="font-medium mb-1">{itemLimitStatus().level === 'error' ? 'Template Capacity Exceeded' : 'Approaching Template Limit'}</p>
+                <p class="text-xs opacity-90">{itemLimitStatus().message}</p>
+              </div>
+            </div>
+          </div>
+        {/if}
 
         <div class="space-y-6">
           {#each lineItems as item, index}
