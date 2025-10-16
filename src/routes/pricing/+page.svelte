@@ -4,19 +4,22 @@
   $: isSignedIn = !!data.session;
 </script>
 
-<div class="h-screen flex flex-col relative overflow-hidden dark:bg-dark-bg">
-  <!-- Header -->
-  <header class="border-b border-thin dark:border-gray-700 px-4 py-3 dark:bg-dark-bg">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
+<div class="h-screen flex flex-col relative overflow-hidden dark:bg-dark-bg font-mono">
+  <!-- Header - Same as homepage -->
+  <header class="border-b border-thin dark:border-gray-700 px-8 py-3" style="background: rgba(0, 0, 0, 0.1); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);">
+    <div class="w-full flex items-center justify-between">
       <div class="flex items-center gap-6">
-        <a href="/" class="text-base tracking-tight font-semibold hover:opacity-70 transition-opacity dark:text-white">inv</a>
-        <a href="/pricing" class="text-xs hover:opacity-70 transition-opacity dark:text-gray-300">Pricing</a>
+        <a href="/" class="text-lg tracking-tight font-medium dark:text-white flex items-end gap-2">
+          <div class="w-12 h-7" style="background: #F58121; image-rendering: pixelated;"></div>
+          <span>inv</span>
+        </a>
+        <a href="/pricing" class="text-sm hover:text-black dark:hover:text-white transition-colors text-gray-600 dark:text-gray-400">Pricing</a>
       </div>
 
       <nav class="flex items-center gap-6">
         <a
           href={isSignedIn ? '/app' : '/auth/login'}
-          class="text-xs border border-black dark:border-white px-4 py-2 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors duration-75 dark:text-white"
+          class="px-5 py-2.5 border border-black dark:border-white text-sm hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors duration-75 dark:text-white"
         >
           {isSignedIn ? 'Dashboard' : 'Sign in'}
         </a>
@@ -119,17 +122,13 @@
     </div>
   </main>
 
-  <!-- Footer -->
-  <footer class="px-4 py-3 mt-auto dark:bg-dark-bg">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
+  <!-- Footer - Same as homepage -->
+  <footer class="px-8 py-3 mt-auto">
+    <div class="max-w-[1400px] mx-auto text-center">
+      <div class="text-xs text-gray-600 dark:text-gray-400">
         <a href="https://x.com/liamhanel" target="_blank" rel="noopener noreferrer" class="hover:text-black dark:hover:text-white transition-colors">
           Created by Liam Hänel
         </a>
-      </div>
-      <div class="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
-        <a href="/legal/terms" class="hover:text-black dark:hover:text-white transition-colors">Terms</a>
-        <a href="/legal/privacy" class="hover:text-black dark:hover:text-white transition-colors">Privacy</a>
       </div>
     </div>
   </footer>

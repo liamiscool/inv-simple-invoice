@@ -160,7 +160,7 @@
   <div id="p5-canvas-container" class="fixed inset-0 w-full h-full z-0"></div>
   
   <!-- Header - Full width frosted glass -->
-  <header class="fixed top-0 left-0 right-0 z-20 border-b border-thin dark:border-gray-700 px-8 py-3" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);">
+  <header class="fixed top-0 left-0 right-0 z-20 border-b border-thin dark:border-gray-700 px-8 py-3" style="background: rgba(0, 0, 0, 0.1); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);">
     <div class="w-full flex items-center justify-between">
       <div class="flex items-center gap-6">
         <a href="/" class="text-lg tracking-tight font-medium dark:text-white flex items-end gap-2">
@@ -173,7 +173,7 @@
       <nav class="flex items-center gap-6">
         <a
           href={isSignedIn ? '/app' : '/auth/login'}
-          class="px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-75 dark:text-white"
+          class="px-5 py-2.5 border border-black dark:border-white text-sm hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors duration-75 dark:text-white"
         >
           {isSignedIn ? 'Dashboard' : 'Sign in'}
         </a>
@@ -251,7 +251,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="px-8 py-3 mt-auto border-t border-gray-200 dark:border-gray-800">
+    <footer class="px-8 py-3 mt-auto">
     <div class="max-w-[1400px] mx-auto text-center">
       <div class="text-xs text-gray-600 dark:text-gray-400">
         <a href="https://x.com/liamhanel" target="_blank" rel="noopener noreferrer" class="hover:text-black dark:hover:text-white transition-colors">
