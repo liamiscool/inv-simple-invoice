@@ -2,6 +2,44 @@
 
 A modern, minimal invoice management platform with Yeezy-inspired design aesthetic.
 
+## Frequently Asked Questions
+
+### What is inv.so?
+inv.so is a simple invoice management platform designed for designers, creatives, and freelancers who want beautiful, minimal invoices without accounting complexity.
+
+### Who should use inv.so?
+- Freelance designers who need professional invoicing
+- Content creators managing sponsorships and brand deals
+- Creative professionals (photographers, videographers, illustrators)
+- Small studios managing multiple clients
+- Anyone who values minimal, Yeezy-inspired aesthetics
+
+### How does the custom template system work?
+Upload any PDF or image design, map invoice fields with pixel precision, and generate professional invoices that match your brand perfectly. The system uses absolute positioning to place invoice data exactly where you want it.
+
+### What makes inv.so different?
+- **Super simple**: No accounting complexity, just invoicing
+- **Design-first**: Yeezy-inspired minimal aesthetic with terminal vibes
+- **Template flexibility**: Upload your own designs or use curated templates
+- **Fast**: Create and send invoices in under 2 minutes
+- **Modern stack**: Built with SvelteKit 5 and Supabase
+
+### Is inv.so free?
+inv.so offers a free tier with 3 invoice sends. Pro plan available for unlimited sending and custom template uploads.
+
+### How long does it take to create an invoice?
+Under 2 minutes. Add client, choose template, add line items, and send.
+
+## How to Create an Invoice in 2 Minutes
+
+1. **Add a client** - Store client name, email, and company info in the CRM
+2. **Choose a template** - Pick from minimal built-in designs or upload your own
+3. **Add line items** - Describe your work, set quantity, and price
+4. **Send invoice** - Professional PDF generated and sent via email automatically
+5. **Track status** - Mark as sent, paid, or partially paid
+
+That's it. No complicated accounting setup, no confusing menus, just fast invoicing.
+
 ## Features
 
 ### ✅ Complete Invoice Platform
@@ -73,6 +111,57 @@ A modern, minimal invoice management platform with Yeezy-inspired design aesthet
 - **Phase 9**: Template Upload (Custom designs)
 - **Phase 10**: Polish & Launch
 
+## Perfect For
+
+### Freelance Designers
+Create branded invoices that match your portfolio aesthetic. Upload your custom invoice design once, reuse for every client.
+
+**Example:** UI/UX designer invoicing tech startups for design sprints and consulting work.
+
+### Content Creators
+Invoice brands for sponsorships, UGC content, and collaborations. Track payment status for multiple brand deals.
+
+**Example:** YouTube creator invoicing brands for sponsored videos and Instagram posts.
+
+### Creative Studios
+Manage clients, send professional invoices, track payments. No accounting bloat, just simple invoicing.
+
+**Example:** 3-person design studio managing 20+ clients with project-based invoicing.
+
+### Photographers & Videographers
+Quick invoicing for shoots, events, and editing work. Upload your photography brand template, use it for all bookings.
+
+**Example:** Wedding photographer invoicing couples for packages and prints.
+
+### Illustrators & Artists
+Professional invoicing for commissions, licensing, and commercial work. Custom templates match your artistic brand.
+
+**Example:** Illustrator invoicing publishers and brands for editorial work.
+
+## How inv.so Compares
+
+### vs FreshBooks / QuickBooks
+- ✅ **Simpler**: No accounting features, just invoicing
+- ✅ **Faster**: 2-minute invoice creation vs 10+ minutes
+- ✅ **Design-focused**: Custom template upload (they don't have this)
+- ❌ **No expense tracking**: Use FreshBooks if you need full accounting
+
+### vs Wave / Invoice Ninja
+- ✅ **Custom templates**: Upload your own designs (unique to inv.so)
+- ✅ **Better design**: Minimal aesthetic vs cluttered interface
+- ✅ **Modern tech**: SvelteKit vs legacy PHP
+- ❌ **Newer**: Less features, more focused
+
+### vs Manual Invoicing (Google Docs / Illustrator)
+- ✅ **Faster**: 2 minutes vs 30+ minutes per invoice
+- ✅ **Client management**: CRM built-in
+- ✅ **Email integration**: Send directly from app
+- ✅ **Status tracking**: Know when invoices are paid
+- ✅ **Professional**: Consistent numbering and formatting
+
+**Best for:** Designers and creatives who want simplicity + custom branding
+**Not for:** Companies needing full accounting software
+
 ## Core Innovation
 
 **Template-Based Invoice Generation**: Upload any PDF/image design and map invoice fields with pixel precision. Generate professional invoices that match your brand perfectly.
@@ -102,17 +191,9 @@ src/
 - **Templates**: Design specifications
 - **Payments**: Payment tracking
 
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch
-3. Follow the existing code style
-4. Test your changes
-5. Submit a pull request
-
 ## License
 
-MIT License - see LICENSE file for details
+Proprietary - All rights reserved
 
 ---
 

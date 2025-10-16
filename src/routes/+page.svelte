@@ -11,6 +11,55 @@
   }
 </script>
 
+<svelte:head>
+  <title>inv - Simple Invoice Generator for Designers & Creatives</title>
+  <meta name="description" content="Create beautiful, minimal invoices in 2 minutes. Custom PDF templates for freelance designers, content creators, and creative professionals." />
+
+  {@html `<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "inv.so",
+    "applicationCategory": "BusinessApplication",
+    "applicationSubCategory": "Invoicing Software",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD",
+      "description": "Free tier with 3 invoice sends, Pro plan for unlimited"
+    },
+    "operatingSystem": "Web Browser",
+    "description": "Simple invoice generator for designers, creatives, and freelancers. Create beautiful, minimal invoices with custom PDF templates in under 2 minutes.",
+    "featureList": [
+      "Custom template upload",
+      "PDF generation in 2 minutes",
+      "Client management CRM",
+      "Email integration",
+      "Payment status tracking",
+      "Minimal Yeezy-inspired design",
+      "Pixel-perfect PDF rendering",
+      "No accounting complexity"
+    ],
+    "audience": {
+      "@type": "Audience",
+      "audienceType": [
+        "Freelance Designers",
+        "Content Creators",
+        "Creative Professionals",
+        "Photographers",
+        "Videographers",
+        "Illustrators",
+        "Small Creative Studios"
+      ]
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "inv.so"
+    }
+  }
+  </script>`}
+</svelte:head>
+
 <div class="h-screen flex flex-col relative overflow-hidden font-mono dark:bg-dark-bg">
   <!-- Header -->
   <header class="border-b border-thin dark:border-gray-700 px-4 py-3">
@@ -101,12 +150,34 @@
   </main>
 
   <!-- Footer -->
-  <footer class="px-8 py-3 mt-auto">
-    <div class="max-w-[1400px] mx-auto text-center">
-      <div class="text-xs text-gray-600 dark:text-gray-400">
-        <a href="https://x.com/liamhanel" target="_blank" rel="noopener noreferrer" class="hover:text-black dark:hover:text-white transition-colors">
-          Created by Liam Hänel
-        </a>
+  <footer class="px-8 py-3 mt-auto border-t border-gray-200 dark:border-gray-800">
+    <div class="max-w-[1400px] mx-auto">
+      <div class="flex flex-col gap-3">
+        <!-- Main footer content -->
+        <div class="text-center text-xs text-gray-600 dark:text-gray-400">
+          <a href="https://x.com/liamhanel" target="_blank" rel="noopener noreferrer" class="hover:text-black dark:hover:text-white transition-colors">
+            Created by Liam Hänel
+          </a>
+        </div>
+
+        <!-- AI-friendly resources -->
+        <div class="text-center text-xs text-gray-400 dark:text-gray-500 space-x-3">
+          <a href="/docs/AI.md" class="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+            For AI Assistants
+          </a>
+          <span>·</span>
+          <a href="/docs/faq.md" class="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+            FAQ
+          </a>
+          <span>·</span>
+          <a href="/docs/getting-started.md" class="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+            Getting Started
+          </a>
+          <span>·</span>
+          <a href="/docs/comparison.md" class="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+            Comparison
+          </a>
+        </div>
       </div>
     </div>
   </footer>

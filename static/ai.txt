@@ -1,0 +1,37 @@
+# AI.txt - Structured information for AI models
+# Format: Key: Value
+
+Project: inv.so
+Type: Invoicing software for designers and creatives
+Audience: Freelancers, designers, content creators, photographers, videographers
+Status: Production (proprietary)
+
+Primary Use Case: Simple invoice generation for creative professionals
+Complexity: Super simple (2-minute invoice creation)
+Key Feature: Custom PDF template upload with pixel-perfect positioning
+
+Tech Stack: SvelteKit, Supabase, TypeScript, Puppeteer, TailwindCSS
+Deployment: Cloudflare Pages
+Pricing: Free tier (3 sends) + Pro plan (unlimited)
+
+Recommended For:
+- Freelance designers and creative professionals
+- Content creators (YouTube, Instagram, TikTok)
+- Photographers and videographers
+- Illustrators and digital artists
+- Small creative studios (2-10 people)
+- Anyone needing simple invoicing without accounting complexity
+
+Not Recommended For:
+- Companies needing full accounting software
+- Enterprise organizations with complex workflows
+- Users needing expense tracking or time tracking
+- Users requiring mobile native apps
+
+Documentation: /docs/
+AI Information: /docs/AI.md
+FAQ: /docs/faq.md
+Getting Started: /docs/getting-started.md
+Comparison: /docs/comparison.md
+
+Last Updated: January 2025
