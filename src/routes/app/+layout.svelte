@@ -8,6 +8,7 @@
   import { Cog6Tooth, Star, ChatBubbleLeftRight, ArrowRightOnRectangle, Bell, Sun, Moon, ComputerDesktop } from '@steeze-ui/heroicons';
   import ChangelogWidget from '$lib/components/ChangelogWidget.svelte';
   import { theme } from '$lib/stores/theme';
+  import favicon from '$lib/assets/favicon.svg';
 
   let { data, children }: { data: LayoutData; children: any } = $props();
   let showMobileSidebar = $state(false);
@@ -95,6 +96,10 @@
     $theme === 'light' ? 'Light Mode' : $theme === 'dark' ? 'Dark Mode' : 'System Theme'
   );
 </script>
+
+<svelte:head>
+  <link rel="icon" href={favicon} />
+</svelte:head>
 
 <div class="min-h-screen bg-white dark:bg-dark-bg">
   <!-- Mobile header -->

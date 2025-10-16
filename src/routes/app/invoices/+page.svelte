@@ -93,6 +93,23 @@
     }
   }
 
+  function handleRowClick(event: MouseEvent, invoiceId: string) {
+    // Don't navigate if clicking checkbox column or action column
+    const target = event.target as HTMLElement;
+
+    // Check if click is on checkbox, dropdown button, or their children
+    if (
+      target.closest('input[type="checkbox"]') ||
+      target.closest('button') ||
+      target.closest('.relative') // dropdown container
+    ) {
+      return;
+    }
+
+    // Navigate to invoice detail page
+    window.location.href = `/app/invoices/${invoiceId}`;
+  }
+
   async function duplicateInvoice(invoiceId: string) {
     try {
       // Redirect to the detail page which has duplicate functionality
@@ -435,8 +452,11 @@
         </thead>
         <tbody>
           {#each filteredInvoices as invoice}
-            <tr class="border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50/50 dark:hover:bg-dark-hover {selectedInvoiceIds.has(invoice.id) ? 'bg-blue-50 dark:bg-blue-900/10' : ''}">
-              <td class="px-4 py-4">
+            <tr
+              class="border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50/50 dark:hover:bg-dark-hover cursor-pointer {selectedInvoiceIds.has(invoice.id) ? 'bg-blue-50 dark:bg-blue-900/10' : ''}"
+              onclick={(e) => handleRowClick(e, invoice.id)}
+            >
+              <td class="px-4 py-4" onclick={(e) => e.stopPropagation()}>
                 <input
                   type="checkbox"
                   checked={selectedInvoiceIds.has(invoice.id)}
@@ -445,12 +465,9 @@
                 />
               </td>
               <td class="px-4 py-4">
-                <a
-                  href="/app/invoices/{invoice.id}"
-                  class="text-sm hover:text-black dark:hover:text-white transition-colors font-medium dark:text-white"
-                >
+                <span class="text-sm hover:text-black dark:hover:text-white transition-colors font-medium dark:text-white">
                   {invoice.number}
-                </a>
+                </span>
               </td>
               <td class="px-4 py-4">
                 <span class="text-sm text-gray-600 dark:text-gray-300">
@@ -477,7 +494,7 @@
                   {invoice.due_date ? formatDate(invoice.due_date) : '—'}
                 </span>
               </td>
-              <td class="px-4 py-4">
+              <td class="px-4 py-4" onclick={(e) => e.stopPropagation()}>
                 <div class="relative">
                   <button
                     onclick={() => toggleDropdown(invoice.id)}
@@ -499,32 +516,74 @@
                           Duplicate
                         </button>
 
-                        {#if invoice.status === 'draft'}
+                        <!-- Status Change Submenu -->
+                        <div class="relative group">
                           <button
-                            onclick={() => { updateInvoiceStatus(invoice.id, 'sent'); closeDropdown(); }}
-                            class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors flex items-center justify-between"
                           >
-                            Mark as Sent
+                            Change Status
+                            <span class="text-xs">›</span>
                           </button>
-                        {/if}
 
-                        {#if ['sent', 'partially_paid'].includes(invoice.status)}
-                          <button
-                            onclick={() => { updateInvoiceStatus(invoice.id, 'paid'); closeDropdown(); }}
-                            class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors"
-                          >
-                            Mark as Paid
-                          </button>
-                        {/if}
+                          <!-- Submenu (appears on hover) -->
+                          <div class="absolute left-full top-0 ml-1 w-48 bg-white dark:bg-dark-input border border-gray-200 dark:border-gray-700 shadow-lg hidden group-hover:block z-20">
+                            <div class="py-1">
+                              {#if invoice.status !== 'draft'}
+                                <button
+                                  onclick={() => { updateInvoiceStatus(invoice.id, 'draft'); closeDropdown(); }}
+                                  class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors"
+                                >
+                                  Draft
+                                </button>
+                              {/if}
 
-                        {#if invoice.status !== 'void'}
-                          <button
-                            onclick={() => { updateInvoiceStatus(invoice.id, 'void'); closeDropdown(); }}
-                            class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors"
-                          >
-                            Mark as Void
-                          </button>
-                        {/if}
+                              {#if invoice.status !== 'sent'}
+                                <button
+                                  onclick={() => { updateInvoiceStatus(invoice.id, 'sent'); closeDropdown(); }}
+                                  class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors"
+                                >
+                                  Sent
+                                </button>
+                              {/if}
+
+                              {#if invoice.status !== 'partially_paid'}
+                                <button
+                                  onclick={() => { updateInvoiceStatus(invoice.id, 'partially_paid'); closeDropdown(); }}
+                                  class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors"
+                                >
+                                  Partially Paid
+                                </button>
+                              {/if}
+
+                              {#if invoice.status !== 'paid'}
+                                <button
+                                  onclick={() => { updateInvoiceStatus(invoice.id, 'paid'); closeDropdown(); }}
+                                  class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors"
+                                >
+                                  Paid
+                                </button>
+                              {/if}
+
+                              {#if invoice.status !== 'overdue'}
+                                <button
+                                  onclick={() => { updateInvoiceStatus(invoice.id, 'overdue'); closeDropdown(); }}
+                                  class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors"
+                                >
+                                  Overdue
+                                </button>
+                              {/if}
+
+                              {#if invoice.status !== 'void'}
+                                <button
+                                  onclick={() => { updateInvoiceStatus(invoice.id, 'void'); closeDropdown(); }}
+                                  class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors"
+                                >
+                                  Void
+                                </button>
+                              {/if}
+                            </div>
+                          </div>
+                        </div>
 
                         <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
 
@@ -548,48 +607,49 @@
     <!-- Mobile: Invoices cards -->
     <div class="block md:hidden space-y-3">
       {#each filteredInvoices as invoice}
-        <div class="border border-gray-200 dark:border-gray-700 p-4 {selectedInvoiceIds.has(invoice.id) ? 'bg-blue-50 dark:bg-blue-900/10' : ''}">
+        <div
+          class="border border-gray-200 dark:border-gray-700 p-4 cursor-pointer {selectedInvoiceIds.has(invoice.id) ? 'bg-blue-50 dark:bg-blue-900/10' : ''}"
+          onclick={() => window.location.href = `/app/invoices/${invoice.id}`}
+        >
           <!-- Header: Checkbox + Number + Status -->
           <div class="flex items-start justify-between mb-3">
             <div class="flex items-start gap-3">
               <input
                 type="checkbox"
+                onclick={(e) => e.stopPropagation()}
                 checked={selectedInvoiceIds.has(invoice.id)}
                 onchange={() => toggleSelection(invoice.id)}
                 class="w-4 h-4 mt-1 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-black dark:focus:border-white cursor-pointer accent-black dark:accent-white"
               />
-              <a href="/app/invoices/{invoice.id}" class="text-sm font-medium hover:text-black dark:hover:text-white transition-colors dark:text-white">
+              <span class="text-sm font-medium hover:text-black dark:hover:text-white transition-colors dark:text-white">
                 {invoice.number}
-              </a>
+              </span>
             </div>
             <span class="inline-flex px-2.5 py-1 text-sm {statusColors[invoice.status as keyof typeof statusColors]}">
               {statusLabels[invoice.status as keyof typeof statusLabels]}
             </span>
           </div>
 
-          <a href="/app/invoices/{invoice.id}" class="block">
-
-            <!-- Client + Amount -->
-            <div class="mb-3">
-              <div class="text-sm text-gray-600 dark:text-gray-300 mb-1">
-                {invoice.client_name}
-              </div>
-              <div class="text-base font-medium dark:text-white">
-                {formatCurrency(invoice.total, invoice.currency)}
-              </div>
+          <!-- Client + Amount -->
+          <div class="mb-3">
+            <div class="text-sm text-gray-600 dark:text-gray-300 mb-1">
+              {invoice.client_name}
             </div>
-
-            <!-- Dates -->
-            <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-3">
-              <div>Issued: {formatDate(invoice.issue_date)}</div>
-              {#if invoice.due_date}
-                <div>Due: {formatDate(invoice.due_date)}</div>
-              {/if}
+            <div class="text-base font-medium dark:text-white">
+              {formatCurrency(invoice.total, invoice.currency)}
             </div>
-          </a>
+          </div>
+
+          <!-- Dates -->
+          <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-3">
+            <div>Issued: {formatDate(invoice.issue_date)}</div>
+            {#if invoice.due_date}
+              <div>Due: {formatDate(invoice.due_date)}</div>
+            {/if}
+          </div>
 
           <!-- Actions -->
-          <div class="flex items-center gap-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+          <div class="flex items-center gap-3 pt-3 border-t border-gray-100 dark:border-gray-700" onclick={(e) => e.stopPropagation()}>
             <button
               onclick={() => duplicateInvoice(invoice.id)}
               class="text-sm text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
