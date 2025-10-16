@@ -86,6 +86,8 @@
 <svelte:head>
   <title>inv - Simple Invoice Generator for Designers & Creatives</title>
   <meta name="description" content="Create beautiful, minimal invoices in 2 minutes. Custom PDF templates for freelance designers, content creators, and creative professionals." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 </svelte:head>
 
 <div class="h-screen w-screen flex flex-col relative overflow-hidden font-mono dark:bg-dark-bg">
@@ -185,30 +187,21 @@
 
     <!-- Footer -->
     <footer class="px-8 py-3 mt-auto border-t border-gray-200 dark:border-gray-800">
-      <div class="w-full flex items-center justify-between">
-        <div class="text-xs text-gray-400 dark:text-gray-500 space-x-3">
-          <a href="/docs/AI.md" class="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-            For AI Assistants
-          </a>
-          <span>·</span>
-          <a href="/docs/faq.md" class="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-            FAQ
-          </a>
-          <span>·</span>
-          <a href="/docs/getting-started.md" class="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-            Getting Started
-          </a>
-          <span>·</span>
-          <a href="/docs/comparison.md" class="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-            Comparison
-          </a>
-        </div>
-        <div class="text-xs text-gray-400 dark:text-gray-500">
-          <a href="https://x.com/liamhanel" target="_blank" rel="noopener noreferrer" class="hover:text-black dark:hover:text-white transition-colors">
-            Created by Liam Hänel
-          </a>
-        </div>
+    <div class="max-w-[1400px] mx-auto text-center">
+      <div class="text-xs text-gray-600 dark:text-gray-400">
+        <a href="https://x.com/liamhanel" target="_blank" rel="noopener noreferrer" class="hover:text-black dark:hover:text-white transition-colors">
+          Created by Liam Hänel
+        </a>
       </div>
+    </div>
+
+    <!-- Hidden AI documentation links for crawlers only -->
+    <div class="hidden">
+      <a href="/docs/AI.md">For AI Assistants</a>
+      <a href="/docs/faq.md">FAQ</a>
+      <a href="/docs/getting-started.md">Getting Started</a>
+      <a href="/docs/comparison.md">Comparison</a>
+    </div>
     </footer>
   </div>
 
