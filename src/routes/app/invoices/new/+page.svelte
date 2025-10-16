@@ -159,28 +159,36 @@
 
       if (numberError) throw numberError;
 
+      // Prepare invoice data
+      const invoiceData = {
+        org_id: profile.org_id,
+        client_id: selectedClientId,
+        template_id: selectedTemplateId,
+        number: nextNumber,
+        issue_date: issueDate,
+        due_date: dueDate || null,
+        currency: currency,
+        status: 'draft',
+        notes: notes || null,
+        include_contact_name: includeContactName,
+        subtotal: totals().subtotal,
+        tax_total: totals().taxTotal,
+        total: totals().total
+      };
+
+      console.log('=== CREATE INVOICE - SAVING TO SUPABASE ===');
+      console.log('Invoice data:', invoiceData);
+
       // Create invoice
       const { data: invoice, error: invoiceError } = await data.supabase
         .from('invoice')
-        .insert({
-          org_id: profile.org_id,
-          client_id: selectedClientId,
-          template_id: selectedTemplateId,
-          number: nextNumber,
-          issue_date: issueDate,
-          due_date: dueDate || null,
-          currency: currency,
-          status: 'draft',
-          notes: notes || null,
-          include_contact_name: includeContactName,
-          subtotal: totals().subtotal,
-          tax_total: totals().taxTotal,
-          total: totals().total
-        })
+        .insert(invoiceData)
         .select()
         .single();
 
       if (invoiceError) throw invoiceError;
+
+      console.log('✅ Invoice created:', invoice);
 
       // Create line items (only save items with descriptions)
       const itemsToInsert = lineItems
@@ -195,13 +203,18 @@
           line_total: (item.qty || 0) * (item.unitPrice || 0)
         }));
 
+      console.log('Line items to insert:', itemsToInsert);
+
       if (itemsToInsert.length > 0) {
         const { error: itemsError } = await data.supabase
           .from('invoice_item')
           .insert(itemsToInsert);
 
         if (itemsError) throw itemsError;
+        console.log('✅ Line items created: ' + itemsToInsert.length + ' items');
       }
+
+      console.log('=== END SAVE ===');
 
       // Redirect to invoice detail page
       window.location.href = `/app/invoices/${invoice.id}`;
@@ -240,27 +253,35 @@
 
       if (numberError) throw numberError;
 
+      // Prepare invoice data
+      const draftInvoiceData = {
+        org_id: profile.org_id,
+        client_id: selectedClientId,
+        template_id: selectedTemplateId,
+        number: nextNumber,
+        issue_date: issueDate,
+        due_date: dueDate || null,
+        currency: currency,
+        status: 'draft',
+        notes: notes || null,
+        include_contact_name: includeContactName,
+        subtotal: totals().subtotal,
+        tax_total: totals().taxTotal,
+        total: totals().total
+      };
+
+      console.log('=== SAVE DRAFT - SAVING TO SUPABASE ===');
+      console.log('Draft invoice data:', draftInvoiceData);
+
       const { data: invoice, error: invoiceError} = await data.supabase
         .from('invoice')
-        .insert({
-          org_id: profile.org_id,
-          client_id: selectedClientId,
-          template_id: selectedTemplateId,
-          number: nextNumber,
-          issue_date: issueDate,
-          due_date: dueDate || null,
-          currency: currency,
-          status: 'draft',
-          notes: notes || null,
-          include_contact_name: includeContactName,
-          subtotal: totals().subtotal,
-          tax_total: totals().taxTotal,
-          total: totals().total
-        })
+        .insert(draftInvoiceData)
         .select()
         .single();
 
       if (invoiceError) throw invoiceError;
+
+      console.log('✅ Draft invoice created:', invoice);
 
       // Create line items (only save items with descriptions)
       const itemsToInsert = lineItems
@@ -275,13 +296,18 @@
           line_total: (item.qty || 0) * (item.unitPrice || 0)
         }));
 
+      console.log('Draft line items to insert:', itemsToInsert);
+
       if (itemsToInsert.length > 0) {
         const { error: itemsError } = await data.supabase
           .from('invoice_item')
           .insert(itemsToInsert);
 
         if (itemsError) throw itemsError;
+        console.log('✅ Draft line items created: ' + itemsToInsert.length + ' items');
       }
+
+      console.log('=== END SAVE DRAFT ===');
 
       // Show success message and stay on page
       draftSavedMessage = 'Draft saved successfully!';
