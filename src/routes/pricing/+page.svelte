@@ -2,9 +2,11 @@
   import { theme } from '$lib/stores/theme';
   import { Icon } from '@steeze-ui/svelte-icon';
   import { Sun, Moon, ComputerDesktop } from '@steeze-ui/heroicons';
-  export let data;
+  import type { PageData } from './$types';
 
-  $: isSignedIn = !!data.session;
+  let { data }: { data: PageData } = $props();
+
+  const isSignedIn = $derived(!!data.session);
 
   const themeIcon = $derived(
     $theme === 'light' ? Sun : $theme === 'dark' ? Moon : ComputerDesktop

@@ -3,10 +3,13 @@
   import { theme } from '$lib/stores/theme';
   import { Icon } from '@steeze-ui/svelte-icon';
   import { Sun, Moon, ComputerDesktop } from '@steeze-ui/heroicons';
-  export let data;
+  import type { PageData } from './$types';
+
+  let { data }: { data: PageData } = $props();
 
   let invoicesSent = 2847;
-  $: isSignedIn = !!data.session;
+
+  const isSignedIn = $derived(!!data.session);
   let loadingStatus = 'Loading P5JS...';
 
   const themeIcon = $derived(
