@@ -160,7 +160,7 @@
   <div id="p5-canvas-container" class="fixed inset-0 w-full h-full z-0"></div>
   
   <!-- Header - Full width frosted glass -->
-  <header class="relative z-10 border-b border-thin dark:border-gray-700 px-8 py-3" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);">
+  <header class="fixed top-0 left-0 right-0 z-20 border-b border-thin dark:border-gray-700 px-8 py-3" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);">
     <div class="w-full flex items-center justify-between">
       <div class="flex items-center gap-6">
         <a href="/" class="text-lg tracking-tight font-medium dark:text-white flex items-end gap-2">
@@ -182,10 +182,10 @@
   </header>
   
   <!-- Content overlay -->
-  <div class="relative z-5 flex flex-col h-full pt-16">
+  <div class="relative z-10 flex flex-col h-full pt-20">
 
     <!-- Main Content - Left aligned -->
-    <main class="flex-1 px-8 py-8 overflow-hidden flex items-center">
+    <main class="flex-1 px-8 py-8 overflow-hidden flex items-center min-h-[calc(100vh-8rem)]">
       <div class="max-w-2xl text-left space-y-12">
 
         <!-- Hero -->
