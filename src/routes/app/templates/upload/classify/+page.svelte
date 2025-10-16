@@ -1549,11 +1549,6 @@
   <!-- Header -->
   <div class="flex items-center justify-between">
     <div>
-      <div class="flex items-center gap-3 mb-2">
-        <a href="/app/templates/upload" class="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white">
-          ← Back to Upload
-        </a>
-      </div>
       <h1 class="text-lg font-medium mb-1 dark:text-white">Classify Text: {data.template.title}</h1>
       <p class="text-sm text-gray-600 dark:text-gray-400">
         Mark text as static (keep) or dynamic (remove & map to invoice fields)
@@ -1706,20 +1701,20 @@
               {@const coveredCount = area.coveredTextIndices?.length || 0}
 
               <div
-                class="border rounded-sm p-2 text-xs cursor-pointer transition-colors {isSelected ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'} {isMapped ? 'bg-green-50' : 'bg-blue-50'}"
+                class="border rounded-sm p-2 text-sm cursor-pointer transition-colors {isSelected ? 'border-black dark:border-white bg-gray-50 dark:bg-dark-input' : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'} {isMapped ? 'bg-green-50 dark:bg-green-900/30' : 'bg-blue-50 dark:bg-blue-900/30'}"
                 onclick={() => { selectedAreaIndex = areaIndex; selectedItemIndex = null; redraw(); }}
               >
                 <div class="flex items-start justify-between gap-2 mb-2">
                   <div class="flex items-center gap-1.5 flex-1 min-w-0">
                     {#if isMapped}
-                      <span class="text-green-600 text-sm flex-shrink-0">✓</span>
+                      <span class="text-green-600 dark:text-green-400 text-sm flex-shrink-0">✓</span>
                     {/if}
                     <div class="flex items-center gap-2 flex-1">
-                      <span class="text-xs px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded border border-indigo-300 font-medium flex-shrink-0">
+                      <span class="text-sm px-1.5 py-0.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded border border-indigo-300 dark:border-indigo-800 font-medium flex-shrink-0">
                         Custom Box
                       </span>
                       {#if coveredCount > 0}
-                        <span class="text-[10px] text-gray-400">({coveredCount} text{coveredCount !== 1 ? 's' : ''} replaced)</span>
+                        <span class="text-xs text-gray-400 dark:text-gray-500">({coveredCount} text{coveredCount !== 1 ? 's' : ''} replaced)</span>
                       {/if}
                     </div>
                   </div>
@@ -1781,7 +1776,7 @@
                     redraw();
                   }}
                   onclick={(e) => e.stopPropagation()}
-                  class="w-full px-2 py-1 text-xs border rounded-sm {isMapped || area.isLineItemsTable ? 'border-green-300 bg-green-50 text-green-700 font-medium' : 'border-gray-200'}"
+                  class="w-full px-4 py-2.5 text-sm border rounded-sm {isMapped || area.isLineItemsTable ? 'border-green-300 dark:border-green-800 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-medium' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-input dark:text-white'}"
                 >
                   <option value="">-- Select field --</option>
                   {#each fieldOptions as field}
@@ -1808,15 +1803,15 @@
               <!-- Skip rendering if covered by a box -->
               {#if !isCoveredByBox}
               <div
-                class="border rounded-sm p-2 text-xs cursor-pointer transition-colors {isSelected ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'} {isMapped ? 'bg-green-50' : isDynamic && !isIgnored ? 'bg-blue-50' : isStatic ? 'bg-gray-50' : ''}"
+                class="border rounded-sm p-2 text-sm cursor-pointer transition-colors {isSelected ? 'border-black dark:border-white bg-gray-50 dark:bg-dark-input' : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'} {isMapped ? 'bg-green-50 dark:bg-green-900/30' : isDynamic && !isIgnored ? 'bg-blue-50 dark:bg-blue-900/30' : isStatic ? 'bg-gray-50 dark:bg-dark-input' : ''}"
                 onclick={() => { selectedItemIndex = index; selectedAreaIndex = null; redraw(); }}
               >
                 <div class="flex items-start justify-between gap-2 mb-2">
                   <div class="flex items-center gap-1.5 flex-1 min-w-0">
                     {#if isMapped}
-                      <span class="text-green-600 text-sm flex-shrink-0">✓</span>
+                      <span class="text-green-600 dark:text-green-400 text-sm flex-shrink-0">✓</span>
                     {/if}
-                    <div class="font-mono text-xs break-all {isIgnored ? 'text-gray-300 line-through' : isStatic ? 'text-gray-400' : isMapped ? 'text-green-700' : 'text-blue-700'}">
+                    <div class="font-mono text-sm break-all {isIgnored ? 'text-gray-300 dark:text-gray-600 line-through' : isStatic ? 'text-gray-400 dark:text-gray-500' : isMapped ? 'text-green-700 dark:text-green-400' : 'text-blue-700 dark:text-blue-400'}">
                       {item.text}
                     </div>
                   </div>
@@ -1826,11 +1821,11 @@
                     class="flex items-center gap-1.5 text-xs flex-shrink-0"
                     title="Toggle between static and dynamic"
                   >
-                    <span class="text-[10px] uppercase tracking-wide {isStatic ? 'font-medium text-gray-500' : 'text-gray-400'}">Static</span>
-                    <div class="relative inline-block w-8 h-4 rounded-full transition-colors {isStatic ? 'bg-gray-300' : 'bg-blue-500'}">
+                    <span class="text-xs uppercase tracking-wide {isStatic ? 'font-medium text-gray-500 dark:text-gray-400' : 'text-gray-400 dark:text-gray-500'}">Static</span>
+                    <div class="relative inline-block w-8 h-4 rounded-full transition-colors {isStatic ? 'bg-gray-300 dark:bg-gray-700' : 'bg-blue-500 dark:bg-blue-600'}">
                       <div class="absolute top-0.5 transition-transform rounded-full w-3 h-3 bg-white {isStatic ? 'left-0.5' : 'left-4'}"></div>
                     </div>
-                    <span class="text-[10px] uppercase tracking-wide {!isStatic ? 'font-medium text-gray-600' : 'text-gray-400'}">Dynamic</span>
+                    <span class="text-xs uppercase tracking-wide {!isStatic ? 'font-medium text-gray-600 dark:text-gray-300' : 'text-gray-400 dark:text-gray-500'}">Dynamic</span>
                   </button>
                 </div>
 
@@ -1843,16 +1838,16 @@
                         bind:value={customFieldName}
                         oninput={handleCustomFieldInput}
                         placeholder="Enter field name..."
-                        class="w-full px-2 py-1 text-xs border border-gray-300 rounded-sm"
+                        class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-sm bg-white dark:bg-dark-input dark:text-white focus:outline-none focus:border-black dark:focus:border-white"
                         autofocus
                       />
 
                       {#if customFieldSuggestion}
-                        <div class="text-xs p-2 bg-blue-50 border border-blue-200 rounded-sm">
-                          <div class="text-blue-700 mb-1">Did you mean:</div>
+                        <div class="text-sm p-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-sm">
+                          <div class="text-blue-700 dark:text-blue-400 mb-1">Did you mean:</div>
                           <button
                             onclick={() => saveCustomField(true)}
-                            class="text-blue-600 hover:underline font-medium"
+                            class="text-blue-600 dark:text-blue-400 hover:underline font-medium"
                           >
                             {fieldOptions.find(f => f.value === customFieldSuggestion)?.label}
                           </button>
@@ -1863,13 +1858,13 @@
                         <button
                           onclick={() => saveCustomField(false)}
                           disabled={!customFieldName.trim()}
-                          class="flex-1 px-2 py-1 text-xs bg-black text-white rounded-sm hover:bg-gray-800 disabled:bg-gray-300"
+                          class="flex-1 px-4 py-2 text-sm bg-black dark:bg-dark-button text-white rounded-sm hover:bg-gray-800 dark:hover:bg-dark-button-hover disabled:bg-gray-300 dark:disabled:bg-gray-700"
                         >
                           Save Custom
                         </button>
                         <button
                           onclick={cancelCustomField}
-                          class="px-2 py-1 text-xs border border-gray-300 rounded-sm hover:bg-gray-50"
+                          class="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-sm hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white dark:bg-dark-input"
                         >
                           Cancel
                         </button>
@@ -1880,7 +1875,7 @@
                       value={classification.fieldMapping || ''}
                       onchange={(e) => updateFieldMapping(index, e.currentTarget.value)}
                       onclick={(e) => e.stopPropagation()}
-                      class="w-full px-2 py-1 text-xs border rounded-sm {isMapped ? 'border-green-300 bg-green-50 text-green-700 font-medium' : 'border-gray-200'}"
+                      class="w-full px-4 py-2.5 text-sm border rounded-sm {isMapped ? 'border-green-300 dark:border-green-800 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-medium' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-input dark:text-white'}"
                     >
                       <option value="">-- Select field --</option>
                       {#each fieldOptions as field}
@@ -1906,10 +1901,10 @@
   <!-- Mapping popup (for both areas and text items) -->
   {#if showMultiSelectPopup && (selectedAreaIndex !== null || selectedItemIndex !== null)}
     <div
-      class="fixed bg-white border border-gray-300 rounded-sm shadow-lg z-50 w-48"
+      class="fixed bg-white dark:bg-dark-input border border-gray-300 dark:border-gray-700 rounded-sm shadow-lg z-50 w-48"
       style="left: {popupX}px; top: {popupY}px; position: fixed;"
     >
-      <div class="text-xs font-medium px-3 py-2 border-b border-gray-200 bg-gray-50">
+      <div class="text-sm font-medium px-3 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-dark-bg dark:text-white">
         {selectedAreaIndex !== null ? 'Map Area' : 'Map Field'}
       </div>
 
@@ -1917,14 +1912,14 @@
         <div class="p-1">
           <button
             onclick={() => selectedAreaIndex !== null ? setAreaAsStatic() : setTextItemAsStatic()}
-            class="w-full text-left px-2 py-1.5 text-xs hover:bg-gray-100 rounded-sm"
+            class="w-full text-left px-2 py-1.5 text-sm hover:bg-gray-100 dark:hover:bg-dark-hover rounded-sm dark:text-white"
           >
             Set as Static
           </button>
 
-          <div class="border-t border-gray-200 my-1"></div>
+          <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
 
-          <div class="text-[10px] text-gray-600 px-2 py-1 uppercase tracking-wide">
+          <div class="text-xs text-gray-600 dark:text-gray-400 px-2 py-1 uppercase tracking-wide">
             Set as Dynamic:
           </div>
 
@@ -1935,19 +1930,19 @@
             {@const isCurrent = currentFieldMapping === field.value}
             <button
               onclick={() => selectedAreaIndex !== null ? applyToArea(field.value) : applyToTextItem(field.value)}
-              class="w-full text-left px-2 py-1.5 text-xs rounded-sm flex items-center justify-between gap-2 {isCurrent ? 'bg-green-100 hover:bg-green-200 font-medium' : 'hover:bg-gray-100'}"
+              class="w-full text-left px-2 py-1.5 text-sm rounded-sm flex items-center justify-between gap-2 {isCurrent ? 'bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50 font-medium' : 'hover:bg-gray-100 dark:hover:bg-dark-hover'} dark:text-white"
               disabled={isUsed && !canReuse && !isCurrent}
             >
-              <span class={isUsed && !canReuse && !isCurrent ? 'text-gray-400' : isCurrent ? 'text-green-700' : ''}>{field.label}</span>
+              <span class={isUsed && !canReuse && !isCurrent ? 'text-gray-400 dark:text-gray-600' : isCurrent ? 'text-green-700 dark:text-green-400' : ''}>{field.label}</span>
               {#if isCurrent}
-                <span class="text-green-600 text-sm">✓</span>
+                <span class="text-green-600 dark:text-green-400 text-sm">✓</span>
               {:else if isUsed && !isCurrent}
-                <span class="text-green-600 text-sm">✓</span>
+                <span class="text-green-600 dark:text-green-400 text-sm">✓</span>
               {/if}
             </button>
           {/each}
 
-          <div class="border-t border-gray-200 my-1"></div>
+          <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
 
           <button
             onclick={() => {
@@ -1963,25 +1958,25 @@
                 showMultiSelectPopup = false;
               }
             }}
-            class="w-full text-left px-2 py-1.5 text-xs hover:bg-gray-100 rounded-sm"
+            class="w-full text-left px-2 py-1.5 text-sm hover:bg-gray-100 dark:hover:bg-dark-hover rounded-sm dark:text-white"
           >
             Custom Field...
           </button>
         </div>
       </div>
 
-      <div class="border-t border-gray-200 p-1">
+      <div class="border-t border-gray-200 dark:border-gray-700 p-1">
         {#if selectedAreaIndex !== null}
           <button
             onclick={() => deleteArea()}
-            class="w-full text-left px-2 py-1.5 text-xs text-red-600 hover:bg-red-50 rounded-sm"
+            class="w-full text-left px-2 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-sm"
           >
             Delete Area
           </button>
         {/if}
         <button
           onclick={() => { showMultiSelectPopup = false; selectedAreaIndex = null; selectedItemIndex = null; redraw(); }}
-          class="w-full text-left px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded-sm"
+          class="w-full text-left px-2 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-dark-hover rounded-sm"
         >
           Cancel
         </button>
@@ -2029,14 +2024,14 @@
     }}
   >
     <div
-      class="bg-white rounded-sm shadow-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+      class="bg-white dark:bg-dark-bg rounded-sm shadow-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
       onclick={(e) => e.stopPropagation()}
     >
       <!-- Header -->
-      <div class="border-b border-gray-200 p-4">
-        <h2 class="text-sm font-medium">Line Items Table Configuration</h2>
+      <div class="border-b border-gray-200 dark:border-gray-700 p-4">
+        <h2 class="text-base font-medium dark:text-white">Line Items Table Configuration</h2>
         {#if tableConfig.autoDetected}
-          <p class="text-xs text-gray-600 mt-1">
+          <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
             ✓ Auto-detected {tableConfig.detectedRows} rows, {tableConfig.columns.length} columns
             {#if tableConfig.confidence}
               (confidence: {Math.round(tableConfig.confidence * 100)}%)
@@ -2049,7 +2044,7 @@
       <div class="p-4 space-y-4">
         <!-- Columns Configuration -->
         <div>
-          <label class="block text-xs font-medium text-gray-700 mb-2">Columns</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Columns</label>
           <div class="space-y-2">
             {#each tableConfig.columns as column, colIndex}
               <div class="border border-gray-200 rounded-sm p-3">
