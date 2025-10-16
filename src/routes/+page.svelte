@@ -86,8 +86,29 @@
 <svelte:head>
   <title>inv - Simple Invoice Generator for Designers & Creatives</title>
   <meta name="description" content="Create beautiful, minimal invoices in 2 minutes. Custom PDF templates for freelance designers, content creators, and creative professionals." />
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://inv.so/" />
+
+  <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://inv.so/" />
+  <meta property="og:title" content="inv - Simple Invoice Generator for Designers & Creatives" />
+  <meta property="og:description" content="Create beautiful, minimal invoices in 2 minutes. Custom PDF templates for freelance designers, content creators, and creative professionals." />
+  <meta property="og:image" content="https://inv.so/og-image.png" />
+  <meta property="og:site_name" content="inv.so" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://inv.so/" />
+  <meta name="twitter:title" content="inv - Simple Invoice Generator for Designers & Creatives" />
+  <meta name="twitter:description" content="Create beautiful, minimal invoices in 2 minutes. Custom PDF templates for freelance designers, content creators, and creative professionals." />
+  <meta name="twitter:image" content="https://inv.so/twitter-card.png" />
+  <meta name="twitter:creator" content="@liamhanel" />
 
   {@html `<script type="application/ld+json">
   {
@@ -169,11 +190,11 @@
 
         <!-- Hero -->
         <div class="space-y-6">
-          <h2 class="text-6xl md:text-7xl font-light tracking-tight leading-[1.05] dark:text-white">
+          <h2 class="text-6xl md:text-7xl font-semibold tracking-tight leading-[1.05] dark:text-white">
             Super simple<br/>
             invoicing.
           </h2>
-          <p class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-2xl">
+          <p class="text-base text-gray-600 dark:text-gray-400 leading-relaxed max-w-2xl">
             For creatives, designers, and creators. No frills. Manage your templates. Send and manage clients and invoices in one place. Upload your own designs or use templates. Free to use.
           </p>
         </div>

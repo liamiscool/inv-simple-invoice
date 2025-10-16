@@ -34,4 +34,7 @@ FAQ: /docs/faq.md
 Getting Started: /docs/getting-started.md
 Comparison: /docs/comparison.md
 
-Last Updated: Oct 2025
+Sitemap: https://inv.so/sitemap.xml
+Robots: https://inv.so/robots.txt
+
+Last Updated: Jan 2025
