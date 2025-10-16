@@ -1,12 +1,28 @@
 <script lang="ts">
+  import { theme } from '$lib/stores/theme';
+  import { Icon } from '@steeze-ui/svelte-icon';
+  import { Sun, Moon, ComputerDesktop } from '@steeze-ui/heroicons';
   export let data;
 
   $: isSignedIn = !!data.session;
+
+  const themeIcon = $derived(
+    $theme === 'light' ? Sun : $theme === 'dark' ? Moon : ComputerDesktop
+  );
+
+  const themeLabel = $derived(
+    $theme === 'light' ? 'Light' : $theme === 'dark' ? 'Dark' : 'System'
+  );
+
+  function cycleTheme() {
+    const next = $theme === 'light' ? 'dark' : $theme === 'dark' ? 'system' : 'light';
+    theme.set(next);
+  }
 </script>
 
 <div class="h-screen flex flex-col relative overflow-hidden dark:bg-dark-bg font-mono">
   <!-- Header - Same as homepage -->
-  <header class="border-b border-thin dark:border-gray-700 px-8 py-3" style="background: rgba(0, 0, 0, 0.1); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);">
+  <header class="border-b border-thin dark:border-gray-700 px-8 py-3 bg-white/10 dark:bg-black/10" style="backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);">
     <div class="w-full flex items-center justify-between">
       <div class="flex items-center gap-6">
         <a href="/" class="text-lg tracking-tight font-medium dark:text-white flex items-end gap-2">
@@ -124,12 +140,23 @@
 
   <!-- Footer - Same as homepage -->
   <footer class="px-8 py-3 mt-auto">
-    <div class="max-w-[1400px] mx-auto text-center">
+    <div class="max-w-[1400px] mx-auto flex items-center justify-between">
+      <!-- Left: Credit -->
       <div class="text-xs text-gray-600 dark:text-gray-400">
         <a href="https://x.com/liamhanel" target="_blank" rel="noopener noreferrer" class="hover:text-black dark:hover:text-white transition-colors">
           Created by Liam Hänel
         </a>
       </div>
+
+      <!-- Right: Theme Switcher -->
+      <button
+        onclick={cycleTheme}
+        class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+        aria-label="Toggle theme"
+      >
+        <Icon src={themeIcon} class="w-4 h-4" />
+        <span>{themeLabel}</span>
+      </button>
     </div>
   </footer>
 </div>
