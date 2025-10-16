@@ -204,7 +204,7 @@
   <div id="p5-canvas-container" class="fixed inset-0 w-full h-full z-0"></div>
   
   <!-- Header - Full width frosted glass -->
-  <header class="fixed top-0 left-0 right-0 z-20 border-b border-thin dark:border-gray-700 px-8 py-3 bg-white/10 dark:bg-black/10" style="backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);">
+  <header class="fixed top-0 left-0 right-0 z-20 border-b border-gray-200 dark:border-gray-800 px-8 py-3 bg-white/10 dark:bg-black/10" style="backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);">
     <div class="w-full flex items-center justify-between">
       <div class="flex items-center gap-6">
         <a href="/" class="text-lg tracking-tight font-medium dark:text-white flex items-end gap-2">

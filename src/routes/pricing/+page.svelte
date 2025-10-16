@@ -24,7 +24,7 @@
 
 <div class="h-screen flex flex-col relative overflow-hidden dark:bg-dark-bg font-mono">
   <!-- Header - Same as homepage -->
-  <header class="border-b border-thin dark:border-gray-700 px-8 py-3 bg-white/10 dark:bg-black/10" style="backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);">
+  <header class="border-b border-gray-200 dark:border-gray-800 px-8 py-3 bg-white/10 dark:bg-black/10" style="backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);">
     <div class="w-full flex items-center justify-between">
       <div class="flex items-center gap-6">
         <a href="/" class="text-lg tracking-tight font-medium dark:text-white flex items-end gap-2">
