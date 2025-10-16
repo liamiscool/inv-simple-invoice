@@ -63,7 +63,7 @@ export const POST: RequestHandler = async ({ request, locals: { supabase } }) =>
       }
 
       case 'invoice.payment_failed': {
-        const invoice = event.data.object as Stripe.Invoice;
+        const invoice = event.data.object as any; // Stripe.Invoice has subscription as string | Subscription | null
         if (invoice.subscription) {
           await updateSubscriptionStatus(supabase, invoice.subscription as string, 'past_due');
         }
@@ -105,6 +105,7 @@ async function handleCheckoutCompleted(supabase: any, session: Stripe.Checkout.S
   }
 
   // Update or create subscription record
+  const sub: any = subscription; // Type assertion for period timestamps
   const { error } = await supabase
     .from('plan_subscription')
     .upsert({
@@ -114,9 +115,9 @@ async function handleCheckoutCompleted(supabase: any, session: Stripe.Checkout.S
       stripe_customer_id: customerId,
       stripe_subscription_id: subscriptionId,
       stripe_price_id: subscription.items.data[0].price.id,
-      current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-      current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-      cancel_at_period_end: subscription.cancel_at_period_end,
+      current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
+      current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
+      cancel_at_period_end: sub.cancel_at_period_end,
       updated_at: new Date().toISOString()
     }, {
       onConflict: 'org_id'
@@ -144,6 +145,7 @@ async function handleSubscriptionUpdated(supabase: any, subscription: Stripe.Sub
                  subscription.status === 'past_due' ? 'past_due' :
                  subscription.status === 'trialing' ? 'trialing' : 'active';
 
+  const sub: any = subscription; // Type assertion for period timestamps
   const { error } = await supabase
     .from('plan_subscription')
     .upsert({
@@ -153,9 +155,9 @@ async function handleSubscriptionUpdated(supabase: any, subscription: Stripe.Sub
       stripe_customer_id: customerId,
       stripe_subscription_id: subscription.id,
       stripe_price_id: subscription.items.data[0].price.id,
-      current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-      current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-      cancel_at_period_end: subscription.cancel_at_period_end,
+      current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
+      current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
+      cancel_at_period_end: sub.cancel_at_period_end,
       updated_at: new Date().toISOString()
     }, {
       onConflict: 'org_id'

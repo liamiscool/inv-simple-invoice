@@ -84,6 +84,7 @@ export interface TemplateSpec {
     client_company?: AreaSpec;
     client_address?: AreaSpec;
     client_email?: AreaSpec;
+    client_tax_id?: AreaSpec;
     items_table: TableSpec;
     subtotal?: AreaSpec;
     tax_total?: AreaSpec;

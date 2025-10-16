@@ -81,7 +81,7 @@ export const actions = {
       // Update template
       const { error } = await supabase
         .from('template')
-        .update({ spec })
+        .update({ spec } as any)
         .eq('id', params.id);
 
       if (error) {

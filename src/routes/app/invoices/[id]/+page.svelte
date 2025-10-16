@@ -57,7 +57,7 @@
     try {
       const { error: updateError } = await data.supabase
         .from('invoice')
-        .update({ status: newStatus })
+        .update({ status: newStatus } as any)
         .eq('id', data.invoice.id);
         
       if (updateError) throw updateError;
@@ -91,7 +91,7 @@
       
       // Generate new invoice number
       const { data: nextNumber, error: numberError } = await data.supabase
-        .rpc('next_invoice_number', { p_org_id: profile.org_id });
+        .rpc('next_invoice_number', { p_org_id: profile.org_id } as any);
         
       if (numberError) throw numberError;
       

@@ -152,7 +152,7 @@ export const actions = {
               grand_total: { x: 140, y: 212, w: 50, align: 'right', font_weight: 'bold' }
             }
           }
-        })
+        } as any)
         .select()
         .single() as { data: any | null; error: any };
 

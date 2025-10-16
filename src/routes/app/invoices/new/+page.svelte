@@ -164,7 +164,7 @@
             tax_total: currentTotals.taxTotal,
             total: currentTotals.total,
             updated_at: new Date().toISOString()
-          })
+          } as any)
           .eq('id', draftInvoiceId);
 
         if (updateError) throw updateError;
@@ -192,7 +192,7 @@
       } else {
         // Create new draft invoice
         const { data: nextNumber, error: numberError } = await data.supabase
-          .rpc('next_invoice_number', { p_org_id: profile.org_id });
+          .rpc('next_invoice_number', { p_org_id: profile.org_id } as any);
 
         if (numberError) throw numberError;
 
@@ -301,7 +301,7 @@
 
       // Generate invoice number
       const { data: nextNumber, error: numberError } = await data.supabase
-        .rpc('next_invoice_number', { p_org_id: profile.org_id });
+        .rpc('next_invoice_number', { p_org_id: profile.org_id } as any);
 
       if (numberError) throw numberError;
 

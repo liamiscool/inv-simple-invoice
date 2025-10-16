@@ -63,7 +63,7 @@
     try {
       const { error } = await data.supabase
         .from('invoice')
-        .update({ status: newStatus })
+        .update({ status: newStatus } as any)
         .eq('id', invoiceId);
 
       if (error) throw error;

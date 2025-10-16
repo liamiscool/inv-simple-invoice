@@ -92,7 +92,7 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
             payment_info: { x: 20, y: 270, w: 170, h: 20, font_size: 8, color: '#666666' }
           }
         }
-      });
+      } as any);
       
     if (createError) {
       console.error('Error creating fallback template:', createError);

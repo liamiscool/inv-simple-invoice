@@ -181,7 +181,7 @@ export const POST: RequestHandler = async ({ request, params, locals: { supabase
     if (invoice.status === 'draft') {
       await supabase
         .from('invoice')
-        .update({ status: 'sent' })
+        .update({ status: 'sent' } as any)
         .eq('id', invoice.id);
     }
 

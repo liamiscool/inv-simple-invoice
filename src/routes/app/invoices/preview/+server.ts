@@ -42,7 +42,7 @@ export const GET: RequestHandler = async ({ url, locals: { supabase, safeGetSess
     .from('client')
     .select('id, name, company, email')
     .eq('id', clientId)
-    .eq('org_id', userProfile.org_id)
+    .eq('org_id', (userProfile as any).org_id)
     .single();
 
   if (!client) {

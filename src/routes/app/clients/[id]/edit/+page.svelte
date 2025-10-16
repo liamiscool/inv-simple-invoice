@@ -54,7 +54,7 @@
           legal_name: legal_name || null,
           tax_id: tax_id || null,
           notes: notes || null
-        })
+        } as any)
         .eq('id', data.client.id)
         .eq('org_id', profile.org_id);
 

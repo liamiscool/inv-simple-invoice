@@ -49,7 +49,7 @@
           bank_details: bankDetails,
           default_currency: defaultCurrency,
           operates_as_company: operatesAsCompany
-        })
+        } as any)
         .eq('id', user.user.id);
         
       if (updateError) throw updateError;

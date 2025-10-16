@@ -98,7 +98,7 @@ export const actions = {
         .from('template')
         .update({
           metadata: classificationState
-        })
+        } as any)
         .eq('id', templateId);
 
       if (error) {
@@ -148,7 +148,7 @@ export const actions = {
 
       const { error } = await supabase
         .from('template')
-        .update({ spec })
+        .update({ spec } as any)
         .eq('id', templateId);
 
       if (error) {

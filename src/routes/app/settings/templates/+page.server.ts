@@ -73,7 +73,7 @@ export const actions = {
         field_name: fieldName,
         field_label: fieldLabel,
         field_type: 'text'
-      });
+      } as any);
 
     if (error) {
       console.error('Error creating custom field:', error);
