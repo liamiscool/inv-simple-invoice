@@ -8,31 +8,59 @@ A minimal, Yeezy-inspired invoice tool with stark minimalism and terminal vibes.
 
 ---
 
-## 🚨 IMPORTANT: PDF CONVERSION ARCHITECTURE
+## 🚨 IMPORTANT: PDF GENERATION ARCHITECTURE
 
-**Current Approach**: CLIENT-SIDE PDF CONVERSION
+**Dual Environment Support**: CLOUDFLARE BROWSER RENDERING (Production) + LOCAL PUPPETEER (Development)
 
-PDFs uploaded by users are converted to PNG **in the browser** (not server-side) to avoid native dependencies like Cairo, Pango, and canvas that don't work on Cloudflare Pages.
+Invoice PDFs are generated server-side using environment-specific Puppeteer implementations to support both local development and serverless production deployment.
 
-**Location**: `src/routes/app/templates/upload/+page.svelte` (lines 6-16, 30-56)
+**Architecture**:
+
+**Development Environment (local)**:
+- Uses standard `puppeteer` package
+- Launches local Chromium binary
+- No Cloudflare credits used
+- Unlimited PDF generation for testing
+- Location: `src/lib/pdf/generator.ts` (launchBrowser function)
+
+**Production Environment (Cloudflare Pages)**:
+- Uses `@cloudflare/puppeteer` package
+- Launches browser via Cloudflare Browser Rendering API
+- Automatic environment detection (checks for BROWSER binding)
+- Managed Chromium instances on Cloudflare's edge network
+- Configuration: `wrangler.toml` (BROWSER binding)
 
 **How it works**:
-1. User uploads PDF via drag & drop
-2. Browser uses pdf.js to render PDF first page at 300 DPI
-3. Canvas API converts to PNG Blob
-4. PNG is uploaded to Supabase Storage
-5. Server only handles PNG uploads
+1. User requests invoice PDF (send, view, or download)
+2. SvelteKit endpoint receives request with optional `platform.env.BROWSER` binding
+3. `launchBrowser()` detects environment:
+   - If `BROWSER` binding present → use Cloudflare Browser Rendering
+   - If no binding → use local Puppeteer
+4. HTML rendered from invoice data + template specification
+5. Browser generates PDF from HTML
+6. PDF stored in Supabase Storage for caching/reuse
+7. PDF URL returned to client
 
-**Future Improvements** (when scaling):
-- Move conversion to Web Worker (better performance, non-blocking UI)
-- Add progress indicator for large PDFs
-- Consider external service (CloudConvert API) for production
-- Or use Cloudflare Workers with pdf.js for server-side conversion
+**Rate Limits** (Cloudflare Free Plan):
+- 10 minutes browser time per day
+- 3 concurrent browsers per account
+- 3 new browser instances per minute
+- Sufficient for invoice generation use case
 
-**Why not server-side?**
-- Native dependencies (cairo, pango) don't work on Cloudflare Pages
-- Serverless environment requires pre-compiled binaries
-- Client-side keeps deployment simple and costs low
+**Files**:
+- `src/lib/pdf/generator.ts` - PDF generation with dual environment support
+- `src/lib/pdf/storage.ts` - PDF caching/upload to Supabase
+- `src/routes/app/invoices/[id]/pdf/+server.ts` - PDF download endpoint
+- `src/routes/app/invoices/[id]/send/+server.ts` - Email sending with PDF
+- `wrangler.toml` - Cloudflare Browser Rendering binding configuration
+
+**Why this approach?**
+- ✅ Works in serverless environment (Cloudflare Pages)
+- ✅ No native dependencies required
+- ✅ Free unlimited testing in development
+- ✅ Cost-effective production (included in Cloudflare Pages)
+- ✅ Fast (runs on Cloudflare's edge network)
+- ✅ Drop-in replacement for standard Puppeteer
 
 ---
 

@@ -6,8 +6,9 @@ import {
   renderInvoiceHTML,
 } from './renderer';
 
-// Puppeteer will be dynamically imported when needed
-// This prevents it from being bundled in Cloudflare Workers
+// Puppeteer - dual environment support:
+// - Development: Uses standard 'puppeteer' with local Chromium
+// - Production: Uses '@cloudflare/puppeteer' with Browser Rendering API
 
 export interface PDFGenerationOptions {
   format?: 'A4' | 'Letter';
@@ -25,33 +26,21 @@ export interface PDFGenerationOptions {
 }
 
 /**
- * Generate a PDF from invoice data using a template
+ * Launch browser with environment-specific Puppeteer
+ * - Development: Local Puppeteer with Chromium binary
+ * - Production: Cloudflare Browser Rendering API
  */
-export async function generateInvoicePDF(
-  invoice: InvoiceData,
-  company: CompanyData,
-  template: TemplateSpec,
-  options: PDFGenerationOptions = {},
-  renderOptions: { includeContactName?: boolean; hideTaxColumn?: boolean } = {}
-): Promise<Buffer> {
-  // Dynamically import Puppeteer only when this function is called
-  // Using string-based import to prevent bundler from analyzing it
-  let puppeteer: any;
-  try {
-    const puppeteerModule = 'puppeteer';
-    puppeteer = await import(/* @vite-ignore */ puppeteerModule);
-  } catch (e) {
-    throw new Error(
-      'PDF generation requires Puppeteer which is not available in this environment. ' +
-      'Please use an external PDF service or Cloudflare Browser Rendering API.'
-    );
-  }
-
-  let browser = null;
-
-  try {
-    // Launch Puppeteer browser
-    browser = await puppeteer.launch({
+async function launchBrowser(browserBinding?: Fetcher) {
+  if (browserBinding) {
+    // Production: Use Cloudflare Browser Rendering API
+    console.log('📄 Using Cloudflare Browser Rendering API (production)');
+    const cloudflare = await import('@cloudflare/puppeteer');
+    return await cloudflare.default.launch(browserBinding);
+  } else {
+    // Development: Use local Puppeteer
+    console.log('📄 Using local Puppeteer (development)');
+    const puppeteer = await import('puppeteer');
+    return await puppeteer.default.launch({
       headless: true,
       args: [
         '--no-sandbox',
@@ -63,6 +52,26 @@ export async function generateInvoicePDF(
         '--single-process'
       ]
     });
+  }
+}
+
+/**
+ * Generate a PDF from invoice data using a template
+ * @param browserBinding - Optional Cloudflare Browser binding (only present in production)
+ */
+export async function generateInvoicePDF(
+  invoice: InvoiceData,
+  company: CompanyData,
+  template: TemplateSpec,
+  options: PDFGenerationOptions = {},
+  renderOptions: { includeContactName?: boolean; hideTaxColumn?: boolean } = {},
+  browserBinding?: Fetcher
+): Promise<Buffer> {
+  let browser = null;
+
+  try {
+    // Launch browser (environment-specific)
+    browser = await launchBrowser(browserBinding);
 
     const page = await browser.newPage();
 
@@ -109,12 +118,14 @@ export async function generateInvoicePDF(
 
 /**
  * Generate PDF with optimized settings for invoice templates
+ * @param browserBinding - Optional Cloudflare Browser binding (only present in production)
  */
 export async function generateOptimizedInvoicePDF(
   invoice: InvoiceData,
   company: CompanyData,
   template: TemplateSpec,
-  options: { includeContactName?: boolean; hideTaxColumn?: boolean } = {}
+  options: { includeContactName?: boolean; hideTaxColumn?: boolean } = {},
+  browserBinding?: Fetcher
 ): Promise<Buffer> {
   const { meta } = template;
 
@@ -134,35 +145,25 @@ export async function generateOptimizedInvoicePDF(
     preferCSSPageSize: true
   };
 
-  return generateInvoicePDF(invoice, company, template, customOptions, options);
+  return generateInvoicePDF(invoice, company, template, customOptions, options, browserBinding);
 }
 
 /**
  * Generate a preview PNG image of the invoice (for template previews)
+ * @param browserBinding - Optional Cloudflare Browser binding (only present in production)
  */
 export async function generateInvoicePreview(
   invoice: InvoiceData,
   company: CompanyData,
   template: TemplateSpec,
-  options: { width?: number; height?: number; quality?: number; includeContactName?: boolean; hideTaxColumn?: boolean } = {}
+  options: { width?: number; height?: number; quality?: number; includeContactName?: boolean; hideTaxColumn?: boolean } = {},
+  browserBinding?: Fetcher
 ): Promise<Buffer> {
-  // Dynamically import Puppeteer
-  // Using string-based import to prevent bundler from analyzing it
-  let puppeteer: any;
-  try {
-    const puppeteerModule = 'puppeteer';
-    puppeteer = await import(/* @vite-ignore */ puppeteerModule);
-  } catch (e) {
-    throw new Error('Preview generation requires Puppeteer which is not available in this environment.');
-  }
-
   let browser = null;
 
   try {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+    // Launch browser (environment-specific)
+    browser = await launchBrowser(browserBinding);
 
     const page = await browser.newPage();
 
@@ -203,12 +204,11 @@ export async function generateInvoicePreview(
 
 /**
  * Health check for PDF generation service
+ * @param browserBinding - Optional Cloudflare Browser binding
  */
-export async function testPDFGeneration(): Promise<boolean> {
+export async function testPDFGeneration(browserBinding?: Fetcher): Promise<boolean> {
   try {
-    const puppeteerModule = 'puppeteer';
-    const puppeteer = await import(/* @vite-ignore */ puppeteerModule);
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await launchBrowser(browserBinding);
     await browser.close();
     return true;
   } catch (error) {

@@ -9,7 +9,7 @@ import { redirect } from '@sveltejs/kit';
 
 import type { RequestHandler } from './$types';
 
-export const GET: RequestHandler = async ({ params, locals: { supabase, safeGetSession }, getClientAddress }) => {
+export const GET: RequestHandler = async ({ params, locals: { supabase, safeGetSession }, getClientAddress, platform }) => {
   const { user } = await safeGetSession();
 
   let orgId: string;
@@ -140,10 +140,11 @@ export const GET: RequestHandler = async ({ params, locals: { supabase, safeGetS
     userProfile,
     template.spec,
     orgId,
-    { 
+    {
       includeContactName: invoice.include_contact_name || false,
       hideTaxColumn: hideTaxColumn
-    }
+    },
+    platform?.env?.BROWSER // Optional Cloudflare Browser binding (production only)
   );
 
   if (!result.success || !result.url) {

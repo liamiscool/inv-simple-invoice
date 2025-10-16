@@ -1,0 +1,12 @@
+name = "inv-simple-invoice"
+compatibility_date = "2025-01-01"
+
+# Cloudflare Browser Rendering API
+# Provides managed Chromium instances for PDF generation in production
+# Free tier: 10 minutes/day browser time, 3 concurrent browsers
+browser = { binding = "BROWSER" }
+
+# SvelteKit static assets
+[assets]
+binding = "ASSETS"
+directory = ".svelte-kit/cloudflare"

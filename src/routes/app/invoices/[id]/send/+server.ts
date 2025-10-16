@@ -11,7 +11,7 @@ import type { RequestHandler } from './$types';
 
 // Cache bust: Force Cloudflare rebuild - 2025-10-15
 
-export const POST: RequestHandler = async ({ request, params, locals: { supabase, safeGetSession } }) => {
+export const POST: RequestHandler = async ({ request, params, locals: { supabase, safeGetSession }, platform }) => {
   const { user } = await safeGetSession();
   
   if (!user) {
@@ -114,7 +114,11 @@ export const POST: RequestHandler = async ({ request, params, locals: { supabase
       invoice,
       userProfile,
       template.spec,
-      profile.org_id
+      profile.org_id,
+      {
+        includeContactName: invoice.include_contact_name || false
+      },
+      platform?.env?.BROWSER // Optional Cloudflare Browser binding (production only)
     );
 
     if (!pdfResult.success) {

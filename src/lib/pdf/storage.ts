@@ -35,11 +35,12 @@ export async function generateAndStorePDF(
   company: CompanyData,
   template: TemplateSpec,
   orgId: string,
-  options: { includeContactName?: boolean; hideTaxColumn?: boolean } = {}
+  options: { includeContactName?: boolean; hideTaxColumn?: boolean } = {},
+  browserBinding?: Fetcher
 ): Promise<PDFStorageResult> {
   try {
     // Generate PDF buffer
-    const pdfBuffer = await generateOptimizedInvoicePDF(invoice, company, template, options);
+    const pdfBuffer = await generateOptimizedInvoicePDF(invoice, company, template, options, browserBinding);
 
     // Define storage path
     const filePath = getInvoicePDFPath(orgId, invoice.id);
@@ -239,7 +240,8 @@ export async function getOrGeneratePDF(
   company: CompanyData,
   template: TemplateSpec,
   orgId: string,
-  options: { includeContactName?: boolean; hideTaxColumn?: boolean } = {}
+  options: { includeContactName?: boolean; hideTaxColumn?: boolean } = {},
+  browserBinding?: Fetcher
 ): Promise<PDFStorageResult> {
   // Check if PDF exists and is current
   const existingUrl = await getStoredPDFUrl(supabase, invoice.id, orgId);
@@ -253,5 +255,5 @@ export async function getOrGeneratePDF(
   }
 
   // Generate new PDF
-  return generateAndStorePDF(supabase, invoice, company, template, orgId, options);
+  return generateAndStorePDF(supabase, invoice, company, template, orgId, options, browserBinding);
 }
