@@ -296,7 +296,7 @@
 
     <!-- Footer -->
     <footer class="px-8 py-3 mt-auto">
-    <div class="max-w-[1400px] mx-auto flex items-center justify-between">
+    <div class="w-full flex items-center justify-between">
       <!-- Left: Credit -->
       <div class="text-xs text-gray-600 dark:text-gray-400">
         <a href="https://x.com/liamhanel" target="_blank" rel="noopener noreferrer" class="hover:text-black dark:hover:text-white transition-colors">
