@@ -2,7 +2,9 @@
   import type { PageData } from './$types';
   
   let { data }: { data: PageData } = $props();
-  
+
+  const invoice: any = data.invoice;
+
   let isLoading = $state(false);
   let message = $state('');
   let error = $state('');
@@ -58,7 +60,7 @@
       const { error: updateError } = await data.supabase
         .from('invoice')
         .update({ status: newStatus } as any)
-        .eq('id', data.invoice.id);
+        .eq('id', invoice.id);
         
       if (updateError) throw updateError;
       
@@ -85,41 +87,43 @@
         .from('app_user')
         .select('org_id')
         .eq('id', user.user.id)
-        .single();
-        
+        .single() as { data: any };
+
       if (!profile) throw new Error('Profile not found');
-      
+
       // Generate new invoice number
       const { data: nextNumber, error: numberError } = await data.supabase
         .rpc('next_invoice_number', { p_org_id: profile.org_id } as any);
-        
+
       if (numberError) throw numberError;
-      
+
       // Create duplicate invoice
+      const invoiceData: any = {
+        org_id: invoice.org_id,
+        client_id: invoice.client_id,
+        template_id: invoice.template_id,
+        number: nextNumber,
+        issue_date: new Date().toISOString().split('T')[0],
+        due_date: invoice.due_date,
+        currency: invoice.currency,
+        status: 'draft',
+        notes: invoice.notes,
+        subtotal: invoice.subtotal,
+        tax_total: invoice.tax_total,
+        total: invoice.total
+      };
       const { data: newInvoice, error: invoiceError } = await data.supabase
         .from('invoice')
-        .insert({
-          org_id: data.invoice.org_id,
-          client_id: data.invoice.client_id,
-          template_id: data.invoice.template_id,
-          number: nextNumber,
-          issue_date: new Date().toISOString().split('T')[0],
-          due_date: data.invoice.due_date,
-          currency: data.invoice.currency,
-          status: 'draft',
-          notes: data.invoice.notes,
-          subtotal: data.invoice.subtotal,
-          tax_total: data.invoice.tax_total,
-          total: data.invoice.total
-        })
+        .insert(invoiceData)
         .select()
         .single();
-        
+
       if (invoiceError) throw invoiceError;
-      
+
       // Duplicate line items
-      const itemsToInsert = data.invoice.items.map(item => ({
-        invoice_id: newInvoice.id,
+      const newInv: any = newInvoice;
+      const itemsToInsert = invoice.items.map((item: any) => ({
+        invoice_id: newInv.id,
         position: item.position,
         description: item.description,
         qty: item.qty,
@@ -133,9 +137,9 @@
         .insert(itemsToInsert);
         
       if (itemsError) throw itemsError;
-      
+
       // Redirect to new invoice
-      window.location.href = `/app/invoices/${newInvoice.id}`;
+      window.location.href = `/app/invoices/${newInv.id}`;
       
     } catch (err: any) {
       error = err.message || 'Failed to duplicate invoice';

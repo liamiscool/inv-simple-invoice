@@ -17,7 +17,7 @@
         .from('app_user')
         .select('org_id')
         .eq('id', user.user.id)
-        .single();
+        .single() as { data: any };
 
       if (!profile) return;
 
