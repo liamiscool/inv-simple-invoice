@@ -1,7 +1,11 @@
-import { getOrGeneratePDF, getStoredPDFUrl } from '$lib/pdf/storage';
+import {
+  getOrGeneratePDF,
+  getStoredPDFUrl,
+} from '$lib/pdf/storage';
 import { getTemplate } from '$lib/templates';
-import { redirect } from '@sveltejs/kit';
 import { checkRateLimit } from '$lib/utils/rateLimiter';
+
+import { redirect } from '@sveltejs/kit';
 
 import type { RequestHandler } from './$types';
 
@@ -116,13 +120,30 @@ export const GET: RequestHandler = async ({ params, locals: { supabase, safeGetS
     invoice.items.sort((a: any, b: any) => a.position - b.position);
   }
 
+  // Check if all line items have 0% tax
+  const hideTaxColumn = invoice.items && invoice.items.length > 0 && 
+    invoice.items.every((item: any) => item.tax_rate === 0);
+
+  // Debug: Log invoice data to see what we're getting
+  console.log('PDF Generation - Invoice data:', {
+    id: invoice.id,
+    include_contact_name: invoice.include_contact_name,
+    hide_tax_column: hideTaxColumn,
+    items_count: invoice.items?.length || 0,
+    items: invoice.items
+  });
+
   // Generate and store PDF
   const result = await getOrGeneratePDF(
     supabase,
     invoice,
     userProfile,
     template.spec,
-    orgId
+    orgId,
+    { 
+      includeContactName: invoice.include_contact_name || false,
+      hideTaxColumn: hideTaxColumn
+    }
   );
 
   if (!result.success || !result.url) {

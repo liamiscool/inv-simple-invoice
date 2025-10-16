@@ -20,6 +20,7 @@
   let dueDate = $state(data.invoice?.due_date || '');
   let notes = $state(data.invoice?.notes || '');
   let currency = $state(data.invoice?.currency || 'EUR');
+  let includeContactName = $state(data.invoice?.include_contact_name || false);
 
   // Line items - pre-populate from existing invoice items
   let lineItems = $state<any[]>(
@@ -109,6 +110,7 @@
     dueDate;
     notes;
     currency;
+    includeContactName;
     lineItems;
 
     // Don't auto-save if no meaningful data yet
@@ -167,6 +169,7 @@
             due_date: dueDate || null,
             currency: currency,
             notes: notes || null,
+            include_contact_name: includeContactName,
             subtotal: currentTotals.subtotal,
             tax_total: currentTotals.taxTotal,
             total: currentTotals.total,
@@ -454,6 +457,21 @@
             </select>
           </div>
         </div>
+
+        <!-- Include Contact Name Option -->
+        {#if selectedClient}
+          <div class="flex items-center gap-3">
+            <input
+              id="includeContactName"
+              type="checkbox"
+              bind:checked={includeContactName}
+              class="w-4 h-4 text-black border-gray-300 rounded focus:ring-black dark:bg-dark-input dark:border-gray-600 dark:focus:ring-gray-500"
+            />
+            <label for="includeContactName" class="text-sm text-gray-700 dark:text-gray-300">
+              Include contact name on invoice
+            </label>
+          </div>
+        {/if}
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
@@ -759,6 +777,7 @@
               due_date: dueDate || '',
               currency: currency,
               notes: notes || '',
+              include_contact_name: includeContactName.toString(),
               items: JSON.stringify(lineItems.map((item: any, index: number) => ({
                 position: index + 1,
                 description: item.description,

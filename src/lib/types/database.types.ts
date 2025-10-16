@@ -70,13 +70,10 @@ export interface Database {
           org_id: string
           name: string
           company: string | null
-          company_address: string | null
           email: string | null
-          currency: string | null
-          legal_name: string | null
+          company_address: string | null
           tax_id: string | null
-          notes: string | null
-          deleted_at: string | null
+          legal_name: string | null
           created_at: string | null
         }
         Insert: {
@@ -84,13 +81,10 @@ export interface Database {
           org_id: string
           name: string
           company?: string | null
-          company_address?: string | null
           email?: string | null
-          currency?: string | null
-          legal_name?: string | null
+          company_address?: string | null
           tax_id?: string | null
-          notes?: string | null
-          deleted_at?: string | null
+          legal_name?: string | null
           created_at?: string | null
         }
         Update: {
@@ -98,42 +92,10 @@ export interface Database {
           org_id?: string
           name?: string
           company?: string | null
-          company_address?: string | null
           email?: string | null
-          currency?: string | null
-          legal_name?: string | null
+          company_address?: string | null
           tax_id?: string | null
-          notes?: string | null
-          deleted_at?: string | null
-          created_at?: string | null
-        }
-      }
-      template: {
-        Row: {
-          id: string
-          org_id: string | null
-          title: string
-          kind: 'curated' | 'uploaded'
-          spec: Json
-          preview_url: string | null
-          created_at: string | null
-        }
-        Insert: {
-          id?: string
-          org_id?: string | null
-          title: string
-          kind: 'curated' | 'uploaded'
-          spec: Json
-          preview_url?: string | null
-          created_at?: string | null
-        }
-        Update: {
-          id?: string
-          org_id?: string | null
-          title?: string
-          kind?: 'curated' | 'uploaded'
-          spec?: Json
-          preview_url?: string | null
+          legal_name?: string | null
           created_at?: string | null
         }
       }
@@ -149,6 +111,7 @@ export interface Database {
           currency: string
           status: 'draft' | 'sent' | 'partially_paid' | 'paid' | 'overdue' | 'void'
           notes: string | null
+          include_contact_name: boolean
           subtotal: number
           tax_total: number
           total: number
@@ -166,6 +129,7 @@ export interface Database {
           currency: string
           status: 'draft' | 'sent' | 'partially_paid' | 'paid' | 'overdue' | 'void'
           notes?: string | null
+          include_contact_name?: boolean
           subtotal?: number
           tax_total?: number
           total?: number
@@ -183,6 +147,7 @@ export interface Database {
           currency?: string
           status?: 'draft' | 'sent' | 'partially_paid' | 'paid' | 'overdue' | 'void'
           notes?: string | null
+          include_contact_name?: boolean
           subtotal?: number
           tax_total?: number
           total?: number
@@ -252,46 +217,75 @@ export interface Database {
         Row: {
           id: string
           org_id: string
-          stripe_customer_id: string | null
-          stripe_subscription_id: string | null
-          plan: 'free' | 'pro_monthly' | 'pro_yearly'
-          status: 'active' | 'canceled' | 'incomplete' | 'past_due'
+          stripe_subscription_id: string
+          status: string
+          current_period_start: string
+          current_period_end: string
           created_at: string | null
         }
         Insert: {
           id?: string
           org_id: string
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          plan: 'free' | 'pro_monthly' | 'pro_yearly'
-          status: 'active' | 'canceled' | 'incomplete' | 'past_due'
+          stripe_subscription_id: string
+          status: string
+          current_period_start: string
+          current_period_end: string
           created_at?: string | null
         }
         Update: {
           id?: string
           org_id?: string
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          plan?: 'free' | 'pro_monthly' | 'pro_yearly'
-          status?: 'active' | 'canceled' | 'incomplete' | 'past_due'
+          stripe_subscription_id?: string
+          status?: string
+          current_period_start?: string
+          current_period_end?: string
           created_at?: string | null
         }
       }
       send_counter: {
         Row: {
+          id: string
           org_id: string
-          sent_count: number
-          updated_at: string | null
+          count: number
+          created_at: string | null
         }
         Insert: {
+          id?: string
           org_id: string
-          sent_count?: number
-          updated_at?: string | null
+          count?: number
+          created_at?: string | null
         }
         Update: {
+          id?: string
           org_id?: string
-          sent_count?: number
-          updated_at?: string | null
+          count?: number
+          created_at?: string | null
+        }
+      }
+      template: {
+        Row: {
+          id: string
+          org_id: string
+          name: string
+          spec: Json
+          is_curated: boolean
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          name: string
+          spec: Json
+          is_curated?: boolean
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          org_id?: string
+          name?: string
+          spec?: Json
+          is_curated?: boolean
+          created_at?: string | null
         }
       }
     }
@@ -299,10 +293,6 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      get_user_org_id: {
-        Args: Record<string, never>
-        Returns: string
-      }
       next_invoice_number: {
         Args: { p_org_id: string }
         Returns: string

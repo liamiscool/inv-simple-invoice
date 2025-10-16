@@ -34,4 +34,4 @@ FAQ: /docs/faq.md
 Getting Started: /docs/getting-started.md
 Comparison: /docs/comparison.md
 
-Last Updated: January 2025
+Last Updated: Oct 2025

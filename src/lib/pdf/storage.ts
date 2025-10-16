@@ -1,7 +1,12 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
 import type { TemplateSpec } from '$lib/templates';
+
+import type { SupabaseClient } from '@supabase/supabase-js';
+
 import { generateOptimizedInvoicePDF } from './generator';
-import type { InvoiceData, CompanyData } from './renderer';
+import type {
+  CompanyData,
+  InvoiceData,
+} from './renderer';
 
 const BUCKET_NAME = 'invoice-pdfs';
 
@@ -29,11 +34,12 @@ export async function generateAndStorePDF(
   invoice: InvoiceData,
   company: CompanyData,
   template: TemplateSpec,
-  orgId: string
+  orgId: string,
+  options: { includeContactName?: boolean; hideTaxColumn?: boolean } = {}
 ): Promise<PDFStorageResult> {
   try {
     // Generate PDF buffer
-    const pdfBuffer = await generateOptimizedInvoicePDF(invoice, company, template);
+    const pdfBuffer = await generateOptimizedInvoicePDF(invoice, company, template, options);
 
     // Define storage path
     const filePath = getInvoicePDFPath(orgId, invoice.id);
@@ -232,7 +238,8 @@ export async function getOrGeneratePDF(
   invoice: InvoiceData,
   company: CompanyData,
   template: TemplateSpec,
-  orgId: string
+  orgId: string,
+  options: { includeContactName?: boolean; hideTaxColumn?: boolean } = {}
 ): Promise<PDFStorageResult> {
   // Check if PDF exists and is current
   const existingUrl = await getStoredPDFUrl(supabase, invoice.id, orgId);
@@ -246,5 +253,5 @@ export async function getOrGeneratePDF(
   }
 
   // Generate new PDF
-  return generateAndStorePDF(supabase, invoice, company, template, orgId);
+  return generateAndStorePDF(supabase, invoice, company, template, orgId, options);
 }

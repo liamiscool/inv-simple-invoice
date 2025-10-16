@@ -8,7 +8,7 @@ Fork for a case study of an art instalation. j_espanca_bacelar 2020
 
 var imgs = [];
 var imgNames = [
-  "/p5js-test/hank-shake-continue-today-main-200403.png"
+  "/js/hank-shake.webp"
 ];
 var imgIndex = -1;
 

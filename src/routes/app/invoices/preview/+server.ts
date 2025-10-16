@@ -33,6 +33,7 @@ export const GET: RequestHandler = async ({ url, locals: { supabase, safeGetSess
   const taxTotal = parseFloat(url.searchParams.get('tax_total') || '0');
   const total = parseFloat(url.searchParams.get('total') || '0');
   const includeContactName = url.searchParams.get('include_contact_name') === 'true';
+  const hideTaxColumn = url.searchParams.get('hide_tax_column') === 'true';
 
   if (!templateId || !clientId) {
     return new Response('Missing required parameters', { status: 400 });
@@ -84,7 +85,7 @@ export const GET: RequestHandler = async ({ url, locals: { supabase, safeGetSess
   };
 
   // Render HTML
-  const html = renderInvoiceHTML(mockInvoice, userProfile, template.spec, { includeContactName });
+  const html = renderInvoiceHTML(mockInvoice, userProfile, template.spec, { includeContactName, hideTaxColumn });
 
   return new Response(html, {
     headers: {

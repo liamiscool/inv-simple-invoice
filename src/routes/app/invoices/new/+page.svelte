@@ -81,6 +81,11 @@
       total: subtotal + taxTotal
     };
   });
+
+  // Check if all line items have 0% tax
+  const hideTaxColumn = $derived(() => {
+    return lineItems.length > 0 && lineItems.every((item: any) => item.taxRate === 0);
+  });
   
   function addLineItem() {
     lineItems.push({ description: '', qty: 1, unitPrice: 0, taxRate: 0 });
@@ -182,6 +187,7 @@
             due_date: dueDate || null,
             currency: currency,
             notes: notes || null,
+            include_contact_name: includeContactName,
             subtotal: currentTotals.subtotal,
             tax_total: currentTotals.taxTotal,
             total: currentTotals.total,
@@ -230,6 +236,7 @@
             currency: currency,
             status: 'draft',
             notes: notes || null,
+            include_contact_name: includeContactName,
             subtotal: currentTotals.subtotal,
             tax_total: currentTotals.taxTotal,
             total: currentTotals.total
@@ -340,6 +347,7 @@
           currency: currency,
           status: 'draft',
           notes: notes || null,
+          include_contact_name: includeContactName,
           subtotal: totals().subtotal,
           tax_total: totals().taxTotal,
           total: totals().total
@@ -567,7 +575,7 @@
 
         <div class="space-y-6">
           {#each lineItems as item, index}
-            <div class="border border-gray-200 dark:border-gray-700 p-4 space-y-4 md:border-0 md:p-0">
+            <div class="border border-gray-200 dark:border-gray-700 p-4 space-y-4 md:border-0 md:p-0 group hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
               <!-- Desktop: Single line with all fields -->
               <div class="hidden md:grid md:grid-cols-12 md:gap-3 md:items-end">
                 <div class="md:col-span-4">
@@ -587,8 +595,19 @@
                     type="number"
                     bind:value={item.qty}
                     min="0"
-                    step="0.01"
+                    step="1"
                     class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors"
+                    onfocus={(e) => {
+                      const target = e.target as HTMLInputElement;
+                      target.select();
+                    }}
+                    onblur={(e) => {
+                      const target = e.target as HTMLInputElement;
+                      if (target.value === '' || target.value === '0') {
+                        target.value = '1';
+                        item.qty = 1;
+                      }
+                    }}
                     required
                   />
                 </div>
@@ -601,6 +620,18 @@
                     min="0"
                     step="0.01"
                     class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors"
+                    onfocus={(e) => {
+                      const target = e.target as HTMLInputElement;
+                      if (target.value === '0') {
+                        target.select();
+                      }
+                    }}
+                    onblur={(e) => {
+                      const target = e.target as HTMLInputElement;
+                      if (target.value === '') {
+                        target.value = '0';
+                      }
+                    }}
                     required
                   />
                 </div>
@@ -614,17 +645,29 @@
                     max="100"
                     step="0.1"
                     class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors"
+                    onfocus={(e) => {
+                      const target = e.target as HTMLInputElement;
+                      if (target.value === '0') {
+                        target.select();
+                      }
+                    }}
+                    onblur={(e) => {
+                      const target = e.target as HTMLInputElement;
+                      if (target.value === '') {
+                        target.value = '0';
+                      }
+                    }}
                   />
                 </div>
 
-                <div class="md:col-span-2">
+                <div class="md:col-span-2 flex items-end">
                   {#if lineItems.length > 1}
                     <button
                       type="button"
                       onclick={() => removeLineItem(index)}
-                      class="w-full px-2 py-2.5 text-sm text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 transition-colors"
+                      class="w-full px-3 py-2.5 text-sm text-gray-500 hover:text-red-600 hover:bg-red-50 dark:text-gray-400 dark:hover:text-red-400 dark:hover:bg-red-900/20 border border-gray-300 hover:border-red-300 dark:border-gray-600 dark:hover:border-red-400 transition-colors opacity-0 group-hover:opacity-100"
                     >
-                      Remove
+                      ✕ Remove
                     </button>
                   {/if}
                 </div>
@@ -651,8 +694,19 @@
                       type="number"
                       bind:value={item.qty}
                       min="0"
-                      step="0.01"
+                      step="1"
                       class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors"
+                      onfocus={(e) => {
+                        const target = e.target as HTMLInputElement;
+                        target.select();
+                      }}
+                      onblur={(e) => {
+                        const target = e.target as HTMLInputElement;
+                        if (target.value === '' || target.value === '0') {
+                          target.value = '1';
+                          item.qty = 1;
+                        }
+                      }}
                       required
                     />
                   </div>
@@ -665,6 +719,16 @@
                       min="0"
                       step="0.01"
                       class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors"
+                      onfocus={(e) => {
+                        if (e.target.value === '0') {
+                          e.target.select();
+                        }
+                      }}
+                      onblur={(e) => {
+                        if (e.target.value === '') {
+                          e.target.value = '0';
+                        }
+                      }}
                       required
                     />
                   </div>
@@ -678,6 +742,16 @@
                       max="100"
                       step="0.1"
                       class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500 transition-colors"
+                      onfocus={(e) => {
+                        if (e.target.value === '0') {
+                          e.target.select();
+                        }
+                      }}
+                      onblur={(e) => {
+                        if (e.target.value === '') {
+                          e.target.value = '0';
+                        }
+                      }}
                     />
                   </div>
 
@@ -686,9 +760,9 @@
                       <button
                         type="button"
                         onclick={() => removeLineItem(index)}
-                        class="w-full px-4 py-2.5 text-sm text-gray-600 hover:text-red-600 border border-gray-300 hover:border-red-300 dark:border-gray-600 dark:text-white dark:hover:text-red-400 dark:hover:border-red-400 transition-colors"
+                        class="w-full px-4 py-2.5 text-sm text-gray-600 hover:text-red-600 hover:bg-red-50 border border-gray-300 hover:border-red-300 dark:border-gray-600 dark:text-white dark:hover:text-red-400 dark:hover:bg-red-900/20 dark:hover:border-red-400 transition-colors"
                       >
-                        Remove
+                        ✕ Remove
                       </button>
                     {/if}
                   </div>
@@ -852,6 +926,7 @@
               currency: currency,
               notes: notes || '',
               include_contact_name: includeContactName.toString(),
+              hide_tax_column: hideTaxColumn().toString(),
               items: JSON.stringify(lineItems.map((item: any, index: number) => ({
                 position: index + 1,
                 description: item.description,

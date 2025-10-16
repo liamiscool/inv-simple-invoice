@@ -70,7 +70,7 @@ export function renderInvoiceHTML(
   invoice: InvoiceData,
   company: CompanyData,
   template: TemplateSpec,
-  options: { includeContactName?: boolean } = {}
+  options: { includeContactName?: boolean; hideTaxColumn?: boolean } = {}
 ): string {
   const { meta, styles, areas } = template;
 
@@ -145,7 +145,7 @@ export function renderInvoiceHTML(
     return `<div class="area area-${key}" style="${getAreaStyle(area)}">${content}</div>`;
   }
 
-  function renderTable(table: TableSpec, items: InvoiceData['items']): string {
+  function renderTable(table: TableSpec, items: InvoiceData['items'], hideTaxColumn: boolean = false): string {
     const tableStyle = [
       `position: absolute`,
       `left: ${table.x}mm`,
@@ -162,7 +162,12 @@ export function renderInvoiceHTML(
     html += `<thead>`;
     html += `<tr style="height: ${headerRowHeight}mm; ${table.header_bg ? `background: ${table.header_bg};` : ''}">`;
     
-    table.columns.forEach(col => {
+    // Filter columns based on hideTaxColumn option
+    const visibleColumns = hideTaxColumn 
+      ? table.columns.filter(col => col.key !== 'tax' && col.key !== 'tax_rate')
+      : table.columns;
+    
+    visibleColumns.forEach(col => {
       const headerStyle = [
         `width: ${col.w}mm`,
         `text-align: ${col.align || 'left'}`,
@@ -185,7 +190,7 @@ export function renderInvoiceHTML(
       const rowBg = table.alt_row_bg && index % 2 === 1 ? `background: ${table.alt_row_bg};` : '';
       html += `<tr style="height: ${table.row_height}mm; ${rowBg}">`;
       
-      table.columns.forEach(col => {
+      visibleColumns.forEach(col => {
         const cellStyle = [
           `padding: 2mm`,
           `text-align: ${col.align || 'left'}`,
@@ -312,13 +317,13 @@ export function renderInvoiceHTML(
   }
 
   // Items table (uses original table spec, but positions are adjusted)
-  content += renderTable(adjustedAreas.items_table, invoice.items);
+  content += renderTable(adjustedAreas.items_table, invoice.items, options.hideTaxColumn);
 
   if (adjustedAreas.subtotal) {
     content += renderArea('subtotal', adjustedAreas.subtotal, `Subtotal: ${formatCurrency(invoice.subtotal, invoice.currency)}`);
   }
 
-  if (adjustedAreas.tax_total) {
+  if (adjustedAreas.tax_total && !options.hideTaxColumn) {
     content += renderArea('tax_total', adjustedAreas.tax_total, `Tax: ${formatCurrency(invoice.tax_total, invoice.currency)}`);
   }
 

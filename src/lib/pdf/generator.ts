@@ -1,5 +1,10 @@
 import type { TemplateSpec } from '$lib/templates';
-import { renderInvoiceHTML, type InvoiceData, type CompanyData } from './renderer';
+
+import {
+  type CompanyData,
+  type InvoiceData,
+  renderInvoiceHTML,
+} from './renderer';
 
 // Puppeteer will be dynamically imported when needed
 // This prevents it from being bundled in Cloudflare Workers
@@ -61,7 +66,7 @@ export async function generateInvoicePDF(
     const page = await browser.newPage();
 
     // Generate HTML content using our template renderer
-    const html = renderInvoiceHTML(invoice, company, template);
+    const html = renderInvoiceHTML(invoice, company, template, options);
 
     // Set content and wait for any fonts/images to load
     await page.setContent(html, {
@@ -104,7 +109,8 @@ export async function generateInvoicePDF(
 export async function generateOptimizedInvoicePDF(
   invoice: InvoiceData,
   company: CompanyData,
-  template: TemplateSpec
+  template: TemplateSpec,
+  options: { includeContactName?: boolean; hideTaxColumn?: boolean } = {}
 ): Promise<Buffer> {
   const { meta } = template;
   
@@ -160,7 +166,7 @@ export async function generateInvoicePreview(
       deviceScaleFactor: 2 // Higher DPI for better quality
     });
 
-    const html = renderInvoiceHTML(invoice, company, template);
+    const html = renderInvoiceHTML(invoice, company, template, options);
     await page.setContent(html, { waitUntil: 'networkidle0' });
 
     // Take screenshot
