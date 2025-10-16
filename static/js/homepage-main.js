@@ -37,6 +37,11 @@ var maxSpeedSlider;
 var maxForceSlider;
 var boundaryShapeButton;
 
+// Dark mode detection
+function isDarkMode() {
+  return document.documentElement.classList.contains('dark');
+}
+
 function preload() {
   console.log('P5JS preload() called');
   // Pre-load all images.
@@ -76,8 +81,9 @@ function setup() {
 }
 
 function draw() {
-  background(255);
-  
+  // Use dark mode background color (#0A0A0A = rgb(10,10,10)) or white
+  background(isDarkMode() ? 10 : 255);
+
   // Only update particles every other frame for performance
   if (frameCount % 2 === 0) {
     for (var i = allParticles.length-1; i > -1; i--) {

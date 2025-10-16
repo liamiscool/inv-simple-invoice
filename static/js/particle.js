@@ -13,9 +13,11 @@ function Particle(x, y) {
   
   this.maxSpeed = random(0.25, maxSpeedSlider.slider.value()); // How fast it can move per frame.
   this.maxForce = random(8, maxForceSlider.slider.value()); // Its speed limit.
-  
-  this.currentColor = color(0);
-  this.endColor = color(0);
+
+  // Use light particles in dark mode, dark particles in light mode
+  var particleColor = isDarkMode() ? 240 : 0;
+  this.currentColor = color(particleColor);
+  this.endColor = color(particleColor);
   this.colorBlendRate = random(0.01, colorBlendSlider.slider.value());
   
   this.currentSize = 0;
@@ -106,7 +108,8 @@ function Particle(x, y) {
   this.kill = function() {
     if (! this.isKilled) {
       this.target = generateRandomPos(width/2, height/2, max(width, height));
-      this.endColor = color(0);
+      // Use light particles in dark mode, dark particles in light mode
+      this.endColor = color(isDarkMode() ? 240 : 0);
       this.isKilled = true;
     }
   }

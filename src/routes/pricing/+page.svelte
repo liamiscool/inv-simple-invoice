@@ -4,19 +4,19 @@
   $: isSignedIn = !!data.session;
 </script>
 
-<div class="h-screen flex flex-col relative overflow-hidden">
+<div class="h-screen flex flex-col relative overflow-hidden dark:bg-dark-bg">
   <!-- Header -->
-  <header class="border-b border-thin px-4 py-3">
+  <header class="border-b border-thin dark:border-gray-700 px-4 py-3 dark:bg-dark-bg">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-6">
-        <a href="/" class="text-base tracking-tight font-semibold hover:opacity-70 transition-opacity">inv</a>
-        <a href="/pricing" class="text-xs hover:opacity-70 transition-opacity">Pricing</a>
+        <a href="/" class="text-base tracking-tight font-semibold hover:opacity-70 transition-opacity dark:text-white">inv</a>
+        <a href="/pricing" class="text-xs hover:opacity-70 transition-opacity dark:text-gray-300">Pricing</a>
       </div>
 
       <nav class="flex items-center gap-6">
         <a
           href={isSignedIn ? '/app' : '/auth/login'}
-          class="text-xs border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors duration-75"
+          class="text-xs border border-black dark:border-white px-4 py-2 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors duration-75 dark:text-white"
         >
           {isSignedIn ? 'Dashboard' : 'Sign in'}
         </a>
@@ -25,92 +25,92 @@
   </header>
 
   <!-- Main Content -->
-  <main class="flex-1 px-4 py-12 overflow-hidden flex items-center justify-center">
+  <main class="flex-1 px-4 py-12 overflow-hidden flex items-center justify-center dark:bg-dark-bg">
     <div class="max-w-4xl mx-auto w-full">
       <div class="text-center mb-12">
-        <h1 class="text-4xl md:text-5xl font-light tracking-tight leading-tight mb-4">
+        <h1 class="text-4xl md:text-5xl font-light tracking-tight leading-tight mb-4 dark:text-white">
           Simple pricing
         </h1>
-        <p class="text-sm text-gray-600 font-normal">
+        <p class="text-sm text-gray-600 dark:text-gray-400 font-normal">
           Start free. Upgrade when you need more.
         </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
         <!-- Free tier -->
-        <div class="border border-thin rounded-sm p-8 space-y-6">
+        <div class="border border-thin dark:border-gray-700 rounded-sm p-8 space-y-6">
           <div>
-            <h2 class="text-2xl font-semibold mb-2">Free</h2>
-            <div class="text-4xl font-light mb-4">$0</div>
-            <p class="text-xs text-gray-600 font-normal">Perfect to get started</p>
+            <h2 class="text-2xl font-semibold mb-2 dark:text-white">Free</h2>
+            <div class="text-4xl font-light mb-4 dark:text-white">$0</div>
+            <p class="text-xs text-gray-600 dark:text-gray-400 font-normal">Perfect to get started</p>
           </div>
 
-          <ul class="text-sm text-gray-600 space-y-3 font-normal">
+          <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-3 font-normal">
             <li class="flex items-start gap-3">
-              <span class="text-black text-lg">→</span>
+              <span class="text-black dark:text-white text-lg">→</span>
               <span>Unlimited invoices per month</span>
             </li>
             <li class="flex items-start gap-3">
-              <span class="text-black text-lg">→</span>
+              <span class="text-black dark:text-white text-lg">→</span>
               <span>Up to 3 clients</span>
             </li>
             <li class="flex items-start gap-3">
-              <span class="text-black text-lg">→</span>
+              <span class="text-black dark:text-white text-lg">→</span>
               <span>Curated templates</span>
             </li>
             <li class="flex items-start gap-3">
-              <span class="text-black text-lg">→</span>
+              <span class="text-black dark:text-white text-lg">→</span>
               <span>Client management</span>
             </li>
           </ul>
 
           <a
             href="/auth/login"
-            class="block w-full py-3 px-6 bg-black text-white text-sm font-medium hover:bg-gray-800 transition-colors duration-75 text-center"
+            class="block w-full py-3 px-6 bg-black dark:bg-white text-white dark:text-black text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors duration-75 text-center"
           >
             Get started free
           </a>
         </div>
 
         <!-- Pro tier -->
-        <div class="border-2 border-black rounded-sm p-8 space-y-6 relative">
-          <div class="absolute -top-3 right-6 bg-black text-white px-3 py-1 text-xs font-medium">
+        <div class="border-2 border-black dark:border-white rounded-sm p-8 space-y-6 relative">
+          <div class="absolute -top-3 right-6 bg-black dark:bg-white text-white dark:text-black px-3 py-1 text-xs font-medium">
             POPULAR
           </div>
 
           <div>
-            <h2 class="text-2xl font-semibold mb-2">Pro</h2>
-            <div class="text-4xl font-light mb-1">$10</div>
-            <p class="text-xs text-gray-600 font-normal mb-3">/month</p>
-            <p class="text-xs text-gray-500 font-normal">$8/month billed yearly</p>
+            <h2 class="text-2xl font-semibold mb-2 dark:text-white">Pro</h2>
+            <div class="text-4xl font-light mb-1 dark:text-white">$10</div>
+            <p class="text-xs text-gray-600 dark:text-gray-400 font-normal mb-3">/month</p>
+            <p class="text-xs text-gray-500 dark:text-gray-500 font-normal">$8/month billed yearly</p>
           </div>
 
-          <ul class="text-sm text-gray-600 space-y-3 font-normal">
+          <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-3 font-normal">
             <li class="flex items-start gap-3">
-              <span class="text-gray-400 text-lg">→</span>
+              <span class="text-gray-400 dark:text-gray-500 text-lg">→</span>
               <span>Everything in Free</span>
             </li>
             <li class="flex items-start gap-3">
-              <span class="text-black text-lg">→</span>
-              <span class="text-black font-semibold">Unlimited clients</span>
+              <span class="text-black dark:text-white text-lg">→</span>
+              <span class="text-black dark:text-white font-semibold">Unlimited clients</span>
             </li>
             <li class="flex items-start gap-3">
-              <span class="text-black text-lg">→</span>
-              <span class="text-black font-semibold">Upload your own designs</span>
+              <span class="text-black dark:text-white text-lg">→</span>
+              <span class="text-black dark:text-white font-semibold">Upload your own designs</span>
             </li>
             <li class="flex items-start gap-3">
-              <span class="text-black text-lg">→</span>
-              <span class="text-black font-semibold">Partial payments tracking</span>
+              <span class="text-black dark:text-white text-lg">→</span>
+              <span class="text-black dark:text-white font-semibold">Partial payments tracking</span>
             </li>
             <li class="flex items-start gap-3">
-              <span class="text-black text-lg">→</span>
-              <span class="text-black font-semibold">Remove branding</span>
+              <span class="text-black dark:text-white text-lg">→</span>
+              <span class="text-black dark:text-white font-semibold">Remove branding</span>
             </li>
           </ul>
 
           <a
             href="/auth/login"
-            class="block w-full py-3 px-6 bg-black text-white text-sm font-medium hover:bg-gray-800 transition-colors duration-75 text-center"
+            class="block w-full py-3 px-6 bg-black dark:bg-white text-white dark:text-black text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors duration-75 text-center"
           >
             Start Pro trial
           </a>
@@ -120,16 +120,16 @@
   </main>
 
   <!-- Footer -->
-  <footer class="px-4 py-3 mt-auto">
+  <footer class="px-4 py-3 mt-auto dark:bg-dark-bg">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-4 text-xs text-gray-600">
-        <a href="https://x.com/liamhanel" target="_blank" rel="noopener noreferrer" class="hover:text-black transition-colors">
+      <div class="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
+        <a href="https://x.com/liamhanel" target="_blank" rel="noopener noreferrer" class="hover:text-black dark:hover:text-white transition-colors">
           Created by Liam Hänel
         </a>
       </div>
-      <div class="flex items-center gap-4 text-xs text-gray-600">
-        <a href="/legal/terms" class="hover:text-black transition-colors">Terms</a>
-        <a href="/legal/privacy" class="hover:text-black transition-colors">Privacy</a>
+      <div class="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
+        <a href="/legal/terms" class="hover:text-black dark:hover:text-white transition-colors">Terms</a>
+        <a href="/legal/privacy" class="hover:text-black dark:hover:text-white transition-colors">Privacy</a>
       </div>
     </div>
   </footer>
