@@ -25,12 +25,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Improved sidebar design with better spacing and visual hierarchy
 
 ### Fixed
+- PDF files now properly deleted from storage when invoices are deleted
+- Dashboard earnings now correctly displays total from paid invoices
+- Invoice PDFs now generate on live site (Cloudflare deployment fixed)
 - PDF generation with Supabase Storage integration
 - Email subject line pre-fill bug
 - Clients can now view invoice PDFs from email links without creating an account
-- Changelog widget dropdown visibility (no longer clipped by sidebar)
-- Icon import syntax for Svelte 5 compatibility
-- Mobile sidebar closing div tag error
 
 ---
 
