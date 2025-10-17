@@ -166,12 +166,19 @@
     }
     
     try {
-      const { error } = await data.supabase
-        .from('invoice')
-        .delete()
-        .eq('id', data.invoice.id);
-        
-      if (error) throw error;
+      const response = await fetch('/api/delete-invoice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ invoiceIds: [data.invoice.id] })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Failed to delete invoice');
+      }
       
       // Redirect to invoices list
       window.location.href = '/app/invoices';

@@ -128,12 +128,19 @@
     }
 
     try {
-      const { error } = await data.supabase
-        .from('invoice')
-        .delete()
-        .eq('id', invoiceId);
+      const response = await fetch('/api/delete-invoice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ invoiceIds: [invoiceId] })
+      });
 
-      if (error) throw error;
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Failed to delete invoice');
+      }
 
       window.location.reload();
 
@@ -282,12 +289,19 @@
     isBulkActionLoading = true;
 
     try {
-      const { error } = await data.supabase
-        .from('invoice')
-        .delete()
-        .in('id', Array.from(selectedInvoiceIds));
+      const response = await fetch('/api/delete-invoice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ invoiceIds: Array.from(selectedInvoiceIds) })
+      });
 
-      if (error) throw error;
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Failed to delete invoices');
+      }
 
       alert(`${count} invoice(s) deleted`);
       window.location.reload();
