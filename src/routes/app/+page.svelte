@@ -40,15 +40,20 @@
         .eq('org_id', orgId)
         .eq('status', 'draft');
 
-      // Get total earnings (paid + partially paid amounts)
+      // Get total earnings (paid invoices total + partially paid amounts)
       const { data: paidInvoices } = await data.supabase
         .from('invoice')
-        .select('amount_paid')
+        .select('total, amount_paid, status')
         .eq('org_id', orgId)
         .in('status', ['paid', 'partially_paid']);
 
       const earnings = (paidInvoices || []).reduce((sum, inv) => {
-        return sum + (inv.amount_paid || 0);
+        // For fully paid invoices, use total. For partially paid, use amount_paid
+        if (inv.status === 'paid') {
+          return sum + (inv.total || 0);
+        } else {
+          return sum + (inv.amount_paid || 0);
+        }
       }, 0);
 
       // Get outstanding amount (sent + partially_paid)
