@@ -1,5 +1,6 @@
 name = "inv-simple-invoice"
 compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
 
 # Cloudflare Browser Rendering API
 # Provides managed Chromium instances for PDF generation in production
