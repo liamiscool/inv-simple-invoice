@@ -64,7 +64,7 @@ export async function generateInvoicePDF(
   company: CompanyData,
   template: TemplateSpec,
   options: PDFGenerationOptions = {},
-  renderOptions: { includeContactName?: boolean; hideTaxColumn?: boolean } = {},
+  renderOptions: { includeContactName?: boolean; hideTaxColumn?: boolean; dateFormat?: string } = {},
   browserBinding?: Fetcher
 ): Promise<Buffer> {
   let browser = null;
@@ -124,7 +124,7 @@ export async function generateOptimizedInvoicePDF(
   invoice: InvoiceData,
   company: CompanyData,
   template: TemplateSpec,
-  options: { includeContactName?: boolean; hideTaxColumn?: boolean } = {},
+  options: { includeContactName?: boolean; hideTaxColumn?: boolean; dateFormat?: string } = {},
   browserBinding?: Fetcher
 ): Promise<Buffer> {
   const { meta } = template;

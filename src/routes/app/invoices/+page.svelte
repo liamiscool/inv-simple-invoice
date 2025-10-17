@@ -2,6 +2,8 @@
   import type { PageData } from './$types';
   import { EllipsisVertical } from '@steeze-ui/heroicons';
   import { Icon } from '@steeze-ui/svelte-icon';
+  import { formatDate } from '$lib/utils/dateFormat';
+  import { getUserDateFormat } from '$lib/utils/userPreferences';
 
   let { data }: { data: PageData } = $props();
 
@@ -66,8 +68,9 @@
     }).format(amount);
   }
   
-  function formatDate(dateString: string) {
-    return new Date(dateString).toLocaleDateString();
+  function formatDateForDisplay(dateString: string) {
+    const userDateFormat = getUserDateFormat(data.profile);
+    return formatDate(dateString, userDateFormat);
   }
   
   function toggleDropdown(invoiceId: string) {
@@ -486,12 +489,12 @@
               </td>
               <td class="px-4 py-4">
                 <span class="text-sm text-gray-500 dark:text-gray-300">
-                  {formatDate(invoice.issue_date)}
+                  {formatDateForDisplay(invoice.issue_date)}
                 </span>
               </td>
               <td class="px-4 py-4">
                 <span class="text-sm text-gray-500 dark:text-gray-300">
-                  {invoice.due_date ? formatDate(invoice.due_date) : '—'}
+                  {invoice.due_date ? formatDateForDisplay(invoice.due_date) : '—'}
                 </span>
               </td>
               <td class="px-4 py-4" onclick={(e) => e.stopPropagation()}>
@@ -642,9 +645,9 @@
 
           <!-- Dates -->
           <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-3">
-            <div>Issued: {formatDate(invoice.issue_date)}</div>
+            <div>Issued: {formatDateForDisplay(invoice.issue_date)}</div>
             {#if invoice.due_date}
-              <div>Due: {formatDate(invoice.due_date)}</div>
+              <div>Due: {formatDateForDisplay(invoice.due_date)}</div>
             {/if}
           </div>
 

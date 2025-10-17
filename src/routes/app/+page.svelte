@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { PageData } from './$types';
   import { onMount } from 'svelte';
+  import { formatDate } from '$lib/utils/dateFormat';
+  import { getUserDateFormat } from '$lib/utils/userPreferences';
 
   let { data }: { data: PageData } = $props();
 
@@ -109,12 +111,9 @@
     }).format(amount);
   }
 
-  function formatDate(dateString: string) {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
+  function formatDateForDisplay(dateString: string) {
+    const userDateFormat = getUserDateFormat(data.profile);
+    return formatDate(dateString, userDateFormat);
   }
 
   function getStatusColor(status: string) {
@@ -237,7 +236,7 @@
                   </div>
                   {#if invoice.due_date}
                     <div class="text-sm text-gray-500 dark:text-gray-300 mt-0.5">
-                      Due {formatDate(invoice.due_date)}
+                      Due {formatDateForDisplay(invoice.due_date)}
                     </div>
                   {/if}
                 </div>

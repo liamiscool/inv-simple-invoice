@@ -105,7 +105,20 @@ export const POST: RequestHandler = async ({ request, params, locals: { supabase
     }
 
     function formatDate(dateString: string): string {
-      return new Date(dateString).toLocaleDateString();
+      const userDateFormat = userProfile.date_format || 'AU';
+      if (userDateFormat === 'AU') {
+        return new Date(dateString).toLocaleDateString('en-AU', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        });
+      } else {
+        return new Date(dateString).toLocaleDateString('en-US', {
+          month: '2-digit',
+          day: '2-digit',
+          year: 'numeric'
+        });
+      }
     }
 
     // Generate and store PDF (regardless of include_pdf setting, we need the URL)
@@ -116,7 +129,8 @@ export const POST: RequestHandler = async ({ request, params, locals: { supabase
       template.spec,
       profile.org_id,
       {
-        includeContactName: invoice.include_contact_name || false
+        includeContactName: invoice.include_contact_name || false,
+        dateFormat: userProfile.date_format || 'AU'
       },
       platform?.env?.BROWSER // Optional Cloudflare Browser binding (production only)
     );

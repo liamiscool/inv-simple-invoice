@@ -1,4 +1,5 @@
 import { redirect } from '@sveltejs/kit';
+
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
@@ -8,7 +9,12 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      redirect(303, `/${next.slice(1)}`);
+      // For email verification, redirect to settings with a success flag
+      if (!next || next === '/app') {
+        redirect(303, '/app/settings?email_verified=true');
+      } else {
+        redirect(303, `/${next.slice(1)}`);
+      }
     }
   }
 

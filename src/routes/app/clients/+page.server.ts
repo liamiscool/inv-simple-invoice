@@ -9,12 +9,12 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
     };
   }
   
-  // Get user's org_id first
+  // Get user's org_id and profile data
   const { data: profile } = await supabase
     .from('app_user')
-    .select('org_id')
+    .select('org_id, date_format')
     .eq('id', user.id)
-    .single() as { data: { org_id: string } | null };
+    .single() as { data: { org_id: string; date_format: string | null } | null };
 
   if (!profile) {
     return {
@@ -30,6 +30,7 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
     .order('created_at', { ascending: false }) as { data: any[] | null };
   
   return {
-    clients: clients || []
+    clients: clients || [],
+    profile
   };
 };

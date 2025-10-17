@@ -39,6 +39,8 @@ export interface Database {
           company_address: string | null
           tax_id: string | null
           bank_details: string | null
+          date_format: string | null
+          operates_as_company: boolean | null
           created_at: string | null
         }
         Insert: {
@@ -50,6 +52,8 @@ export interface Database {
           company_address?: string | null
           tax_id?: string | null
           bank_details?: string | null
+          date_format?: string | null
+          operates_as_company?: boolean | null
           created_at?: string | null
         }
         Update: {
@@ -61,6 +65,8 @@ export interface Database {
           company_address?: string | null
           tax_id?: string | null
           bank_details?: string | null
+          date_format?: string | null
+          operates_as_company?: boolean | null
           created_at?: string | null
         }
       }
@@ -217,28 +223,28 @@ export interface Database {
         Row: {
           id: string
           org_id: string
-          stripe_subscription_id: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          plan: string
           status: string
-          current_period_start: string
-          current_period_end: string
           created_at: string | null
         }
         Insert: {
           id?: string
           org_id: string
-          stripe_subscription_id: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          plan: string
           status: string
-          current_period_start: string
-          current_period_end: string
           created_at?: string | null
         }
         Update: {
           id?: string
           org_id?: string
-          stripe_subscription_id?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          plan?: string
           status?: string
-          current_period_start?: string
-          current_period_end?: string
           created_at?: string | null
         }
       }

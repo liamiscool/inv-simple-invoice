@@ -3,6 +3,10 @@ import type {
   TableSpec,
   TemplateSpec,
 } from '$lib/templates';
+import {
+  type DateFormat,
+  formatDate,
+} from '$lib/utils/dateFormat';
 
 export interface InvoiceData {
   id: string;
@@ -70,7 +74,7 @@ export function renderInvoiceHTML(
   invoice: InvoiceData,
   company: CompanyData,
   template: TemplateSpec,
-  options: { includeContactName?: boolean; hideTaxColumn?: boolean } = {}
+  options: { includeContactName?: boolean; hideTaxColumn?: boolean; dateFormat?: DateFormat } = {}
 ): string {
   const { meta, styles, areas } = template;
 
@@ -118,8 +122,9 @@ export function renderInvoiceHTML(
     }).format(amount);
   }
 
-  function formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString();
+  function formatDateForDisplay(dateString: string): string {
+    const userDateFormat = options.dateFormat || 'AU';
+    return formatDate(dateString, userDateFormat);
   }
 
   function getAreaStyle(area: AreaSpec): string {
@@ -164,7 +169,7 @@ export function renderInvoiceHTML(
     
     // Filter columns based on hideTaxColumn option
     const visibleColumns = hideTaxColumn 
-      ? table.columns.filter(col => col.key !== 'tax' && col.key !== 'tax_rate')
+      ? table.columns.filter(col => col.key !== 'tax_rate')
       : table.columns;
     
     visibleColumns.forEach(col => {
@@ -285,19 +290,19 @@ export function renderInvoiceHTML(
   }
 
   if (adjustedAreas.issue_date) {
-    content += renderArea('issue_date', adjustedAreas.issue_date, `Issue Date: ${formatDate(invoice.issue_date)}`);
+    content += renderArea('issue_date', adjustedAreas.issue_date, `Issue Date: ${formatDateForDisplay(invoice.issue_date)}`);
   }
 
   if (adjustedAreas.due_date && invoice.due_date) {
-    content += renderArea('due_date', adjustedAreas.due_date, `Due Date: ${formatDate(invoice.due_date)}`);
+    content += renderArea('due_date', adjustedAreas.due_date, `Due Date: ${formatDateForDisplay(invoice.due_date)}`);
   }
 
   if (adjustedAreas.client_company && invoice.client.company) {
     content += renderArea('client_company', adjustedAreas.client_company, invoice.client.company);
   }
 
-  if (adjustedAreas.client_legal_name && invoice.client.legal_name) {
-    content += renderArea('client_legal_name', adjustedAreas.client_legal_name, invoice.client.legal_name);
+  if ((adjustedAreas as any).client_legal_name && invoice.client.legal_name) {
+    content += renderArea('client_legal_name', (adjustedAreas as any).client_legal_name, invoice.client.legal_name);
   }
 
   console.log('=== CLIENT NAME DEBUG ===');

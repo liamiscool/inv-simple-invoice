@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { PageData } from './$types';
   import { calculateMaxItems } from '$lib/templates';
+  import { formatDate } from '$lib/utils/dateFormat';
+  import { getUserDateFormat } from '$lib/utils/userPreferences';
 
   let { data }: { data: PageData } = $props();
 
@@ -55,8 +57,9 @@
     }).format(amount);
   }
   
-  function formatDate(dateString: string) {
-    return new Date(dateString).toLocaleDateString();
+  function formatDateForDisplay(dateString: string) {
+    const userDateFormat = getUserDateFormat(data.profile);
+    return formatDate(dateString, userDateFormat);
   }
   
   async function updateStatus(newStatus: string) {
@@ -415,12 +418,12 @@
           </div>
           <div class="flex justify-between">
             <span class="text-gray-600 dark:text-gray-400">Issue Date:</span>
-            <span class="dark:text-white">{formatDate(data.invoice.issue_date)}</span>
+            <span class="dark:text-white">{formatDateForDisplay(data.invoice.issue_date)}</span>
           </div>
           {#if data.invoice.due_date}
             <div class="flex justify-between">
               <span class="text-gray-600 dark:text-gray-400">Due Date:</span>
-              <span class="dark:text-white">{formatDate(data.invoice.due_date)}</span>
+              <span class="dark:text-white">{formatDateForDisplay(data.invoice.due_date)}</span>
             </div>
           {/if}
           <div class="flex justify-between">
@@ -547,7 +550,7 @@
           {#each data.invoice.payments as payment}
             <div class="flex justify-between items-center py-4">
               <div>
-                <div class="text-sm font-medium dark:text-white">{formatDate(payment.date)}</div>
+                <div class="text-sm font-medium dark:text-white">{formatDateForDisplay(payment.date)}</div>
                 {#if payment.notes}
                   <div class="text-sm text-gray-500 mt-1 dark:text-gray-400">{payment.notes}</div>
                 {/if}

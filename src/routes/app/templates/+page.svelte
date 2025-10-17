@@ -1,13 +1,16 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import type { PageData } from './$types';
+  import { formatDate } from '$lib/utils/dateFormat';
+  import { getUserDateFormat } from '$lib/utils/userPreferences';
 
   let { data }: { data: PageData } = $props();
   let deletingId: string | null = $state(null);
   let previewingTemplate: any | null = $state(null);
 
-  function formatDate(dateString: string) {
-    return new Date(dateString).toLocaleDateString();
+  function formatDateForDisplay(dateString: string) {
+    const userDateFormat = getUserDateFormat(data.profile);
+    return formatDate(dateString, userDateFormat);
   }
 
   function openPreview(template: any) {

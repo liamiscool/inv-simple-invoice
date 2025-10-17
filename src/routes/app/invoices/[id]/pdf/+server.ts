@@ -142,7 +142,8 @@ export const GET: RequestHandler = async ({ params, locals: { supabase, safeGetS
     orgId,
     {
       includeContactName: invoice.include_contact_name || false,
-      hideTaxColumn: hideTaxColumn
+      hideTaxColumn: hideTaxColumn,
+      dateFormat: userProfile.date_format || 'AU'
     },
     platform?.env?.BROWSER // Optional Cloudflare Browser binding (production only)
   );

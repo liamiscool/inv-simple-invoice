@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { PageData } from './$types';
+  import { formatDate } from '$lib/utils/dateFormat';
+  import { getUserDateFormat } from '$lib/utils/userPreferences';
   
   let { data }: { data: PageData } = $props();
   
@@ -133,7 +135,7 @@
               </td>
               <td class="px-4 py-4">
                 <span class="text-sm text-gray-500 dark:text-gray-300">
-                  {new Date(client.created_at || '').toLocaleDateString()}
+                  {formatDate(client.created_at || '', getUserDateFormat(data.profile))}
                 </span>
               </td>
               <td class="px-4 py-4">
@@ -177,7 +179,7 @@
                 <div class="text-gray-600 dark:text-gray-300">{client.email}</div>
               {/if}
               <div class="text-gray-500 dark:text-gray-400">
-                {client.currency || 'EUR'} • Added {new Date(client.created_at || '').toLocaleDateString()}
+                {client.currency || 'EUR'} • Added {formatDate(client.created_at || '', getUserDateFormat(data.profile))}
               </div>
             </div>
           </a>

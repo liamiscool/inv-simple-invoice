@@ -35,7 +35,7 @@ export async function generateAndStorePDF(
   company: CompanyData,
   template: TemplateSpec,
   orgId: string,
-  options: { includeContactName?: boolean; hideTaxColumn?: boolean } = {},
+  options: { includeContactName?: boolean; hideTaxColumn?: boolean; dateFormat?: string } = {},
   browserBinding?: Fetcher
 ): Promise<PDFStorageResult> {
   try {
@@ -240,7 +240,7 @@ export async function getOrGeneratePDF(
   company: CompanyData,
   template: TemplateSpec,
   orgId: string,
-  options: { includeContactName?: boolean; hideTaxColumn?: boolean } = {},
+  options: { includeContactName?: boolean; hideTaxColumn?: boolean; dateFormat?: string } = {},
   browserBinding?: Fetcher
 ): Promise<PDFStorageResult> {
   // Check if PDF exists and is current

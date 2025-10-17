@@ -7,8 +7,8 @@
   import { Icon } from '@steeze-ui/svelte-icon';
   import { Cog6Tooth, Star, ChatBubbleLeftRight, ArrowRightOnRectangle, Bell, Sun, Moon, ComputerDesktop } from '@steeze-ui/heroicons';
   import ChangelogWidget from '$lib/components/ChangelogWidget.svelte';
+  import NotificationContainer from '$lib/components/NotificationContainer.svelte';
   import { theme } from '$lib/stores/theme';
-  import favicon from '$lib/assets/favicon.svg';
 
   let { data, children }: { data: LayoutData; children: any } = $props();
   let showMobileSidebar = $state(false);
@@ -17,31 +17,38 @@
   let showProfileMenu = $state(false);
   let showChangelogWidget = $state(false);
 
-  onMount(async () => {
-    try {
-      const { data: user } = await data.supabase.auth.getUser();
-      if (!user.user) return;
+  onMount(() => {
+    // Fetch subscription info
+    (async () => {
+      try {
+        const { data: user } = await data.supabase.auth.getUser();
+        if (!user.user) return;
 
-      const { data: profile } = await data.supabase
-        .from('app_user')
-        .select('org_id')
-        .eq('id', user.user.id)
-        .single();
+        const { data: profile } = await data.supabase
+          .from('app_user')
+          .select('org_id')
+          .eq('id', user.user.id)
+          .single() as { data: { org_id: string } | null };
 
-      if (!profile) return;
+        if (!profile) return;
 
-      const { data: sub } = await data.supabase
-        .from('plan_subscription')
-        .select('plan, status')
-        .eq('org_id', profile.org_id)
-        .maybeSingle();
+        const { data: sub } = await data.supabase
+          .from('plan_subscription')
+          .select('plan, status')
+          .eq('org_id', profile.org_id)
+          .maybeSingle() as { data: { plan: string; status: string } | null };
 
-      if (sub && sub.plan === 'pro' && sub.status === 'active') {
-        subscriptionPlan = 'pro';
+        if (sub && sub.plan !== 'free' && sub.status === 'active') {
+          subscriptionPlan = 'pro';
+        }
+      } catch (err: any) {
+        // Only log non-network errors to avoid spam during timeouts
+        if (err?.code !== 'UND_ERR_CONNECT_TIMEOUT' && !err?.message?.includes('timeout')) {
+          console.error('Error fetching subscription:', err);
+        }
+        // Don't throw or redirect on network errors - let the user continue
       }
-    } catch (err) {
-      console.error('Error fetching subscription:', err);
-    }
+    })();
 
     // Close profile menu when clicking outside
     const handleClickOutside = (e: MouseEvent) => {
@@ -98,7 +105,9 @@
 </script>
 
 <svelte:head>
-  <link rel="icon" href={favicon} />
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 </svelte:head>
 
 <div class="min-h-screen bg-white dark:bg-dark-bg">
@@ -435,3 +444,6 @@
   monthlyLink={STRIPE_MONTHLY_LINK}
   yearlyLink={STRIPE_YEARLY_LINK}
 />
+
+<!-- Notification Container -->
+<NotificationContainer />

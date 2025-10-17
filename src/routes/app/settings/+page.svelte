@@ -1,16 +1,31 @@
 <script lang="ts">
   import type { PageData } from './$types';
+  import { DATE_FORMAT_OPTIONS } from '$lib/utils/dateFormat';
+  import { enhance } from '$app/forms';
+  import type { Database } from '$lib/types/database.types';
+  import { notify } from '$lib/stores/notifications';
+  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+  import { invalidateAll } from '$app/navigation';
   
   let { data }: { data: PageData } = $props();
   
   let isLoading = $state(false);
-  let message = $state('');
-  let error = $state('');
 
   // Custom fields state
   let showCustomFieldForm = $state(false);
   let customFieldLabel = $state('');
   let isCustomFieldCreating = $state(false);
+  
+  // Account update state
+  let newEmail = $state(data.session?.user?.email || '');
+  let currentPassword = $state('');
+  let newPassword = $state('');
+  let confirmNewPassword = $state('');
+  let isAccountLoading = $state(false);
+  
+  // Reactive current email that updates when session changes
+  let currentEmail = $state(data.session?.user?.email || '');
   
   // Form data - initialize with current data
   let fullName = $state(data.profile?.full_name || '');
@@ -19,6 +34,7 @@
   let taxId = $state(data.profile?.tax_id || '');
   let bankDetails = $state(data.profile?.bank_details || '');
   let defaultCurrency = $state(data.profile?.default_currency || 'EUR');
+  let dateFormat = $state(data.profile?.date_format || 'AU');
   let operatesAsCompany = $state(data.profile?.operates_as_company || false);
   
   const currencies = [
@@ -28,15 +44,128 @@
     { code: 'CAD', name: 'Canadian Dollar (C$)' },
     { code: 'AUD', name: 'Australian Dollar (A$)' }
   ];
+
+  // Handle email verification success
+  onMount(() => {
+    if ($page.url.searchParams.get('email_verified') === 'true') {
+      // Refresh the session to get updated email
+      data.supabase.auth.getSession().then(({ data: sessionData }) => {
+        if (sessionData.session?.user?.email) {
+          currentEmail = sessionData.session.user.email;
+          newEmail = sessionData.session.user.email;
+          notify.success('Email Updated', 'Your email address has been successfully updated!');
+        }
+      });
+      
+      // Clean up the URL
+      window.history.replaceState({}, '', '/app/settings');
+    }
+  });
   
+  async function handleAccountUpdate(e: Event) {
+    e.preventDefault();
+    isAccountLoading = true;
+    
+    try {
+      const { data: user, error: userError } = await data.supabase.auth.getUser();
+      if (userError) throw userError;
+      if (!user.user) throw new Error('No user found');
+      
+      // Check if email changed
+      const emailChanged = newEmail !== currentEmail;
+      
+      if (emailChanged) {
+        // Basic email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(newEmail)) {
+          throw new Error('Please enter a valid email address');
+        }
+      }
+      
+      // Check if password fields are filled
+      const passwordChangeRequested = currentPassword || newPassword || confirmNewPassword;
+      
+      if (passwordChangeRequested) {
+        // Validate password fields
+        if (!currentPassword) {
+          throw new Error('Current password is required to change password');
+        }
+        if (!newPassword) {
+          throw new Error('New password is required');
+        }
+        if (newPassword.length < 6) {
+          throw new Error('New password must be at least 6 characters');
+        }
+        if (newPassword !== confirmNewPassword) {
+          throw new Error('New passwords do not match');
+        }
+        
+        // Verify current password by attempting to sign in
+        const { error: signInError } = await data.supabase.auth.signInWithPassword({
+          email: data.session?.user?.email || '',
+          password: currentPassword
+        });
+        
+        if (signInError) {
+          throw new Error('Current password is incorrect');
+        }
+        
+        // Update password
+        const { error: passwordError } = await data.supabase.auth.updateUser({
+          password: newPassword
+        });
+        
+        if (passwordError) throw passwordError;
+        
+        // Clear password fields
+        currentPassword = '';
+        newPassword = '';
+        confirmNewPassword = '';
+        
+        notify.success('Password Updated', 'Your password has been changed successfully');
+      }
+      
+      if (emailChanged) {
+        // Update email with verification redirect
+        // For local development, use localhost:5173, for production use the actual origin
+        const redirectUrl = window.location.hostname === 'localhost' 
+          ? 'http://localhost:5173/auth/callback'
+          : `${window.location.origin}/auth/callback`;
+          
+        const { error: emailError } = await data.supabase.auth.updateUser({
+          email: newEmail
+        }, {
+          emailRedirectTo: redirectUrl
+        });
+        
+        if (emailError) throw emailError;
+        
+        notify.info('Email Update Initiated', 'Check your new email for a verification link. You must click the link to confirm the email change.');
+      }
+      
+      if (!emailChanged && !passwordChangeRequested) {
+        notify.info('No Changes', 'No changes to save');
+      }
+      
+    } catch (err: any) {
+      // Handle network timeout errors gracefully
+      if (err?.code === 'UND_ERR_CONNECT_TIMEOUT' || err?.message?.includes('timeout')) {
+        notify.error('Network Timeout', 'Please check your connection and try again');
+      } else {
+        notify.error('Update Failed', err.message || 'Something went wrong. Please try again.');
+      }
+    } finally {
+      isAccountLoading = false;
+    }
+  }
+
   async function handleSubmit(e: Event) {
     e.preventDefault();
     isLoading = true;
-    error = '';
-    message = '';
     
     try {
-      const { data: user } = await data.supabase.auth.getUser();
+      const { data: user, error: userError } = await data.supabase.auth.getUser();
+      if (userError) throw userError;
       if (!user.user) throw new Error('No user found');
       
       const { error: updateError } = await data.supabase
@@ -48,16 +177,22 @@
           tax_id: taxId,
           bank_details: bankDetails,
           default_currency: defaultCurrency,
+          date_format: dateFormat,
           operates_as_company: operatesAsCompany
         } as any)
         .eq('id', user.user.id);
         
       if (updateError) throw updateError;
       
-      message = 'Settings saved successfully!';
+      notify.success('Settings Saved', 'Your profile settings have been updated successfully');
       
     } catch (err: any) {
-      error = err.message || 'Something went wrong. Please try again.';
+      // Handle network timeout errors gracefully
+      if (err?.code === 'UND_ERR_CONNECT_TIMEOUT' || err?.message?.includes('timeout')) {
+        notify.error('Network Timeout', 'Please check your connection and try again');
+      } else {
+        notify.error('Save Failed', err.message || 'Something went wrong. Please try again.');
+      }
     } finally {
       isLoading = false;
     }
@@ -73,9 +208,97 @@
   <div>
     <h1 class="text-lg font-medium mb-1 dark:text-white">Settings</h1>
     <p class="text-sm text-gray-500 dark:text-gray-400">
-      Manage your profile and company information
+      Manage your account, profile and company information
     </p>
   </div>
+
+  <!-- Account Form -->
+  <form onsubmit={handleAccountUpdate} class="space-y-12">
+    <div class="space-y-5">
+      <h2 class="text-base font-medium pb-2 border-b border-gray-200 dark:text-white dark:border-gray-700">Account</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div>
+          <label for="newEmail" class="block text-sm text-gray-500 mb-1.5 dark:text-gray-400">Email</label>
+          <input
+            id="newEmail"
+            type="email"
+            bind:value={newEmail}
+            placeholder="your@email.com"
+            class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500"
+            required
+          />
+          <p class="text-xs text-gray-400 mt-1">
+            Current: {currentEmail || 'Not available'}
+          </p>
+
+        </div>
+
+        <div>
+          <div class="block text-sm text-gray-500 mb-1.5 dark:text-gray-400">Plan</div>
+          <div class="px-4 py-2.5 text-sm border border-gray-300 bg-gray-50 text-gray-500 dark:bg-dark-input dark:text-gray-400 dark:border-gray-600">
+            {data.subscription?.plan === 'free' ? 'Free' : 'Pro'} Plan
+          </div>
+        </div>
+      </div>
+
+      <!-- Password Change Section -->
+      <div class="pt-5 border-t border-gray-200 dark:border-gray-700">
+        <h3 class="text-sm font-medium mb-3 dark:text-white">Change Password</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div>
+            <label for="currentPassword" class="block text-sm text-gray-500 mb-1.5 dark:text-gray-400">Current Password</label>
+            <input
+              id="currentPassword"
+              type="password"
+              bind:value={currentPassword}
+              placeholder="Enter current password"
+              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500"
+            />
+          </div>
+
+          <div>
+            <label for="newPassword" class="block text-sm text-gray-500 mb-1.5 dark:text-gray-400">New Password</label>
+            <input
+              id="newPassword"
+              type="password"
+              bind:value={newPassword}
+              placeholder="Enter new password"
+              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500"
+            />
+          </div>
+
+          <div>
+            <label for="confirmNewPassword" class="block text-sm text-gray-500 mb-1.5 dark:text-gray-400">Confirm New Password</label>
+            <input
+              id="confirmNewPassword"
+              type="password"
+              bind:value={confirmNewPassword}
+              placeholder="Confirm new password"
+              class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500"
+            />
+          </div>
+        </div>
+        
+        <p class="text-xs text-gray-400 mt-2">
+          Leave password fields empty if you don't want to change your password
+        </p>
+      </div>
+
+      <!-- Account Save Button -->
+      <div class="flex justify-end pt-4">
+        <button
+          type="submit"
+          disabled={isAccountLoading}
+          class="px-5 py-2.5 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50 dark:bg-dark-button dark:hover:bg-dark-button-hover"
+        >
+          {isAccountLoading ? 'Updating...' : 'Update Account'}
+        </button>
+      </div>
+
+    </div>
+  </form>
 
   <!-- Profile Form -->
   <form onsubmit={handleSubmit} class="space-y-12">
@@ -83,7 +306,7 @@
     <div class="space-y-5">
       <h2 class="text-base font-medium pb-2 border-b border-gray-200 dark:text-white dark:border-gray-700">Personal Information</h2>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div>
           <label for="fullName" class="block text-sm text-gray-500 mb-1.5 dark:text-gray-400">Full Name</label>
           <input
@@ -105,6 +328,19 @@
           >
             {#each currencies as currency}
               <option value={currency.code}>{currency.name}</option>
+            {/each}
+          </select>
+        </div>
+
+        <div>
+          <label for="dateFormat" class="block text-sm text-gray-500 mb-1.5 dark:text-gray-400">Date Format</label>
+          <select
+            id="dateFormat"
+            bind:value={dateFormat}
+            class="w-full px-4 py-2.5 text-sm border border-gray-300 focus:outline-none focus:border-black transition-colors dark:bg-dark-input dark:text-white dark:border-gray-600 dark:focus:border-gray-500"
+          >
+            {#each DATE_FORMAT_OPTIONS as option}
+              <option value={option.value}>{option.label} - {option.example}</option>
             {/each}
           </select>
         </div>
@@ -193,18 +429,6 @@
       </button>
     </div>
 
-    <!-- Messages -->
-    {#if message}
-      <div class="text-center">
-        <p class="text-sm text-green-600 dark:text-green-400">{message}</p>
-      </div>
-    {/if}
-
-    {#if error}
-      <div class="text-center">
-        <p class="text-sm text-red-600 dark:text-red-400">{error}</p>
-      </div>
-    {/if}
   </form>
 
   <!-- Template Settings / Custom Fields (separate from profile form) -->
@@ -322,29 +546,13 @@
     </div>
   </div>
 
-  <!-- Account Information (separate section, no form needed) -->
-  <div class="space-y-12 mt-12">
-    <div class="space-y-5">
-      <h2 class="text-base font-medium pb-2 border-b border-gray-200 dark:text-white dark:border-gray-700">Account</h2>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div>
-          <label class="block text-sm text-gray-500 mb-1.5 dark:text-gray-400">Email</label>
-          <div class="px-4 py-2.5 text-sm border border-gray-300 bg-gray-50 text-gray-500 dark:bg-dark-input dark:text-gray-400 dark:border-gray-600">
-            {data.session?.user?.email || 'Not available'}
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-sm text-gray-500 mb-1.5 dark:text-gray-400">Plan</label>
-          <div class="px-4 py-2.5 text-sm border border-gray-300 bg-gray-50 text-gray-500 dark:bg-dark-input dark:text-gray-400 dark:border-gray-600">
-            {data.subscription?.plan === 'free' ? 'Free' : 'Pro'} Plan
-          </div>
-        </div>
-      </div>
-
-      {#if data.subscription?.plan === 'free'}
-        <div class="pt-5 border-t border-gray-200 dark:border-gray-700">
+  <!-- Upgrade Section -->
+  {#if data.subscription?.plan === 'free'}
+    <div class="space-y-12 mt-12">
+      <div class="space-y-5">
+        <h2 class="text-base font-medium pb-2 border-b border-gray-200 dark:text-white dark:border-gray-700">Upgrade</h2>
+        
+        <div class="pt-5">
           <p class="text-sm text-gray-500 mb-3 dark:text-gray-400">
             Upgrade to Pro for unlimited sending and custom templates
           </p>
@@ -355,7 +563,7 @@
             Upgrade to Pro
           </button>
         </div>
-      {/if}
+      </div>
     </div>
-  </div>
+  {/if}
 </div>

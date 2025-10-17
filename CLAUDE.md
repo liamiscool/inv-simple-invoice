@@ -16,19 +16,20 @@ Invoice PDFs are generated server-side using environment-specific Puppeteer impl
 
 **Architecture**:
 
-**Development Environment (local)**:
+**Development Environment (local with `pnpm dev`)**:
 - Uses standard `puppeteer` package
 - Launches local Chromium binary
 - No Cloudflare credits used
 - Unlimited PDF generation for testing
-- Location: `src/lib/pdf/generator.ts` (launchBrowser function)
+- Runs on `http://localhost:5173`
+- NOTE: Requires Chromium download first time (automatic via `pnpm install`)
 
 **Production Environment (Cloudflare Pages)**:
 - Uses `@cloudflare/puppeteer` package
 - Launches browser via Cloudflare Browser Rendering API
 - Automatic environment detection (checks for BROWSER binding)
 - Managed Chromium instances on Cloudflare's edge network
-- Configuration: `wrangler.toml` (BROWSER binding)
+- Configuration: `wrangler.toml` (BROWSER binding + nodejs_compat)
 
 **How it works**:
 1. User requests invoice PDF (send, view, or download)
@@ -41,26 +42,56 @@ Invoice PDFs are generated server-side using environment-specific Puppeteer impl
 6. PDF stored in Supabase Storage for caching/reuse
 7. PDF URL returned to client
 
+**Testing Locally**:
+- **Option 1 (Recommended)**: Use `pnpm dev` for standard development
+  - Uses local Puppeteer with Chromium
+  - Fast, no Cloudflare credits used
+  - Works immediately after `pnpm install`
+
+- **Option 2 (Not Recommended)**: Use `wrangler pages dev` to simulate Cloudflare
+  - PROBLEM: Wrangler bundler tries to include standard `puppeteer` which has Node.js dependencies
+  - This causes bundling errors (fs, path, http, etc. modules not available in Workers)
+  - Even with `nodejs_compat` and `ssr.external: ['puppeteer']` in vite.config, wrangler still analyzes puppeteer dependencies
+  - **Use production deployment instead** - just push to GitHub and test on live site
+
+- **Option 3 (Best for Cloudflare Testing)**: Deploy to production
+  - Push to GitHub → Cloudflare auto-deploys
+  - Test with real Cloudflare Browser Rendering API
+  - No local bundling issues
+  - Uses actual production environment
+
 **Rate Limits** (Cloudflare Free Plan):
 - 10 minutes browser time per day
 - 3 concurrent browsers per account
 - 3 new browser instances per minute
-- Sufficient for invoice generation use case
+- Sufficient for invoice generation use case (~600 PDFs/day at 1sec each)
+
+**Pricing** (beyond free tier):
+- $0.09 per browser hour after free tier exhausted
+- Significantly cheaper than alternatives (Browserless.io = $50/month, PDFMonkey = $29/month)
 
 **Files**:
 - `src/lib/pdf/generator.ts` - PDF generation with dual environment support
 - `src/lib/pdf/storage.ts` - PDF caching/upload to Supabase
 - `src/routes/app/invoices/[id]/pdf/+server.ts` - PDF download endpoint
 - `src/routes/app/invoices/[id]/send/+server.ts` - Email sending with PDF
-- `wrangler.toml` - Cloudflare Browser Rendering binding configuration
+- `wrangler.toml` - Cloudflare configuration (BROWSER binding + nodejs_compat)
+- `vite.config.ts` - Build configuration (excludes puppeteer from SSR bundle)
 
 **Why this approach?**
 - ✅ Works in serverless environment (Cloudflare Pages)
 - ✅ No native dependencies required
 - ✅ Free unlimited testing in development
-- ✅ Cost-effective production (included in Cloudflare Pages)
+- ✅ Cost-effective production (10 min/day free, then $0.09/hour)
 - ✅ Fast (runs on Cloudflare's edge network)
 - ✅ Drop-in replacement for standard Puppeteer
+
+**Alternative Options Considered**:
+See PDF generation service comparison in project docs for full analysis of:
+- Browserless.io (1,000 PDFs/month free, then $50/month)
+- PDFMonkey (300 PDFs/month free, then $29/month)
+- CloudConvert (10 PDFs/day free, then $8/month)
+- html2pdf.app, DocRaptor, etc.
 
 ---
 
