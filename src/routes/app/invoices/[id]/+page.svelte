@@ -24,6 +24,11 @@
   let emailLoading = $state(false);
   let emailError = $state('');
   let emailSuccess = $state('');
+
+  // Invoice number editing
+  let isEditingNumber = $state(false);
+  let editedNumber = $state(invoice.number);
+  let numberError = $state('');
   
   const statusColors = {
     draft: 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-800',
@@ -66,23 +71,56 @@
     isLoading = true;
     error = '';
     message = '';
-    
+
     try {
       const { error: updateError } = await data.supabase
         .from('invoice')
         .update({ status: newStatus } as any)
         .eq('id', invoice.id);
-        
+
       if (updateError) throw updateError;
-      
+
       // Refresh the page to show updated data
       window.location.reload();
-      
+
     } catch (err: any) {
       error = err.message || 'Failed to update status';
     } finally {
       isLoading = false;
     }
+  }
+
+  async function saveInvoiceNumber() {
+    numberError = '';
+
+    if (!editedNumber || editedNumber.trim() === '') {
+      numberError = 'Invoice number cannot be empty';
+      return;
+    }
+
+    try {
+      const { error: updateError } = await data.supabase
+        .from('invoice')
+        .update({ number: editedNumber.trim() } as any)
+        .eq('id', invoice.id);
+
+      if (updateError) throw updateError;
+
+      // Update local state and exit edit mode
+      invoice.number = editedNumber.trim();
+      isEditingNumber = false;
+      message = 'Invoice number updated successfully';
+      setTimeout(() => message = '', 3000);
+
+    } catch (err: any) {
+      numberError = err.message || 'Failed to update invoice number';
+    }
+  }
+
+  function cancelEditNumber() {
+    editedNumber = invoice.number;
+    isEditingNumber = false;
+    numberError = '';
   }
   
   async function duplicateInvoice() {
@@ -102,9 +140,12 @@
 
       if (!profile) throw new Error('Profile not found');
 
-      // Generate new invoice number
+      // Generate new invoice number (with client_id for custom prefix support)
       const { data: nextNumber, error: numberError } = await data.supabase
-        .rpc('next_invoice_number', { p_org_id: profile.org_id } as any);
+        .rpc('next_invoice_number', {
+          p_org_id: profile.org_id,
+          p_client_id: invoice.client_id
+        } as any);
 
       if (numberError) throw numberError;
 
@@ -310,7 +351,44 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
         <div class="flex items-center gap-3 mb-1">
-          <h1 class="text-lg font-medium dark:text-white">Invoice {data.invoice.number}</h1>
+          {#if isEditingNumber}
+            <div class="flex items-center gap-2">
+              <input
+                type="text"
+                bind:value={editedNumber}
+                class="px-3 py-1.5 text-lg font-medium border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-black dark:focus:border-gray-500 dark:bg-dark-input dark:text-white"
+                placeholder="Invoice number"
+              />
+              <button
+                onclick={saveInvoiceNumber}
+                class="px-3 py-1.5 bg-black dark:bg-dark-button text-white text-sm hover:bg-gray-800 dark:hover:bg-dark-button-hover transition-colors"
+              >
+                Save
+              </button>
+              <button
+                onclick={cancelEditNumber}
+                class="px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white text-sm hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          {:else}
+            <div class="flex items-center gap-2">
+              <h1 class="text-lg font-medium dark:text-white">Invoice {data.invoice.number}</h1>
+              <button
+                onclick={() => isEditingNumber = true}
+                class="text-gray-400 hover:text-black dark:hover:text-white transition-colors group relative"
+                title="Edit invoice number"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                <span class="absolute hidden group-hover:block left-1/2 -translate-x-1/2 top-full mt-1 px-2 py-1 bg-gray-900 text-white text-xs whitespace-nowrap z-10">
+                  Override invoice number
+                </span>
+              </button>
+            </div>
+          {/if}
           <span class="inline-flex px-2.5 py-1 text-sm {statusColors[data.invoice.status as keyof typeof statusColors]}">
             {statusLabels[data.invoice.status as keyof typeof statusLabels]}
           </span>
@@ -320,12 +398,17 @@
             </span>
           {/if}
         </div>
-        <!-- Breadcrumbs -->
-        <div class="flex items-center gap-2 text-xs">
-          <a href="/app/invoices" class="text-gray-400 hover:text-black transition-colors dark:hover:text-white">Invoices</a>
-          <span class="text-gray-400">/</span>
-          <span class="text-gray-600 dark:text-gray-400">{data.invoice.number}</span>
-        </div>
+        {#if numberError}
+          <p class="text-xs text-red-600 dark:text-red-400 mt-1">{numberError}</p>
+        {/if}
+        {#if !isEditingNumber}
+          <!-- Breadcrumbs -->
+          <div class="flex items-center gap-2 text-xs">
+            <a href="/app/invoices" class="text-gray-400 hover:text-black transition-colors dark:hover:text-white">Invoices</a>
+            <span class="text-gray-400">/</span>
+            <span class="text-gray-600 dark:text-gray-400">{data.invoice.number}</span>
+          </div>
+        {/if}
       </div>
 
       <div class="flex items-center gap-2">

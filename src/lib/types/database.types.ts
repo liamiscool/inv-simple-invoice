@@ -131,11 +131,14 @@ export type Database = {
           deleted_at: string | null
           email: string | null
           id: string
+          invoice_counter: number | null
+          invoice_prefix: string | null
           legal_name: string | null
           name: string
           notes: string | null
           org_id: string
           tax_id: string | null
+          use_custom_invoice_prefix: boolean | null
         }
         Insert: {
           company?: string | null
@@ -145,11 +148,14 @@ export type Database = {
           deleted_at?: string | null
           email?: string | null
           id?: string
+          invoice_counter?: number | null
+          invoice_prefix?: string | null
           legal_name?: string | null
           name: string
           notes?: string | null
           org_id: string
           tax_id?: string | null
+          use_custom_invoice_prefix?: boolean | null
         }
         Update: {
           company?: string | null
@@ -159,11 +165,14 @@ export type Database = {
           deleted_at?: string | null
           email?: string | null
           id?: string
+          invoice_counter?: number | null
+          invoice_prefix?: string | null
           legal_name?: string | null
           name?: string
           notes?: string | null
           org_id?: string
           tax_id?: string | null
+          use_custom_invoice_prefix?: boolean | null
         }
         Relationships: [
           {
@@ -197,6 +206,35 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: true
             referencedRelation: "app_org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_invoice_counter: {
+        Row: {
+          client_id: string
+          current_counter: number
+          updated_at: string | null
+          year: number
+        }
+        Insert: {
+          client_id: string
+          current_counter?: number
+          updated_at?: string | null
+          year: number
+        }
+        Update: {
+          client_id?: string
+          current_counter?: number
+          updated_at?: string | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_invoice_counter_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client"
             referencedColumns: ["id"]
           },
         ]
@@ -527,7 +565,7 @@ export type Database = {
         Returns: string
       }
       next_invoice_number: {
-        Args: { p_org_id: string }
+        Args: { p_org_id: string; p_client_id?: string }
         Returns: string
       }
     }

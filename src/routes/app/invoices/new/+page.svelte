@@ -155,7 +155,10 @@
 
       // Generate invoice number
       const { data: nextNumber, error: numberError } = await data.supabase
-        .rpc('next_invoice_number', { p_org_id: profile.org_id } as any);
+        .rpc('next_invoice_number', {
+          p_org_id: profile.org_id,
+          p_client_id: selectedClientId
+        } as any);
 
       if (numberError) throw numberError;
 
@@ -249,7 +252,10 @@
       if (!profile) throw new Error('Profile not found');
 
       const { data: nextNumber, error: numberError } = await data.supabase
-        .rpc('next_invoice_number', { p_org_id: profile.org_id } as any);
+        .rpc('next_invoice_number', {
+          p_org_id: profile.org_id,
+          p_client_id: selectedClientId
+        } as any);
 
       if (numberError) throw numberError;
 
@@ -384,6 +390,26 @@
                 </option>
               {/each}
             </select>
+            {#if selectedClient && !selectedClient.use_custom_invoice_prefix}
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1.5">
+                <span class="inline-flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <span>
+                    Using default numbering (INV-{new Date().getFullYear()}-####).
+                    <a href="/app/clients/{selectedClient.id}/edit" class="underline hover:text-black dark:hover:text-white transition-colors">Set custom prefix</a> for client-specific numbers.
+                  </span>
+                </span>
+              </p>
+            {:else if selectedClient && selectedClient.use_custom_invoice_prefix}
+              <p class="text-xs text-green-600 dark:text-green-400 mt-1.5 flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Using custom prefix: {selectedClient.invoice_prefix}-{new Date().getFullYear()}-###</span>
+              </p>
+            {/if}
           </div>
 
           <div>

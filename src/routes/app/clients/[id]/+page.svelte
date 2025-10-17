@@ -90,6 +90,21 @@
           <dt class="text-sm text-gray-500 dark:text-gray-400 mb-1">Currency</dt>
           <dd class="text-base dark:text-white">{data.client.currency || 'EUR'}</dd>
         </div>
+
+        <div>
+          <dt class="text-sm text-gray-500 dark:text-gray-400 mb-1">Invoice Numbering</dt>
+          {#if data.client.use_custom_invoice_prefix && data.client.invoice_prefix}
+            <dd class="text-base dark:text-white">
+              <span class="font-mono">{data.client.invoice_prefix}-{new Date().getFullYear()}-###</span>
+              <span class="text-sm text-gray-500 dark:text-gray-400 ml-2">(Custom prefix)</span>
+            </dd>
+          {:else}
+            <dd class="text-base dark:text-white">
+              <span class="font-mono">INV-{new Date().getFullYear()}-####</span>
+              <span class="text-sm text-gray-500 dark:text-gray-400 ml-2">(Default)</span>
+            </dd>
+          {/if}
+        </div>
       </div>
 
       <div class="space-y-5">
