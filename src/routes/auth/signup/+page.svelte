@@ -42,27 +42,27 @@
   <title>Sign up - inv</title>
 </svelte:head>
 
-<div class="min-h-screen flex flex-col px-4 pt-4">
+<div class="min-h-screen bg-white dark:bg-dark-bg flex flex-col">
   <!-- Back to home - top left -->
-  <div class="mb-8">
+  <div class="px-4 py-3 mb-8">
     <a
       href="/"
-      class="text-xs text-gray-600 hover:text-black transition-colors inline-flex items-center gap-1"
+      class="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors inline-flex items-center gap-2"
     >
-      ← inv
+      <span class="text-base">←</span> Back
     </a>
   </div>
 
   <div class="flex-1 flex items-center justify-center">
-    <div class="w-full max-w-sm space-y-6">
+    <div class="w-full max-w-sm space-y-8">
       <!-- Header -->
-      <div class="text-center space-y-2">
-        <h1 class="text-lg">Create account</h1>
-        <p class="text-xs text-gray-600">Beautiful invoices for designers</p>
+      <div class="text-center space-y-3">
+        <h1 class="text-2xl font-medium dark:text-white">Sign up</h1>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Beautiful invoices for designers</p>
       </div>
 
     <!-- Form -->
-    <form onsubmit={handleSignup} class="space-y-4">
+    <form onsubmit={handleSignup} class="space-y-6">
       <div>
         <label for="email" class="sr-only">Email</label>
         <input
@@ -70,7 +70,7 @@
           type="email"
           bind:value={email}
           placeholder="Enter your email"
-          class="w-full px-3 py-2 text-sm border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+          class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-700 dark:bg-dark-input dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors"
           required
           disabled={isLoading}
         />
@@ -84,7 +84,7 @@
           bind:value={password}
           placeholder="Create a password (min 6 characters)"
           minlength="6"
-          class="w-full px-3 py-2 text-sm border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+          class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-700 dark:bg-dark-input dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors"
           required
           disabled={isLoading}
         />
@@ -93,22 +93,22 @@
       <button
         type="submit"
         disabled={isLoading}
-        class="w-full py-2 px-4 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+        class="w-full px-5 py-2.5 bg-black dark:bg-dark-button text-white text-sm hover:bg-gray-800 dark:hover:bg-dark-button-hover transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isLoading ? 'Creating account...' : 'Create account'}
       </button>
 
-      <div class="text-center text-xs">
-        <span class="text-gray-600">Already have an account?</span>
+      <div class="text-center text-sm">
+        <span class="text-gray-600 dark:text-gray-400">Already have an account?</span>
         {' '}
-        <a href="/auth/login" class="text-gray-600 hover:text-black transition-colors">Sign in</a>
+        <a href="/auth/login" class="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">Sign in</a>
       </div>
     </form>
 
     <!-- Message -->
     {#if message}
       <div class="text-center">
-        <p class="text-xs {message.includes('created') ? 'text-green-600' : 'text-red-600'}">
+        <p class="text-sm {message.includes('created') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">
           {message}
         </p>
       </div>

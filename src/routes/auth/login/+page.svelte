@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { PageData } from './$types';
+  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
 
   let { data }: { data: PageData } = $props();
 
@@ -9,6 +11,15 @@
   let message = $state('');
   let useMagicLink = $state(false);
   let showResetPassword = $state(false);
+
+  // Check for email verification success
+  onMount(() => {
+    if ($page.url.searchParams.get('email_verified') === 'true') {
+      message = 'Email verified successfully! Please log in with your new email address.';
+      // Clean up the URL
+      window.history.replaceState({}, '', '/auth/login');
+    }
+  });
 
   async function handlePasswordLogin(e: Event) {
     e.preventDefault();
@@ -85,29 +96,29 @@
   <title>Sign in - inv</title>
 </svelte:head>
 
-<div class="min-h-screen flex flex-col px-4 pt-4">
+<div class="min-h-screen bg-white dark:bg-dark-bg flex flex-col">
   <!-- Back to home - top left -->
-  <div class="mb-8">
+  <div class="px-4 py-3 mb-8">
     <a
       href="/"
-      class="text-xs text-gray-600 hover:text-black transition-colors inline-flex items-center gap-1"
+      class="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors inline-flex items-center gap-2"
     >
-      ← inv
+      <span class="text-base">←</span> Back
     </a>
   </div>
 
   <div class="flex-1 flex items-center justify-center">
-    <div class="w-full max-w-sm space-y-6">
+    <div class="w-full max-w-sm space-y-8">
       <!-- Header -->
-      <div class="text-center space-y-2">
-        <h1 class="text-lg">Sign in</h1>
-        <p class="text-xs text-gray-600">Beautiful invoices for designers</p>
+      <div class="text-center space-y-3">
+        <h1 class="text-2xl font-medium dark:text-white">Sign in</h1>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Beautiful invoices for designers</p>
       </div>
     
     <!-- Form -->
     {#if showResetPassword}
       <!-- Reset Password -->
-      <form onsubmit={handleResetPassword} class="space-y-4">
+      <form onsubmit={handleResetPassword} class="space-y-6">
         <div>
           <label for="email-reset" class="sr-only">Email</label>
           <input
@@ -115,7 +126,7 @@
             type="email"
             bind:value={email}
             placeholder="Enter your email"
-            class="w-full px-3 py-2 text-sm border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+            class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-700 dark:bg-dark-input dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors"
             required
             disabled={isLoading}
           />
@@ -124,7 +135,7 @@
         <button
           type="submit"
           disabled={isLoading}
-          class="w-full py-2 px-4 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+          class="w-full px-5 py-2.5 bg-black dark:bg-dark-button text-white text-sm hover:bg-gray-800 dark:hover:bg-dark-button-hover transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Sending...' : 'Send reset link'}
         </button>
@@ -133,7 +144,7 @@
           <button
             type="button"
             onclick={() => showResetPassword = false}
-            class="text-xs text-gray-600 hover:text-black transition-colors"
+            class="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
           >
             ← Back to sign in
           </button>
@@ -141,7 +152,7 @@
       </form>
     {:else if !useMagicLink}
       <!-- Password Login (Default) -->
-      <form onsubmit={handlePasswordLogin} class="space-y-4">
+      <form onsubmit={handlePasswordLogin} class="space-y-6">
         <div>
           <label for="email" class="sr-only">Email</label>
           <input
@@ -149,7 +160,7 @@
             type="email"
             bind:value={email}
             placeholder="Enter your email"
-            class="w-full px-3 py-2 text-sm border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+            class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-700 dark:bg-dark-input dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors"
             required
             disabled={isLoading}
           />
@@ -162,7 +173,7 @@
             type="password"
             bind:value={password}
             placeholder="Enter your password"
-            class="w-full px-3 py-2 text-sm border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+            class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-700 dark:bg-dark-input dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors"
             required
             disabled={isLoading}
           />
@@ -171,20 +182,20 @@
         <button
           type="submit"
           disabled={isLoading}
-          class="w-full py-2 px-4 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+          class="w-full px-5 py-2.5 bg-black dark:bg-dark-button text-white text-sm hover:bg-gray-800 dark:hover:bg-dark-button-hover transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Signing in...' : 'Sign in'}
         </button>
 
-        <div class="flex items-center justify-between text-xs">
+        <div class="flex items-center justify-between text-sm">
           <button
             type="button"
             onclick={() => showResetPassword = true}
-            class="text-gray-600 hover:text-black transition-colors"
+            class="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
           >
             Forgot password?
           </button>
-          <a href="/auth/signup" class="text-gray-600 hover:text-black transition-colors">
+          <a href="/auth/signup" class="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
             Sign up
           </a>
         </div>
@@ -193,7 +204,7 @@
           <button
             type="button"
             onclick={() => useMagicLink = true}
-            class="text-xs text-gray-600 hover:text-black transition-colors"
+            class="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
           >
             Use magic link instead
           </button>
@@ -201,7 +212,7 @@
       </form>
     {:else}
       <!-- Magic Link Login -->
-      <form onsubmit={handleMagicLink} class="space-y-4">
+      <form onsubmit={handleMagicLink} class="space-y-6">
         <div>
           <label for="email-magic" class="sr-only">Email</label>
           <input
@@ -209,7 +220,7 @@
             type="email"
             bind:value={email}
             placeholder="Enter your email"
-            class="w-full px-3 py-2 text-sm border border-thin rounded-sm focus:outline-none focus:border-black transition-colors"
+            class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-700 dark:bg-dark-input dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors"
             required
             disabled={isLoading}
           />
@@ -218,7 +229,7 @@
         <button
           type="submit"
           disabled={isLoading}
-          class="w-full py-2 px-4 bg-black text-white text-sm hover:bg-gray-800 transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+          class="w-full px-5 py-2.5 bg-black dark:bg-dark-button text-white text-sm hover:bg-gray-800 dark:hover:bg-dark-button-hover transition-colors duration-75 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Sending...' : 'Send magic link'}
         </button>
@@ -227,7 +238,7 @@
           <button
             type="button"
             onclick={() => useMagicLink = false}
-            class="text-xs text-gray-600 hover:text-black transition-colors"
+            class="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
           >
             ← Back to password login
           </button>
@@ -238,7 +249,7 @@
     <!-- Message -->
     {#if message}
       <div class="text-center">
-        <p class="text-xs {message.includes('Check your email') ? 'text-green-600' : 'text-red-600'}">
+        <p class="text-sm {message.includes('Check your email') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">
           {message}
         </p>
       </div>
