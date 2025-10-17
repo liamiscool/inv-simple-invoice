@@ -199,7 +199,7 @@
   </script>`}
 </svelte:head>
 
-<div class="h-screen w-screen flex flex-col relative overflow-hidden font-mono dark:bg-dark-bg">
+<div class="min-h-screen w-screen flex flex-col relative overflow-hidden font-mono dark:bg-dark-bg">
   <!-- P5JS Background Canvas -->
   <div id="p5-canvas-container" class="fixed inset-0 w-full h-full z-0"></div>
   
@@ -208,7 +208,7 @@
     <div class="w-full flex items-center justify-between">
       <div class="flex items-center gap-6">
         <a href="/" class="text-lg tracking-tight font-medium dark:text-white flex items-end gap-2">
-          <div class="w-12 h-7" style="background: #F58121; image-rendering: pixelated;"></div>
+          <div class="w-12 h-7 bg-black dark:bg-white" style="image-rendering: pixelated;"></div>
           <span>inv</span>
         </a>
         <a href="/pricing" class="text-sm hover:text-black dark:hover:text-white transition-colors text-gray-600 dark:text-gray-400">Pricing</a>
@@ -226,10 +226,10 @@
   </header>
   
   <!-- Content overlay -->
-  <div class="relative z-10 flex flex-col h-full pt-20">
+  <div class="relative z-10 flex flex-col min-h-screen pt-16 md:pt-20">
 
     <!-- Main Content - Left aligned -->
-    <main class="flex-1 px-8 py-8 overflow-hidden flex items-center min-h-[calc(100vh-8rem)]">
+    <main class="flex-1 px-8 py-8 flex items-start md:items-center">
       <div class="max-w-2xl text-left space-y-12">
 
         <!-- Hero -->
@@ -267,7 +267,7 @@
         <!-- Features grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8 max-w-3xl">
           <div class="space-y-2">
-            <div class="text-2xl" style="color: #F58121;">↑</div>
+            <div class="text-2xl text-black dark:text-white">↑</div>
             <h3 class="text-sm font-medium dark:text-white">Upload custom designs</h3>
             <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
               Your invoice templates. PDF or PNG.
@@ -275,7 +275,7 @@
           </div>
 
           <div class="space-y-2">
-            <div class="text-2xl" style="color: #F58121;">◼</div>
+            <div class="text-2xl text-black dark:text-white">◼</div>
             <h3 class="text-sm font-medium dark:text-white">Manage invoices</h3>
             <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
               Track clients, payments, and status.
@@ -283,7 +283,7 @@
           </div>
 
           <div class="space-y-2">
-            <div class="text-2xl" style="color: #F58121;">→</div>
+            <div class="text-2xl text-black dark:text-white">→</div>
             <h3 class="text-sm font-medium dark:text-white">Send & get paid</h3>
             <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
               Email pixel-perfect PDFs. Simple.

@@ -115,7 +115,7 @@
   <div class="md:hidden border-b border-thin dark:border-gray-700 px-4 py-3 dark:bg-dark-bg">
     <div class="flex items-center justify-between">
       <a href="/app" class="text-lg tracking-tight font-medium dark:text-white flex items-end gap-2">
-        <div class="w-12 h-7" style="background: #F58121; image-rendering: pixelated;"></div>
+        <div class="w-12 h-7 bg-black dark:bg-white" style="image-rendering: pixelated;"></div>
         <span>inv</span>
       </a>
       <button
@@ -135,7 +135,7 @@
         <!-- Logo -->
         <div class="px-6 py-6 border-b border-gray-200 dark:border-gray-700">
           <a href="/app" class="text-lg tracking-tight font-medium dark:text-white flex items-end gap-2">
-            <div class="w-12 h-7" style="background: #F58121; image-rendering: pixelated;"></div>
+            <div class="w-12 h-7 bg-black dark:bg-white" style="image-rendering: pixelated;"></div>
             <span>inv</span>
           </a>
         </div>
@@ -281,7 +281,7 @@
     <!-- Logo -->
     <div class="px-6 py-6 border-b border-gray-200 dark:border-gray-700">
       <a href="/app" class="text-lg tracking-tight font-medium dark:text-white flex items-end gap-2">
-        <div class="w-12 h-7" style="background: #F58121; image-rendering: pixelated;"></div>
+        <div class="w-12 h-7 bg-black dark:bg-white" style="image-rendering: pixelated;"></div>
         <span>inv</span>
       </a>
     </div>

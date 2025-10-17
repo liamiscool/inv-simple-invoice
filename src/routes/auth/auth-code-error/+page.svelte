@@ -2,7 +2,7 @@
   <title>Authentication Error - inv</title>
 </svelte:head>
 
-<div class="min-h-screen flex flex-col items-center justify-center px-4">
+<div class="min-h-screen flex flex-col items-center justify-start px-4 pt-16 md:pt-20">
   <div class="w-full max-w-sm space-y-6 text-center">
     <div class="space-y-2">
       <h1 class="text-lg">Authentication Error</h1>

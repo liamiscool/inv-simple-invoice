@@ -107,7 +107,7 @@
     </a>
   </div>
 
-  <div class="flex-1 flex items-center justify-center">
+  <div class="flex-1 flex items-start md:items-center justify-center pt-8 md:pt-16">
     <div class="w-full max-w-sm space-y-8">
       <!-- Header -->
       <div class="text-center space-y-3">

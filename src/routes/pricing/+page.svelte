@@ -22,13 +22,13 @@
   }
 </script>
 
-<div class="h-screen flex flex-col relative overflow-hidden dark:bg-dark-bg font-mono">
+<div class="min-h-screen flex flex-col relative overflow-hidden dark:bg-dark-bg font-mono">
   <!-- Header - Same as homepage -->
-  <header class="border-b border-gray-200 dark:border-gray-800 px-8 py-3 bg-white/10 dark:bg-black/10" style="backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);">
+  <header class="fixed top-0 left-0 right-0 z-20 border-b border-gray-200 dark:border-gray-800 px-8 py-3 bg-white/10 dark:bg-black/10" style="backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);">
     <div class="w-full flex items-center justify-between">
       <div class="flex items-center gap-6">
         <a href="/" class="text-lg tracking-tight font-medium dark:text-white flex items-end gap-2">
-          <div class="w-12 h-7" style="background: #F58121; image-rendering: pixelated;"></div>
+          <div class="w-12 h-7 bg-black dark:bg-white" style="image-rendering: pixelated;"></div>
           <span>inv</span>
         </a>
         <a href="/pricing" class="text-sm hover:text-black dark:hover:text-white transition-colors text-gray-600 dark:text-gray-400">Pricing</a>
@@ -46,9 +46,9 @@
   </header>
 
   <!-- Main Content -->
-  <main class="flex-1 px-4 py-12 overflow-hidden flex items-center justify-center dark:bg-dark-bg">
+  <main class="flex-1 px-4 py-8 md:py-12 pt-16 md:pt-20 flex items-start md:items-center justify-center dark:bg-dark-bg">
     <div class="max-w-4xl mx-auto w-full">
-      <div class="text-center mb-12">
+      <div class="text-center mb-8 md:mb-12">
         <h1 class="text-4xl md:text-5xl font-light tracking-tight leading-tight mb-4 dark:text-white">
           Simple pricing
         </h1>
@@ -57,9 +57,9 @@
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-3xl mx-auto">
         <!-- Free tier -->
-        <div class="border border-thin dark:border-gray-700 rounded-sm p-8 space-y-6">
+        <div class="border border-thin dark:border-gray-700 rounded-sm p-6 md:p-8 space-y-6">
           <div>
             <h2 class="text-2xl font-semibold mb-2 dark:text-white">Free</h2>
             <div class="text-4xl font-light mb-4 dark:text-white">$0</div>
@@ -94,7 +94,7 @@
         </div>
 
         <!-- Pro tier -->
-        <div class="border-2 border-black dark:border-white rounded-sm p-8 space-y-6 relative">
+        <div class="border-2 border-black dark:border-white rounded-sm p-6 md:p-8 space-y-6 relative">
           <div class="absolute -top-3 right-6 bg-black dark:bg-white text-white dark:text-black px-3 py-1 text-xs font-medium">
             POPULAR
           </div>
