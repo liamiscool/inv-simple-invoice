@@ -38,20 +38,29 @@ async function launchBrowser(browserBinding?: Fetcher) {
     return await cloudflare.default.launch(browserBinding);
   } else {
     // Development: Use local Puppeteer
+    // Use string-based import to prevent bundler from analyzing it
     console.log('📄 Using local Puppeteer (development)');
-    const puppeteer = await import('puppeteer');
-    return await puppeteer.default.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process'
-      ]
-    });
+    try {
+      const puppeteerModule = 'puppeteer';
+      const puppeteer = await import(/* @vite-ignore */ puppeteerModule);
+      return await puppeteer.default.launch({
+        headless: true,
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-gpu',
+          '--no-first-run',
+          '--no-zygote',
+          '--single-process'
+        ]
+      });
+    } catch (e) {
+      throw new Error(
+        'PDF generation requires Puppeteer which is not available in this environment. ' +
+        'Please ensure the BROWSER binding is configured for Cloudflare Browser Rendering API.'
+      );
+    }
   }
 }
 
